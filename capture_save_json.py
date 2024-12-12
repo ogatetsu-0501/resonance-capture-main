@@ -8,7 +8,7 @@ class Capture:
         # 保存先のフォルダを定義
         self.output_dir = "pack"
         self.json_file = "HomeGoodsQuotationFactory_translated.json"
-        self.output_csv = "output.csv"
+        self.factory_json_file = "HomeGoodsFactory.json"
         # 保存先フォルダが存在しない場合は作成
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -56,23 +56,25 @@ class Capture:
             # HomeGoodsQuotationFactory_translated.json をロード
             reference_data = self.load_json_file(self.json_file)
 
+            # HomeGoodsFactory.json をロード
+            factory_data = self.load_json_file(self.factory_json_file)
+
             # データ処理
             results = []
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            date_str = datetime.now().strftime("%Y-%m-%d")
 
             user_info = response_data.get("user_info", {})
             uid = user_info.get("uid")
-
-            # UIDリストを作成
-            allowed_uids = ["9910460194", "1234567890", "9876543210"]  # 許可されたUIDをリストで定義
-
-            # UIDがリストに含まれていない場合は処理をスキップ
-            if uid not in allowed_uids:
-                print(f"UID {uid} は許可されていません。処理をスキップします。")
+            
+            # UIDが9910460194でない場合は処理をスキップ
+            if uid != "9910460194":
+                print("対象のUIDではありませんでした。")
                 return
 
             goods_price = response_data.get("goods_price", {})
             
+            city_counter = {}
             for price_type in ["sell_price", "buy_price"]:
                 price_data = goods_price.get(price_type, {})
                 for id_key, price_info in price_data.items():
@@ -90,34 +92,60 @@ class Capture:
 
                     if reference_item:
                         idCN = reference_item.get("idCN", "").split("/")
+                        goods_id = reference_item.get("goodsId")
+                        num = reference_item.get("num")  # 販売個数を取得
+
+                        # HomeGoodsFactory.json から特産品情報を検索
+                        speciality = "通常品"
+                        if goods_id:
+                            factory_item = next(
+                                (item for item in factory_data if item.get("id") == goods_id),
+                                None
+                            )
+                            if factory_item:
+                                speciality = "特産品" if factory_item.get("isSpeciality") else "通常品"
+
+                        # idCNを分解して情報を追加
                         if len(idCN) >= 3:
                             city, transaction_type, product_name = idCN[:3]
+                            city_counter[city] = city_counter.get(city, 0) + 1
                             results.append({
                                 "都市名": city,
                                 "売りor買い": transaction_type,
                                 "商品名": product_name,
                                 "値段": price_info.get("price"),
                                 "傾向": price_info.get("trend"),
+                                "倍率": price_info.get("quota"),  # 倍率を追加
+                                "販売個数": num,  # 販売個数を追加
+                                "特産品": speciality,  # 特産品を追加
                                 "更新時間": timestamp
                             })
                     else:
                         print(f"ID {id_key} に対応するアイテムが見つかりませんでした")
 
+            # 都市名でデータをフィルタリング
+            if city_counter:
+                primary_city = max(city_counter, key=city_counter.get)  # データ数が多い都市名を選択
+                results = [row for row in results if row["都市名"] == primary_city]
+
             # 結果をCSVに保存
-            self.save_to_csv(results)
+            self.save_to_csv(results, primary_city, date_str)
 
         except Exception as e:
             print(f"CSV出力処理でエラーが発生しました: {e}")
 
-
-    def save_to_csv(self, data):
-        """データをCSV形式で保存"""
-        fieldnames = ["都市名", "売りor買い", "商品名", "値段", "傾向", "更新時間"]
-        with open(self.output_csv, "w", newline="", encoding="utf-8") as csvfile:
+    def save_to_csv(self, data, city, date_str):
+        """データをCSV形式で追記または新規保存"""
+        fieldnames = ["都市名", "売りor買い", "商品名", "値段", "傾向", "倍率", "販売個数", "特産品", "更新時間"]
+        output_csv = os.path.join(self.output_dir, f"output_{city}_{date_str}.csv")
+        file_exists = os.path.exists(output_csv)
+        
+        with open(output_csv, "a", newline="", encoding="utf-8") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
+            if not file_exists:
+                writer.writeheader()  # ファイルが存在しない場合はヘッダーを追加
             writer.writerows(data)
-        print(f"{self.output_csv} にデータを保存しました")
+        print(f"{output_csv} にデータを保存しました")
 
 
 # mitmproxyのアドオンとして登録
