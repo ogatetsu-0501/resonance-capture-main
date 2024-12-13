@@ -6,12 +6,12 @@ from datetime import datetime
 class Capture:
     def __init__(self):
         # 保存先のフォルダを定義
-        self.output_dir = "pack"
+        self.base_dir = "価格"  # ベースフォルダ名を変更
         self.json_file = "HomeGoodsQuotationFactory_translated.json"
         self.factory_json_file = "HomeGoodsFactory.json"
         # 保存先フォルダが存在しない場合は作成
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+        if not os.path.exists(self.base_dir):
+            os.makedirs(self.base_dir)
 
     def response(self, flow):
         """
@@ -25,7 +25,7 @@ class Capture:
         if flow.request.url.startswith(target_url) and target_method in flow.request.content.decode("utf-8"):
             try:
                 # 保存先のファイル名を生成
-                output_file = os.path.join(self.output_dir, "raw_response.bin")
+                output_file = os.path.join(self.base_dir, "raw_response.bin")
                 
                 # レスポンスデータをそのまま保存
                 with open(output_file, "wb") as f:
@@ -137,7 +137,11 @@ class Capture:
     def save_to_csv(self, data, city, date_str):
         """データをCSV形式で追記または新規保存"""
         fieldnames = ["都市名", "売りor買い", "商品名", "値段", "傾向", "倍率", "販売個数", "特産品", "更新時間"]
-        output_csv = os.path.join(self.output_dir, f"output_{city}_{date_str}.csv")
+        city_dir = os.path.join(self.base_dir, city)  # 都市ごとのフォルダ
+        if not os.path.exists(city_dir):
+            os.makedirs(city_dir)  # 都市フォルダがない場合は作成
+
+        output_csv = os.path.join(city_dir, f"output_{date_str}.csv")
         file_exists = os.path.exists(output_csv)
         
         with open(output_csv, "a", newline="", encoding="utf-8") as csvfile:
