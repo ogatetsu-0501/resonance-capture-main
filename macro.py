@@ -1,12 +1,12 @@
 import os
 from ppadb.client import Client as AdbClient
 import time
-import itertools
 from datetime import datetime
 import pandas as pd
+import json
 
 # ADBツールのパスを環境変数に追加
-ADB_PATH = r"C:\Program Files\Netease\MuMuPlayerGlobal-12.0\shell"
+ADB_PATH = r"C:\\Program Files\\Netease\\MuMuPlayerGlobal-12.0\\shell"
 os.environ["PATH"] += os.pathsep + ADB_PATH
 
 # ADBクライアントの初期化
@@ -31,71 +31,83 @@ if not device:
 
 print(f"Connected to device: {device.serial}")
 
+# 共通待機時間 (秒)
+WAIT_TIME = 1
+
 # タップ操作（指定座標をタップ）
 def tap(x, y):
     command = f"input tap {x} {y}"
     device.shell(command)
     print(f"Tapped at ({x}, {y})")
+    time.sleep(WAIT_TIME)  # 共通待機時間
 
 # テキスト入力（文字列を入力）
 def send_text(text):
     command = f"input text '{text}'"
     device.shell(command)
     print(f"Text input: {text}")
+    time.sleep(WAIT_TIME)  # 共通待機時間
 
 # キーイベント送信（仮想キーを押す）
 def press_key(key_code):
     command = f"input keyevent {key_code}"
     device.shell(command)
     print(f"Key pressed: {key_code}")
+    time.sleep(WAIT_TIME)  # 共通待機時間
 
-# 入力①の値をループ毎に変えるための配列
-input1_loops = ["入力①_1A", "入力①_1B", "入力①_1C"]
+# 連携処理の関数
+def execute_linkage(link_codes, password):
+    print(f"Starting linkage process at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
-# 操作を1回分実行する関数
-def execute_once():
-    print(f"Execution started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    for input1_value in input1_loops:
-        # 最初の3回タップ
-        tap(1411, 620)
-        tap(1451, 440)
-        tap(1045, 407)
+    for link_code in link_codes:
+        print(f"Processing linkage with code: {link_code}")
+        # 各座標に基づいて操作
+        tap(1350, 50)  # 連携ボタン
+        tap(818, 344)  # 連携コード入力欄
+        send_text(link_code)  # 連携コード入力
+        tap(1516, 844)  # 入力確定
+        tap(789, 449)  # 連携パスワード入力欄
+        send_text(password)  # 連携パスワード入力
+        tap(1516, 844)  # 入力確定
+        tap(973, 655)  # 連携確定
+        tap(804, 551)  # 連携完了
+        tap(804, 551)  # ゲームイン
+        time.sleep(5)
+        tap(912, 63)  # ログイン受け取り
+        tap(912, 63)  # ログイン受け取り
+        tap(912, 63)  # ログイン受け取り
+        tap(912, 63)  # ログイン受け取り
+        tap(912, 63)  # ログイン受け取り
+        
+    print("Linkage process completed.")
 
-        # 次の3回タップ
-        tap(250, 43)
-        tap(50, 822)
-        tap(1161, 629)
+# 取引処理の関数
+def execute_trade(trade_coords):
+    print(f"Starting trade process at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    
+    tap(1461, 620)  # 街に行く
+    time.sleep(3)
+    for coord in trade_coords:
+        tap(coord[0], coord[1])  # 取引所操作（仮座標）
+    time.sleep(3)
+    tap(1150,398) # 購入
+    time.sleep(3)
+    tap(98, 50)  # 戻る
+    tap(98, 50)  # 戻る
+    tap(98, 50)  # 戻る
 
-        # 次の3回タップ
-        tap(1340, 50)
-        tap(825, 349)
-        tap(845, 839)
+    print("Trade process completed.")
 
-        # 入力①（1つの値を入力）
-        print(f"Processing input①: {input1_value}")
-        send_text(input1_value)
-        press_key(66)  # Enterキー
-
-        # タップ1回
-        tap(1530, 843)
-
-        # 次の2回タップ
-        tap(730, 443)
-        tap(454, 856)
-
-        # 入力②（指定された文字列を入力）
-        input2_value = "12345qwert"
-        send_text(input2_value)
-        press_key(66)  # Enterキー
-
-        # 次の3回タップ
-        tap(152, 839)
-        tap(976, 662)
-        tap(807, 537)
-
-        # 最後のタップ
-        tap(776, 562)
-    print(f"Execution completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+# ログアウト処理の関数
+def execute_logout():
+    print(f"Starting logout process at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    time.sleep(3)
+    tap(194, 836)  # アイコンを押す
+    time.sleep(3)
+    tap(55, 821)  # ログアウト
+    tap(1176, 630)  # ログアウト確認
+    time.sleep(5)
+    print("Logout process completed.")
 
 # 消費疲労値の読み込み
 def load_consumption_fatigue():
@@ -110,7 +122,26 @@ def get_latest_file(folder_path):
     files = [f for f in os.listdir(folder_path) if f.endswith(".csv")]
     if not files:
         return None
-    latest_file = max(files, key=lambda x: datetime.strptime(x.split("_")[1].replace(".csv", ""), "%Y-%m-%d_%H-%M-%S"))
+
+    def extract_timestamp(filename):
+        try:
+            # ファイル名のタイムスタンプを正確に抽出
+            timestamp_part = filename.split("_")[1] + "_" + filename.split("_")[2].replace(".csv", "")
+            return datetime.strptime(timestamp_part, "%Y-%m-%d_%H-%M-%S")
+        except Exception as e:
+            print(f"ファイル名の解析中にエラーが発生しました: {e}")
+            return None
+
+    # タイムスタンプが有効なファイルのみフィルタリング
+    valid_files = [(f, extract_timestamp(f)) for f in files]
+    valid_files = [(f, ts) for f, ts in valid_files if ts is not None]
+
+    if not valid_files:
+        print("有効なタイムスタンプを持つファイルが見つかりませんでした。")
+        return None
+
+    # 最新のタイムスタンプを持つファイルを選択
+    latest_file = max(valid_files, key=lambda x: x[1])[0]
     return os.path.join(folder_path, latest_file)
 
 # 都市フォルダ内の最新データを取得
@@ -122,13 +153,14 @@ def get_latest_city_data():
         if os.path.isdir(city_folder):
             latest_file = get_latest_file(city_folder)
             if latest_file:
+                print(f"都市: {city_name}, 最新ファイル: {latest_file}")
                 city_data[city_name] = pd.read_csv(latest_file)
     return city_data
 
 # 利益計算
 def calculate_profits():
     data_folder = "価格"
-    transaction_history_file = "TransactionHistory.csv"
+    transaction_history_file = "TransactionHistory.json"  # JSONファイルに変更
 
     # 最新データの取得
     city_data = get_latest_city_data()
@@ -150,55 +182,92 @@ def calculate_profits():
             # 利益計算
             merged_data["利益"] = (merged_data["値段_sell"] - merged_data["値段_buy"]) * merged_data["販売個数_buy"]
             profitable_data = merged_data[merged_data["利益"] > 0]
-            total_profit = profitable_data["利益"].sum()
 
-            if total_profit > 0:
+            # 商品データを新しい形式で作成
+            items_buy = profitable_data.apply(lambda row: {
+                "商品名": row["商品名"],
+                "購入数": int(row["販売個数_buy"]),  # int型に変換
+                "買値": int(row["値段_buy"]),  # int型に変換
+                "売値": int(row["値段_sell"])  # int型に変換
+            }, axis=1).tolist()
+
+            # 合計購入個数の計算
+            total_buy_quantity = int(profitable_data["販売個数_buy"].sum())  # int型に変換
+
+            if not profitable_data.empty:
+                total_profit = int(profitable_data["利益"].sum())  # int型に変換
+
                 # 消費疲労値の取得
                 fatigue_value = fatigue_data.get(buy_city, {}).get(sell_city, 500)
 
                 # 疲労度毎利益
                 fatigue_adjusted_profit = total_profit / fatigue_value
-                results.append((buy_city, sell_city, fatigue_adjusted_profit))
+                results.append({
+                    "買い都市": buy_city,
+                    "売り都市": sell_city,
+                    "疲労度毎利益": fatigue_adjusted_profit,
+                    "都市1合計購入個数": total_buy_quantity,
+                    "都市1購入品": items_buy
+                })
 
     # 往復利益計算
     final_results = []
-    for buy_city, sell_city, profit1 in results:
-        for sell_city2, buy_city2, profit2 in results:
-            if buy_city == sell_city2 and sell_city == buy_city2:
-                avg_profit = (profit1 + profit2) / 2
-                final_results.append((buy_city, sell_city, avg_profit))
+    for buy_entry in results:
+        for sell_entry in results:
+            if (buy_entry["買い都市"] == sell_entry["売り都市"]
+                    and buy_entry["売り都市"] == sell_entry["買い都市"]):
+                avg_profit = (buy_entry["疲労度毎利益"] + sell_entry["疲労度毎利益"]) / 2
+                total_buy_quantity_2 = sum(item["購入数"] for item in sell_entry["都市1購入品"])
+                final_results.append({
+                    "計算日時": datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+                    "都市1": buy_entry["買い都市"],
+                    "都市2": buy_entry["売り都市"],
+                    "疲労度毎利益": avg_profit,
+                    "都市1合計購入個数": buy_entry["都市1合計購入個数"],
+                    "都市2合計購入個数": total_buy_quantity_2,
+                    "都市1購入品": buy_entry["都市1購入品"],
+                    "都市2購入品": sell_entry["都市1購入品"]
+                })
 
     # 並び替えと上位3位の抽出
-    final_results.sort(key=lambda x: x[2], reverse=True)
+    final_results.sort(key=lambda x: x["疲労度毎利益"], reverse=True)
     top_3 = final_results[:3]
 
-    # 結果をTransactionHistory.csvに書き込み
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    history_data = pd.DataFrame(top_3, columns=["買い都市名", "売り都市名", "疲労度毎利益"])
-    history_data.insert(0, "計算日時", now)
+    # 結果をTransactionHistory.jsonに書き込み
+    with open(transaction_history_file, "w", encoding="utf-8") as json_file:
+        json.dump(top_3, json_file, ensure_ascii=False, indent=4)
 
-    if os.path.exists(transaction_history_file):
-        existing_data = pd.read_csv(transaction_history_file)
-        history_data = pd.concat([existing_data, history_data], ignore_index=True)
+    print("TransactionHistory.json updated.")
 
-    history_data.to_csv(transaction_history_file, index=False)
-    print("TransactionHistory.csv updated.")
+# メイン処理
+if __name__ == "__main__":
+    while True:  # 無限ループを開始
+        # 連携コードと取引座標のリスト
+        linkage_data = [
+            ("Re733761K103494q", (810, 190)),
+            ("Rq733832C901737e", (1242, 256)),
+            ("Pq733841m008770I", (1425, 432)),
+            ("Qx734105j098469X", (147, 513)),
+            ("nQ733931N031265t", (808, 370)),
+            ("Qx734105j098469X", (147, 513)),
+            ("Vh734185C444443y", (690, 315))
+        ]
+        test_password = "12345qwert"  # 仮の連携パスワード
 
-# メインループ
-print("Waiting for the next 10-minute mark...")
-while True:
-    # 現在の時間を取得
-    now = datetime.now()
-    # 現在の時間が10分の倍数か確認
-    if now.minute % 10 == 0 and now.second == 0:
-        execute_once()
-        print("Waiting for the next 10-minute mark...")
-        time.sleep(60)  # 1分待機して次の10分間隔を防ぐ
+        for link_code, trade_coord in linkage_data:
+            # 連携処理
+            execute_linkage([link_code], test_password)  # 指定された連携コードで連携を実行
+
+            # 取引処理
+            execute_trade([trade_coord])  # 指定された座標で取引を実行
+
+            # ログアウト処理
+            execute_logout()  # ログアウトを実行
 
         # 利益計算処理の実行
-        print("Starting data processing...")
-        calculate_profits()
-        print("Data processing completed.")
+        print("Starting data processing...")  # データ処理の開始を通知
+        calculate_profits()  # 利益計算処理を実行
+        print("Data processing completed.")  # データ処理の完了を通知
 
-    else:
-        time.sleep(1)  # 毎秒確認
+        print("All processes completed successfully.")  # 全処理の完了を通知
+

@@ -67,10 +67,6 @@ class Capture:
             user_info = response_data.get("user_info", {})
             uid = user_info.get("uid")
             
-            # UIDが9910460194でない場合は処理をスキップ
-            if uid != "9910460194":
-                print("対象のUIDではありませんでした。")
-                return
 
             goods_price = response_data.get("goods_price", {})
             
@@ -108,10 +104,14 @@ class Capture:
                         # idCNを分解して情報を追加
                         if len(idCN) >= 3:
                             city, transaction_type, product_name = idCN[:3]
+                            
+                            # "売り"または"買い"をprice_typeで設定
+                            transaction_type = "買い" if price_type == "sell_price" else "売り"
+                            
                             city_counter[city] = city_counter.get(city, 0) + 1
                             results.append({
                                 "都市名": city,
-                                "売りor買い": transaction_type,
+                                "売りor買い": transaction_type,  # 修正点：price_typeに基づき正確に設定
                                 "商品名": product_name,
                                 "値段": price_info.get("price"),
                                 "傾向": price_info.get("trend"),
@@ -122,6 +122,7 @@ class Capture:
                             })
                     else:
                         print(f"ID {id_key} に対応するアイテムが見つかりませんでした")
+
 
             # 都市名でデータをフィルタリング
             if city_counter:
@@ -141,15 +142,18 @@ class Capture:
         if not os.path.exists(city_dir):
             os.makedirs(city_dir)  # 都市フォルダがない場合は作成
 
-        output_csv = os.path.join(city_dir, f"output_{date_str}.csv")
+        # タイムスタンプ形式のファイル名を生成
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_csv = os.path.join(city_dir, f"output_{timestamp}.csv")
         file_exists = os.path.exists(output_csv)
-        
+
         with open(output_csv, "a", newline="", encoding="utf-8") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             if not file_exists:
                 writer.writeheader()  # ファイルが存在しない場合はヘッダーを追加
             writer.writerows(data)
         print(f"{output_csv} にデータを保存しました")
+
 
 
 # mitmproxyのアドオンとして登録
