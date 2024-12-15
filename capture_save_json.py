@@ -62,29 +62,22 @@ class Capture:
             # データ処理
             results = []
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            date_str = datetime.now().strftime("%Y-%m-%d")
-
-            user_info = response_data.get("user_info", {})
-            uid = user_info.get("uid")
-            
 
             goods_price = response_data.get("goods_price", {})
-            
             city_counter = {}
+
             for price_type in ["sell_price", "buy_price"]:
                 price_data = goods_price.get(price_type, {})
                 for id_key, price_info in price_data.items():
-                    print(f"現在処理中のID: {id_key}")
-                    
                     try:
-                        # リスト内で該当する ID を検索 (整数として比較)
+                        # リスト内で該当する ID を検索
                         reference_item = next(
                             (item for item in reference_data if int(item.get("id", 0)) == int(id_key)),
                             None
                         )
                     except ValueError as e:
                         print(f"IDの比較中にエラーが発生しました: {e}")
-                        continue  # エラー発生時は次のループに進む
+                        continue
 
                     if reference_item:
                         idCN = reference_item.get("idCN", "").split("/")
@@ -101,59 +94,53 @@ class Capture:
                             if factory_item:
                                 speciality = "特産品" if factory_item.get("isSpeciality") else "通常品"
 
-                        # idCNを分解して情報を追加
                         if len(idCN) >= 3:
                             city, transaction_type, product_name = idCN[:3]
-                            
-                            # "売り"または"買い"をprice_typeで設定
+
+                            # 都市名が「（废弃）」の場合はデータをスキップ
+                            if city == "（废弃）":
+                                print(f"廃棄データをスキップしました: ID {id_key}, 都市名 {city}")
+                                continue
+
                             transaction_type = "買い" if price_type == "sell_price" else "売り"
-                            
+
                             city_counter[city] = city_counter.get(city, 0) + 1
                             results.append({
                                 "都市名": city,
-                                "売りor買い": transaction_type,  # 修正点：price_typeに基づき正確に設定
+                                "売りor買い": transaction_type,
                                 "商品名": product_name,
                                 "値段": price_info.get("price"),
                                 "傾向": price_info.get("trend"),
-                                "倍率": price_info.get("quota"),  # 倍率を追加
-                                "販売個数": num,  # 販売個数を追加
-                                "特産品": speciality,  # 特産品を追加
+                                "倍率": price_info.get("quota"),
+                                "販売個数": num,
+                                "特産品": speciality,
                                 "更新時間": timestamp
                             })
-                    else:
-                        print(f"ID {id_key} に対応するアイテムが見つかりませんでした")
 
-
-            # 都市名でデータをフィルタリング
-            if city_counter:
-                primary_city = max(city_counter, key=city_counter.get)  # データ数が多い都市名を選択
-                results = [row for row in results if row["都市名"] == primary_city]
-
-            # 結果をCSVに保存
-            self.save_to_csv(results, primary_city, date_str)
+            # 都市ごとのデータをCSVに保存
+            for city in city_counter.keys():
+                city_results = [row for row in results if row["都市名"] == city]
+                self.save_to_city_csv(city_results, city)
 
         except Exception as e:
             print(f"CSV出力処理でエラーが発生しました: {e}")
 
-    def save_to_csv(self, data, city, date_str):
-        """データをCSV形式で追記または新規保存"""
+    def save_to_city_csv(self, data, city):
+        """都市ごとにデータを output.csv に追記保存"""
         fieldnames = ["都市名", "売りor買い", "商品名", "値段", "傾向", "倍率", "販売個数", "特産品", "更新時間"]
         city_dir = os.path.join(self.base_dir, city)  # 都市ごとのフォルダ
         if not os.path.exists(city_dir):
             os.makedirs(city_dir)  # 都市フォルダがない場合は作成
 
-        # タイムスタンプ形式のファイル名を生成
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        output_csv = os.path.join(city_dir, f"output_{timestamp}.csv")
-        file_exists = os.path.exists(output_csv)
+        output_csv = os.path.join(city_dir, "output.csv")  # 都市フォルダ内のoutput.csv
 
+        file_exists = os.path.exists(output_csv)
         with open(output_csv, "a", newline="", encoding="utf-8") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             if not file_exists:
                 writer.writeheader()  # ファイルが存在しない場合はヘッダーを追加
             writer.writerows(data)
         print(f"{output_csv} にデータを保存しました")
-
 
 
 # mitmproxyのアドオンとして登録
