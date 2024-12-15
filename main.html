@@ -1,46 +1,45 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>貨物積載ツール</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <h1>貨物積載ツール</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>最新CSV取得ツール</title>
+  </head>
+  <body>
+    <h1>最新CSVデータ取得</h1>
+    <button id="loadCsv">アニタエネルギーラボの最新データを読み込む</button>
 
-    <!-- 貨物積載上限入力 -->
-    <div class="accordion" id="cargo-limit">
-        <h2>貨物積載上限を入力</h2>
-        <div class="content">
-            <label for="cargoLimit">積載上限:</label>
-            <input type="number" id="cargoLimit" placeholder="例: 100">
-            <button onclick="saveCargoLimit()">保存</button>
-        </div>
-    </div>
+    <h2>結果</h2>
+    <div id="results"></div>
 
-    <!-- 都市別税率入力 -->
-    <div class="accordion" id="city-taxes">
-        <h2>都市別税率を入力</h2>
-        <div class="content">
-            <div id="cityTaxInputs">
-                <!-- 都市の税率入力が動的に追加される -->
-            </div>
-            <button onclick="saveCityTaxes()">保存</button>
-        </div>
-    </div>
+    <script>
+      document.getElementById("loadCsv").addEventListener("click", () => {
+        fetchLatestCsv("アニタエネルギーラボ");
+      });
 
-    <!-- 都市別購入個数バフ -->
-    <div class="accordion" id="city-buffs">
-        <h2>都市別購入個数バフを入力</h2>
-        <div class="content">
-            <div id="cityBuffInputs">
-                <!-- 都市のバフ入力が動的に追加される -->
-            </div>
-            <button onclick="saveCityBuffs()">保存</button>
-        </div>
-    </div>
+      async function fetchLatestCsv(town) {
+        try {
+          const response = await fetch(`/latest-csv/${town}`);
+          const data = await response.json();
 
-    <script src="script.js"></script>
-</body>
+          if (data.error) {
+            alert(data.error);
+            return;
+          }
+
+          const latestFile = data.latest_file;
+          console.log(`最新のファイル名: ${latestFile}`);
+
+          // 最新CSVファイルを取得して表示
+          const csvResponse = await fetch(`/download/${town}/${latestFile}`);
+          const csvText = await csvResponse.text();
+
+          // 結果を表示
+          document.getElementById("results").textContent = csvText;
+        } catch (error) {
+          console.error("エラー:", error);
+        }
+      }
+    </script>
+  </body>
 </html>
