@@ -1,45 +1,28 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>最新CSV取得ツール</title>
-  </head>
-  <body>
-    <h1>最新CSVデータ取得</h1>
-    <button id="loadCsv">アニタエネルギーラボの最新データを読み込む</button>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ペア表示ツール</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>ペア表示ツール</h1>
+<button id="settingsButton">設定</button> <!-- 設定ボタン追加 -->
 
-    <h2>結果</h2>
-    <div id="results"></div>
+<div id="outputContainer"></div>
 
-    <script>
-      document.getElementById("loadCsv").addEventListener("click", () => {
-        fetchLatestCsv("アニタエネルギーラボ");
-      });
+<!-- モーダルダイアログ:ユーザー設定用 -->
+<div id="settingsModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>税率設定</h2>
+    <p>各フォルダ別に新しい税率(%)を入力してください。（10%がデフォルト）</p>
+    <div id="taxSettings"></div>
+    <button id="saveSettings">保存</button>
+  </div>
+</div>
 
-      async function fetchLatestCsv(town) {
-        try {
-          const response = await fetch(`/latest-csv/${town}`);
-          const data = await response.json();
-
-          if (data.error) {
-            alert(data.error);
-            return;
-          }
-
-          const latestFile = data.latest_file;
-          console.log(`最新のファイル名: ${latestFile}`);
-
-          // 最新CSVファイルを取得して表示
-          const csvResponse = await fetch(`/download/${town}/${latestFile}`);
-          const csvText = await csvResponse.text();
-
-          // 結果を表示
-          document.getElementById("results").textContent = csvText;
-        } catch (error) {
-          console.error("エラー:", error);
-        }
-      }
-    </script>
-  </body>
+<script src="script.js"></script>
+</body>
 </html>
