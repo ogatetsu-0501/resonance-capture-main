@@ -10,13 +10,12 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   const allData = [];
-  // 設定読み込み
   const storedSettings = JSON.parse(
     localStorage.getItem("userSettings") || "{}"
   );
   const defaultFolderTax = 10;
   const defaultFolderQty = 0;
-  const defaultFolderSpec = 0; // フォルダ特産品倍率デフォルト0%
+  const defaultFolderSpec = 0;
   let folderSettings = {};
   folders.forEach((f) => {
     folderSettings[f] = {
@@ -48,9 +47,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const promises = folders.map((folderName) => {
     const csvUrl = `価格/${folderName}/output.csv`;
     return fetch(csvUrl)
-      .then((response) => {
-        if (!response.ok) throw new Error(`${csvUrl}取得失敗`);
-        return response.text();
+      .then((res) => {
+        if (!res.ok) throw new Error(`${csvUrl}取得失敗`);
+        return res.text();
       })
       .then((data) => {
         const lines = data.split("\n");
@@ -119,16 +118,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const trendIndex = headers.indexOf("傾向");
         const multiIndex = headers.indexOf("倍率");
         const qtyIndex = headers.indexOf("販売個数");
-        const specialIndex = headers.indexOf("特産品"); // 特産品列
+        const specialIndex = headers.indexOf("特産品");
 
-        // 商品は「買いデータ」に出現するもののみ対象
+        // 買いデータに登場する商品のみ対象
         allData.forEach((d) => {
           d.buyRows.forEach((r) => {
             allProductsSet.add(r[pIndex]);
           });
         });
         const allProducts = Array.from(allProductsSet);
-        // productSettingsにない商品は初期値設定
         allProducts.forEach((prod) => {
           if (!productSettings[prod]) {
             productSettings[prod] = { taxAdjust: 0, qtyAdjust: 0 };
@@ -146,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const columns = [
           { key: "productName", name: "商品名", numeric: false },
           { key: "profit", name: "利益", numeric: true },
-          { key: "quantityA", name: "販売個数", numeric: true },
+          { key: "displayQtyA", name: "販売個数", numeric: true },
           { key: "priceA", name: "買い値段", numeric: true },
           { key: "priceB", name: "売り値段", numeric: true },
           { key: "trendA", name: "買い傾向", numeric: false },
@@ -167,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
         function recalcQuantity(origQty, folderName, productName, isSpecial) {
           const folderQ = folderSettings[folderName].qty;
           const productQ = productSettings[productName].qtyAdjust || 0;
-          const folderSpec = folderSettings[folderName].spec; // 特産品倍率%
+          const folderSpec = folderSettings[folderName].spec;
           let total = folderQ + productQ;
           if (isSpecial === "特産品") {
             total += folderSpec;
@@ -192,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const trendA = r[trendIndex];
                 const multiplierA = parseFloat(r[multiIndex]);
                 const origQtyA = parseFloat(r[qtyIndex]);
-                const isSpecial = r[specialIndex]; // "特産品" or "通常品"等
+                const isSpecial = r[specialIndex];
                 buyMapA[productName] = {
                   origPriceA,
                   trendA,
@@ -211,9 +209,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 sellMapB[productName] = { origPriceB, trendB, multiplierB };
               });
 
-              const comparisonRows = [];
-              let fatigueValueCommon = 1;
               const itemsForCapCalc = [];
+              let fatigueValueCommon = 1;
 
               for (const productName in buyMapA) {
                 if (sellMapB[productName]) {
@@ -234,14 +231,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     productName
                   );
 
-                  const adjQtyA = Math.floor(
-                    recalcQuantity(
-                      buyMapA[productName].origQtyA,
-                      dataA.folderName,
-                      productName,
-                      buyMapA[productName].isSpecial
-                    )
+                  const adjQtyA = recalcQuantity(
+                    buyMapA[productName].origQtyA,
+                    dataA.folderName,
+                    productName,
+                    buyMapA[productName].isSpecial
                   );
+                  const displayQtyA = Math.floor(adjQtyA);
 
                   const originalProfit = priceB - priceA;
                   const profitForCalc = originalProfit < 0 ? 0 : originalProfit;
@@ -254,7 +250,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     priceB,
                     trendB: sellMapB[productName].trendB,
                     multiplierB: sellMapB[productName].multiplierB,
-                    quantityA: adjQtyA,
+                    displayQtyA,
+                    // 一旦quantityAはdisplayQtyAで初期化
+                    quantityA: displayQtyA,
                     profit: originalProfit,
                     profitForCalc,
                     fatigue: fVal,
@@ -266,24 +264,31 @@ document.addEventListener("DOMContentLoaded", function () {
               itemsForCapCalc.sort((a, b) => b.profitForCalc - a.profitForCalc);
               let remain = capacity;
               let totalProfitTimesQuantity = 0;
+              // 全商品表示のためfinalRows=itemsForCapCalcを加工
+              const finalRows = [];
+
               for (const item of itemsForCapCalc) {
-                if (remain <= 0) break;
                 let usedQty = item.quantityA;
-                if (usedQty > remain) usedQty = remain;
-                remain -= usedQty;
-                totalProfitTimesQuantity +=
-                  usedQty * (item.profit < 0 ? 0 : item.profit);
-                comparisonRows.push({ ...item, quantityA: usedQty });
+                if (remain <= 0) {
+                  usedQty = 0;
+                } else {
+                  if (usedQty > remain) usedQty = remain;
+                  remain -= usedQty;
+                  totalProfitTimesQuantity +=
+                    usedQty * (item.profit < 0 ? 0 : item.profit);
+                }
+                // 全アイテムをfinalRowsに投入
+                finalRows.push({ ...item, quantityA: usedQty });
               }
 
-              if (comparisonRows.length > 0) {
+              if (finalRows.length > 0) {
                 const sumRatio = totalProfitTimesQuantity / fatigueValueCommon;
                 resultSets.push({
                   aFolderName: dataA.folderName,
                   bFolderName: dataB.folderName,
                   fatigueVal: fatigueValueCommon,
                   sumRatio: sumRatio,
-                  rows: comparisonRows,
+                  rows: finalRows,
                 });
               }
             }
@@ -382,14 +387,16 @@ document.addEventListener("DOMContentLoaded", function () {
             cardDiv.className = "pair-card";
             outputContainer.appendChild(cardDiv);
 
+            // 往復表示
             const cardTitle = document.createElement("h2");
-            cardTitle.textContent = `${folder1} ↔ ${folder2}(平均販売個数×利益/消費疲労値: ${card.avgRatio})`;
+            cardTitle.textContent = `${folder1} ↔ ${folder2}(購入個数×利益/消費疲労値(往復): ${card.avgRatio})`;
             cardDiv.appendChild(cardTitle);
 
+            // 片道表示
             {
               const set = card.AtoB;
               const subtitle = document.createElement("h3");
-              subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 販売個数×利益/消費疲労値: ${set.sumRatio}`;
+              subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
               cardDiv.appendChild(subtitle);
               const tableContainer = document.createElement("div");
               cardDiv.appendChild(tableContainer);
@@ -398,7 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
             {
               const set = card.BtoA;
               const subtitle = document.createElement("h3");
-              subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 販売個数×利益/消費疲労値: ${set.sumRatio}`;
+              subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
               cardDiv.appendChild(subtitle);
               const tableContainer = document.createElement("div");
               cardDiv.appendChild(tableContainer);
@@ -407,7 +414,6 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
 
-        // 初回描画
         recalculateAndRender();
 
         // 設定モーダル
