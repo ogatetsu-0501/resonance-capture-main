@@ -8,17 +8,20 @@
 </head>
 <body>
 <h1>ペア表示ツール</h1>
-<button id="settingsButton">設定</button> <!-- 設定ボタン追加 -->
-
+<button id="settingsButton">設定</button>
 <div id="outputContainer"></div>
 
-<!-- モーダルダイアログ:ユーザー設定用 -->
 <div id="settingsModal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
-    <h2>税率設定</h2>
-    <p>各フォルダ別に新しい税率(%)を入力してください。（10%がデフォルト）</p>
-    <div id="taxSettings"></div>
+    <h2>設定</h2>
+    <p>フォルダ別税率・販売個数倍率・特産品倍率、積載上限、商品別軽減率などを設定してください。</p>
+    <h3>フォルダ別設定</h3>
+    <div id="folderSettings"></div>
+    <h3>全体設定</h3>
+    <label>積載上限: <input type="number" id="capacityInput" min="1" value="1000"></label>
+    <h3>商品別設定（買いデータに存在する商品のみ）</h3>
+    <div id="productSettings"></div>
     <button id="saveSettings">保存</button>
   </div>
 </div>
