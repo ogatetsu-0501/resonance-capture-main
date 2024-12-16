@@ -6,99 +6,128 @@ import pandas as pd
 import json
 import subprocess
 
-# ADBツールのパスを環境変数に追加
+# 小学生でもわかるように、全ての行にコメントを付けます。
+# ADBツールのパスを環境変数に追加する(コンピュータがADBを見つけられるようにする)
 ADB_PATH = r"C:\\Program Files\\Netease\\MuMuPlayerGlobal-12.0\\shell"
-os.environ["PATH"] += os.pathsep + ADB_PATH
+os.environ["PATH"] += os.pathsep + ADB_PATH  # PATHにADBの場所を追加する
 
-# ADBクライアントの初期化
-client = AdbClient(host="127.0.0.1", port=5037)
+# ADBサービスを再起動する関数(ADBが動かないとき直すため)
+def restart_adb_service():
+    # ADBを一旦止めるコマンドを実行する(ADBが動いていてもリセットする)
+    subprocess.run([r"C:\\Program Files\\Netease\\MuMuPlayerGlobal-12.0\\shell\\adb.exe", "kill-server"])
+    # ADBを起動するコマンドを実行する(ADBを再スタートさせる)
+    subprocess.run([r"C:\\Program Files\\Netease\\MuMuPlayerGlobal-12.0\\shell\\adb.exe", "start-server"])
+    time.sleep(3)  # 少し待ってADBが安定して起動するのを待つ
 
-# MuMu Playerの再起動関数
+# ADBクライアントの初期化(スマホやエミュレータに接続するためのお手伝い)
+restart_adb_service()  # ADBサービスを再起動しておく
+client = AdbClient(host="127.0.0.1", port=5037)  # ADBクライアントを作る
+
+# MuMu Playerを再起動する関数
 def restart_mumu_player():
+    # MuMu Playerを再起動するよ
     print("Restarting MuMu Player...")
     try:
-        subprocess.run(["taskkill", "/IM", "MuMuPlayer.exe", "/F"], check=True)
-        time.sleep(5)  # 確実に終了するまで待機
+        # MuMuPlayer.exeを強制終了する(一旦止める)
+        # もしMuMuPlayer.exeが見つからなかったとしてもエラーを無視して次へ進むようにする(check=False)
+        subprocess.run(["taskkill", "/IM", "MuMuPlayer.exe", "/F"], check=False)
+        time.sleep(5)  # ちゃんと止まったかもしれないのでちょっと待つ
+        # MuMu Playerを起動する(また動かす)
         subprocess.Popen([r"C:\\Program Files\\Netease\\MuMuPlayerGlobal-12.0\\shell\\MuMuPlayer.exe"])
-        time.sleep(30)  # 起動完了まで待機
+        time.sleep(30)  # 起動が終わるまで待つ
+        # ADBを使ってMuMu Playerとつなげる（リモート接続）
         client.remote_connect("127.0.0.1", 7555)
         print("MuMu Player restarted and reconnected successfully.")
     except subprocess.CalledProcessError as e:
+        # MuMuPlayer.exeを終了できなかった場合のエラー
         print(f"Failed to restart MuMu Player: {e.output}")
         exit()
     except Exception as e:
+        # それ以外の予期しないエラーが起きたとき
         print(f"Unexpected error while restarting MuMu Player: {e}")
         exit()
 
-# ゲームを起動する処理
+# ゲームを起動する関数
 def start_game(device):
+    # ゲームを起動する
     print("Starting game...")
     try:
-        tap(device, 248, 668)  # ゲームアイコンをタップ
-        time.sleep(10)  # ゲーム起動待機
-        tap(device, 844, 480)  # ゲーム画面で初期タップ
+        tap(device, 248, 668)  # ゲームアイコンがある場所をタップ
+        time.sleep(10)  # ゲームが開くまで待つ
+        tap(device, 844, 480)  # ゲーム画面で最初にタップする場所(例えばログインボタン)
         time.sleep(10)
         print("Game started.")
     except Exception as e:
+        # ゲームが起動できなかった場合のエラーを表示
         print(f"Failed to start game: {e}")
         exit()
 
-# MuMu Playerに接続
-MUMU_IP = "127.0.0.1"
-MUMU_PORT = 7555
+# MuMu Playerへ接続するための情報
+MUMU_IP = "127.0.0.1"  # MuMu Playerは自分のパソコン内で動くので127.0.0.1(自分自身)
+MUMU_PORT = 7555       # MuMu Playerの接続ポート
 
 def connect_to_mumu():
+    # MuMu Playerに接続するよ
     try:
-        client.remote_connect(MUMU_IP, MUMU_PORT)
+        client.remote_connect(MUMU_IP, MUMU_PORT)  # 指定のIPとポートに接続
         print(f"Successfully connected to {MUMU_IP}:{MUMU_PORT}")
     except Exception as e:
+        # 接続できなかった場合はエラー
         print(f"Failed to connect to {MUMU_IP}:{MUMU_PORT}: {e}")
         exit()
 
-# 接続確認
+# デバイスが接続できているか確認する関数
 def check_device():
+    # ADBクライアントからデバイスを取得する
     device = client.device(f"{MUMU_IP}:{MUMU_PORT}")
     if not device:
+        # 見つからなかった場合は注意喚起
         print("No devices connected. Please check MuMu Player and try again.")
         exit()
+    # 接続できたデバイスを表示する
     print(f"Connected to device: {device.serial}")
     return device
 
-WAIT_TIME = 1
+WAIT_TIME = 1  # タップや入力の後、少し待つ秒数
 
 def tap(device, x, y):
+    # 画面上の(x, y)をタップする
     command = f"input tap {x} {y}"
-    device.shell(command)
+    device.shell(command)  # デバイスにコマンドを送る
     print(f"Tapped at ({x}, {y})")
-    time.sleep(WAIT_TIME)
+    time.sleep(WAIT_TIME)  # ちょっと待つ
 
 def send_text(device, text):
+    # テキスト入力コマンドを送る
     command = f"input text '{text}'"
     device.shell(command)
     print(f"Text input: {text}")
     time.sleep(WAIT_TIME)
 
 def press_key(device, key_code):
+    # キーボードイベントを送る(key_codeはボタン番号)
     command = f"input keyevent {key_code}"
     device.shell(command)
     print(f"Key pressed: {key_code}")
     time.sleep(WAIT_TIME)
 
+# リンクコードを使った処理を行う関数
 def execute_linkage(device, link_codes, password):
     print(f"Starting linkage process at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     for link_code in link_codes:
         print(f"Processing linkage with code: {link_code}")
-        tap(device, 1350, 50)
-        tap(device, 818, 344)
-        send_text(device, link_code)
-        tap(device, 1516, 844)
-        tap(device, 789, 449)
-        send_text(device, password)
-        tap(device, 1516, 844)
-        tap(device, 973, 655)
-        tap(device, 804, 551)
-        tap(device, 804, 551)
-        time.sleep(5)
+        tap(device, 1350, 50)   # 設定や入力画面へ行くボタンをタップ
+        tap(device, 818, 344)   # コード入力欄へ行くためのタップ
+        send_text(device, link_code)  # リンクコードを入力
+        tap(device, 1516, 844)  # OKボタンを押す
+        tap(device, 789, 449)   # パスワード入力欄へ行くためのタップ
+        send_text(device, password)   # パスワードを入力
+        tap(device, 1516, 844)  # OKボタンを押す
+        tap(device, 973, 655)   # リンク実行ボタンを押す
+        tap(device, 804, 551)   # 確認ボタンを押す
+        tap(device, 804, 551)   # 確認をもう一度押す
+        time.sleep(10)          # リンクが終わるのを待つ
+        tap(device, 912, 63)    # 戻るボタンを何回か押して前の画面へ
         tap(device, 912, 63)
         tap(device, 912, 63)
         tap(device, 912, 63)
@@ -106,30 +135,33 @@ def execute_linkage(device, link_codes, password):
         tap(device, 912, 63)
     print("Linkage process completed.")
 
+# トレード(取引)を行う処理
 def execute_trade(device, trade_coords):
     print(f"Starting trade process at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    tap(device, 1461, 620)
+    tap(device, 1461, 620)  # トレード画面へ行くボタン
     time.sleep(3)
     for coord in trade_coords:
-        tap(device, coord[0], coord[1])
+        tap(device, coord[0], coord[1])  # 商品の場所をタップ
     time.sleep(3)
-    tap(device, 1150, 398)
+    tap(device, 1150, 398)  # トレード確定ボタン
     time.sleep(3)
-    tap(device, 98, 50)
+    tap(device, 98, 50)     # 戻るボタンを連打して前の画面に戻る
     tap(device, 98, 50)
     tap(device, 98, 50)
     print("Trade process completed.")
 
+# ログアウトする処理
 def execute_logout(device):
     print(f"Starting logout process at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     time.sleep(3)
-    tap(device, 194, 836)
+    tap(device, 194, 836)  # メニューを開くボタン
     time.sleep(3)
-    tap(device, 55, 821)
-    tap(device, 1176, 630)
+    tap(device, 55, 821)   # ログアウトボタン
+    tap(device, 1176, 630) # 確認ボタン
     time.sleep(5)
     print("Logout process completed.")
 
+# 消費疲労度をCSVから読み込む関数
 def load_consumption_fatigue():
     consumption_fatigue_file = "ConsumptionFatigueLevel.csv"
     if os.path.exists(consumption_fatigue_file):
@@ -137,17 +169,20 @@ def load_consumption_fatigue():
     else:
         return pd.DataFrame()
 
+# 最新の都市データを読み込む関数(価格フォルダから読み込む)
 def get_latest_city_data():
     data_folder = "価格"
     city_data = {}
-    for city_name in os.listdir(data_folder):
-        city_folder = os.path.join(data_folder, city_name)
-        if os.path.isdir(city_folder):
-            output_csv_path = os.path.join(city_folder, "output.csv")
-            if os.path.exists(output_csv_path):
-                city_data[city_name] = pd.read_csv(output_csv_path)
+    if os.path.exists(data_folder):
+        for city_name in os.listdir(data_folder):
+            city_folder = os.path.join(data_folder, city_name)
+            if os.path.isdir(city_folder):
+                output_csv_path = os.path.join(city_folder, "output.csv")
+                if os.path.exists(output_csv_path):
+                    city_data[city_name] = pd.read_csv(output_csv_path)
     return city_data
 
+# 利益を計算する関数(仕入れと売値を比べて利益が出るか計算)
 def calculate_profits():
     city_data = get_latest_city_data()
     results = []
@@ -165,17 +200,36 @@ def calculate_profits():
     if results:
         print(f"Calculation complete. Results: {results}")
 
+# GitコマンドをPython内で実行する関数
+def run_git_commands():
+    # Git関連のコマンドをPythonから実行する
+    # フォルダをGitリポジトリとして初期化
+    subprocess.run(["git", "init"], check=True)
+    # すべてのファイルをステージする
+    subprocess.run(["git", "add", "."], check=True)
+    # コミットを作成
+    subprocess.run(["git", "commit", "-m", "Add csv"], check=True)
+    # リモートリポジトリを追加
+    subprocess.run(["git", "remote", "add", "origin", "https://github.com/ogatetsu-0501/resonance-capture-main.git"], check=False)
+    # リモートへプッシュ
+    subprocess.run(["git", "push", "-u", "origin", "main"], check=False)
+    print("Git commands executed.")
+
+# メインの処理
 if __name__ == "__main__":
-    next_execution_time = datetime.now()
+    next_execution_time = datetime.now()  # 次に処理する時間を現在時刻に設定
     while True:
         print(next_execution_time)
-        current_time = datetime.now()
+        current_time = datetime.now()  # 現在の時間を取得
         if current_time >= next_execution_time:
+            # 一定時間ごとにやりたい処理(15分ごと)
             next_execution_time = current_time + timedelta(minutes=15)
-            restart_mumu_player()
-            connect_to_mumu()
-            device = check_device()
-            start_game(device)
+            restart_mumu_player()      # MuMu Player再起動
+            connect_to_mumu()          # MuMu Playerへ接続
+            device = check_device()    # デバイス取得
+            start_game(device)         # ゲームを起動
+
+            # リンク用のデータ(コードと座標のセット)
             linkage_data = [
                 ("Re733761K103494q", (810, 190)),
                 ("Rq733832C901737e", (1242, 256)),
@@ -185,10 +239,17 @@ if __name__ == "__main__":
                 ("Qx734105j098469X", (147, 513)),
                 ("Vh734185C444443y", (690, 315))
             ]
-            test_password = "12345qwert"
+            test_password = "12345qwert"  # テスト用パスワード
+
             for link_code, trade_coord in linkage_data:
-                execute_linkage(device, [link_code], test_password)
-                execute_trade(device, [trade_coord])
-                execute_logout(device)
-            calculate_profits()
-        time.sleep(1)
+                execute_linkage(device, [link_code], test_password)  # リンク処理
+                execute_trade(device, [trade_coord])                # トレード処理
+                execute_logout(device)                               # ログアウト処理
+
+            calculate_profits()  # 利益計算
+
+            # ここでGitコマンドをPython内で実行する
+            # コードがひととおり終わった後、変更をGitHubにプッシュするため
+            run_git_commands()
+
+        time.sleep(1)  # 1秒待ってからまたチェックする
