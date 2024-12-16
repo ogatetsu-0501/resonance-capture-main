@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "マンド鉱山",
     "鉄路同盟前哨基地",
     "ワンダーランド",
+    "荒地駅",
   ];
 
   const allData = [];
