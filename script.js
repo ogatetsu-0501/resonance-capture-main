@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", function () {
     storedSettings.capacity != null ? storedSettings.capacity : 1000;
   let productSettings = storedSettings.productSettings || {};
 
+  // 各フォルダのnewestTimeを格納する配列
+  const newestTimes = [];
+
   const promises = folders.map((folderName) => {
     const csvUrl = `価格/${folderName}/output.csv`;
     return fetch(csvUrl)
@@ -67,11 +70,16 @@ document.addEventListener("DOMContentLoaded", function () {
           const row = lines[i].split(",").map((c) => c.trim());
           if (row.length === 1 && row[0] === "") continue;
           const t = new Date(row[timeIndex]);
-          if (newestTime === null || t > newestTime) {
+          if (newestTime === null) {
             newestTime = t;
             newestRows = [row];
-          } else if (t.getTime() === newestTime.getTime()) {
-            newestRows.push(row);
+          } else {
+            if (t > newestTime) {
+              newestTime = t;
+              newestRows = [row];
+            } else if (t.getTime() === newestTime.getTime()) {
+              newestRows.push(row);
+            }
           }
         }
         const sellRows = [],
@@ -81,6 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
           else buyRows.push(r);
         });
         allData.push({ folderName, headers, sellRows, buyRows });
+        if (newestTime) newestTimes.push(newestTime);
       });
   });
 
@@ -89,6 +98,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if (allData.length === 0) {
       console.error("データなし");
       return;
+    }
+
+    // 最も古い日時を求める
+    // newestTimesには各フォルダの最新データの日付が入っているので、
+    // ここでその中から最も古い(最小)日時を求める
+    let oldestTimeDisplay = document.getElementById("oldestTimeDisplay");
+    if (newestTimes.length > 0) {
+      let oldestTime = newestTimes.reduce((a, b) => (a < b ? a : b)); // 最小の日時
+      oldestTimeDisplay.textContent = `最も古い日時: ${oldestTime.toLocaleString()}`;
+    } else {
+      oldestTimeDisplay.textContent = "最も古い日時: 取得できませんでした";
     }
 
     fetch("価格/ConsumptionFatigueLevel.csv")
@@ -251,7 +271,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     trendB: sellMapB[productName].trendB,
                     multiplierB: sellMapB[productName].multiplierB,
                     displayQtyA,
-                    // 一旦quantityAはdisplayQtyAで初期化
                     quantityA: displayQtyA,
                     profit: originalProfit,
                     profitForCalc,
@@ -264,9 +283,9 @@ document.addEventListener("DOMContentLoaded", function () {
               itemsForCapCalc.sort((a, b) => b.profitForCalc - a.profitForCalc);
               let remain = capacity;
               let totalProfitTimesQuantity = 0;
-              // 全商品表示のためfinalRows=itemsForCapCalcを加工
               const finalRows = [];
 
+              // 全商品を表示するため全アイテムをfinalRowsに入れるがquantityAは上限考慮
               for (const item of itemsForCapCalc) {
                 let usedQty = item.quantityA;
                 if (remain <= 0) {
@@ -277,7 +296,6 @@ document.addEventListener("DOMContentLoaded", function () {
                   totalProfitTimesQuantity +=
                     usedQty * (item.profit < 0 ? 0 : item.profit);
                 }
-                // 全アイテムをfinalRowsに投入
                 finalRows.push({ ...item, quantityA: usedQty });
               }
 
@@ -387,12 +405,10 @@ document.addEventListener("DOMContentLoaded", function () {
             cardDiv.className = "pair-card";
             outputContainer.appendChild(cardDiv);
 
-            // 往復表示
             const cardTitle = document.createElement("h2");
             cardTitle.textContent = `${folder1} ↔ ${folder2}(購入個数×利益/消費疲労値(往復): ${card.avgRatio})`;
             cardDiv.appendChild(cardTitle);
 
-            // 片道表示
             {
               const set = card.AtoB;
               const subtitle = document.createElement("h3");
