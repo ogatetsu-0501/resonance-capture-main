@@ -102,7 +102,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // 最も古い日時を求めて表示
     let oldestTimeDisplay = document.getElementById("oldestTimeDisplay");
     if (newestTimes.length > 0) {
       let oldestTime = newestTimes.reduce((a, b) => (a < b ? a : b));
@@ -173,12 +172,10 @@ document.addEventListener("DOMContentLoaded", function () {
           { key: "multiplierB", name: "売り倍率", numeric: true },
         ];
 
-        // 修正：税率計算前の値が入っているのでそのまま掛け算
         function recalcPrice(oldValue, folderName, productName) {
           const folderTax = folderSettings[folderName].tax;
           const productTaxAdj = productSettings[productName].taxAdjust || 0;
           const effectiveTax = folderTax - productTaxAdj;
-          // そのまま掛け算
           const newVal = Math.round(oldValue * (1 + effectiveTax / 100));
           return newVal;
         }
@@ -195,8 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return newQty;
         }
 
-        function recalculateAndRender() {
-          outputContainer.innerHTML = "";
+        function doBaseCalculation() {
           const resultSets = [];
           for (let i = 0; i < allData.length; i++) {
             for (let j = 0; j < allData.length; j++) {
@@ -307,130 +303,201 @@ document.addEventListener("DOMContentLoaded", function () {
                   fatigueVal: fatigueValueCommon,
                   sumRatio: sumRatio,
                   rows: finalRows,
+                  originalItems: itemsForCapCalc,
                 });
               }
             }
           }
+          return resultSets;
+        }
 
-          const pairsMap = {};
-          resultSets.forEach((set) => {
-            const pairKey = [set.aFolderName, set.bFolderName].sort().join("|");
-            if (!pairsMap[pairKey]) {
-              pairsMap[pairKey] = { AtoB: null, BtoA: null };
-            }
-            const [baseA, baseB] = [set.aFolderName, set.bFolderName].sort();
-            if (set.aFolderName === baseA && set.bFolderName === baseB) {
-              pairsMap[pairKey].AtoB = set;
-            } else {
-              pairsMap[pairKey].BtoA = set;
-            }
+        function recalcWithFactor(originalItems, factor, fatigueVal) {
+          const recalced = originalItems.map((item) => {
+            const newQty = Math.floor(item.displayQtyA * factor);
+            return { ...item, quantityA: newQty };
           });
+          recalced.sort((a, b) => b.profitForCalc - a.profitForCalc);
 
-          const finalPairs = [];
-          for (const key in pairsMap) {
-            const pair = pairsMap[key];
-            if (pair.AtoB && pair.BtoA) {
-              const avgRatio = (pair.AtoB.sumRatio + pair.BtoA.sumRatio) / 2;
-              finalPairs.push({
-                pairKey: key,
-                AtoB: pair.AtoB,
-                BtoA: pair.BtoA,
-                avgRatio,
-              });
+          let remain = capacity;
+          let totalProfitTimesQuantity = 0;
+          for (const item of recalced) {
+            let usedQty = item.quantityA;
+            if (remain <= 0) {
+              usedQty = 0;
+            } else {
+              if (usedQty > remain) usedQty = remain;
+              remain -= usedQty;
+              totalProfitTimesQuantity +=
+                usedQty * (item.profit < 0 ? 0 : item.profit);
             }
           }
+          const sumRatio = totalProfitTimesQuantity / fatigueVal;
+          return sumRatio;
+        }
 
-          finalPairs.sort((a, b) => b.avgRatio - a.avgRatio);
+        const resultSets = doBaseCalculation();
 
-          function renderTable(
-            titleElement,
-            subtitleElement,
-            tableContainer,
-            rows
-          ) {
-            rows.sort((a, b) => parseFloat(b.priceA) - parseFloat(a.priceA));
-            let html = "<table><thead><tr>";
-            columns.forEach((col, i) => {
-              html += `<th data-col-index="${i}">${col.name}</th>`;
+        // pairsMap作成
+        const pairsMap = {};
+        resultSets.forEach((set) => {
+          const pairKey = [set.aFolderName, set.bFolderName].sort().join("|");
+          if (!pairsMap[pairKey]) {
+            pairsMap[pairKey] = { AtoB: null, BtoA: null };
+          }
+          const [baseA, baseB] = [set.aFolderName, set.bFolderName].sort();
+          if (set.aFolderName === baseA && set.bFolderName === baseB) {
+            pairsMap[pairKey].AtoB = set;
+          } else {
+            pairsMap[pairKey].BtoA = set;
+          }
+        });
+
+        const finalPairs = [];
+        for (const key in pairsMap) {
+          const pair = pairsMap[key];
+          if (pair.AtoB && pair.BtoA) {
+            const avgRatio = (pair.AtoB.sumRatio + pair.BtoA.sumRatio) / 2;
+            finalPairs.push({
+              pairKey: key,
+              AtoB: pair.AtoB,
+              BtoA: pair.BtoA,
+              avgRatio,
             });
-            html += "</tr></thead><tbody>";
-            rows.forEach((item) => {
-              html += "<tr>";
-              columns.forEach((col) => {
-                let val = item[col.key];
-                if (col.key === "trendA" || col.key === "trendB") {
-                  val = convertTrend(val);
+          }
+        }
+
+        finalPairs.sort((a, b) => b.avgRatio - a.avgRatio);
+
+        function renderTable(
+          titleElement,
+          subtitleElement,
+          tableContainer,
+          rows
+        ) {
+          rows.sort((a, b) => parseFloat(b.priceA) - parseFloat(a.priceA));
+          let html = "<table><thead><tr>";
+          columns.forEach((col, i) => {
+            html += `<th data-col-index="${i}">${col.name}</th>`;
+          });
+          html += "</tr></thead><tbody>";
+          rows.forEach((item) => {
+            html += "<tr>";
+            columns.forEach((col) => {
+              let val = item[col.key];
+              if (col.key === "trendA" || col.key === "trendB") {
+                val = convertTrend(val);
+              }
+              html += `<td>${val}</td>`;
+            });
+            html += "</tr>";
+          });
+          html += "</tbody></table>";
+          tableContainer.innerHTML = html;
+
+          const thList = tableContainer.querySelectorAll("th");
+          thList.forEach((th) => {
+            th.addEventListener("click", () => {
+              const colIndex = parseInt(th.getAttribute("data-col-index"), 10);
+              const col = columns[colIndex];
+              rows.sort((a, b) => {
+                let valA = a[col.key],
+                  valB = b[col.key];
+                if (col.numeric) {
+                  valA = parseFloat(valA);
+                  valB = parseFloat(valB);
+                  return valB - valA;
+                } else {
+                  if (valA < valB) return 1;
+                  if (valA > valB) return -1;
+                  return 0;
                 }
-                html += `<td>${val}</td>`;
               });
-              html += "</tr>";
+              renderTable(titleElement, subtitleElement, tableContainer, rows);
             });
-            html += "</tbody></table>";
-            tableContainer.innerHTML = html;
-
-            const thList = tableContainer.querySelectorAll("th");
-            thList.forEach((th) => {
-              th.addEventListener("click", () => {
-                const colIndex = parseInt(
-                  th.getAttribute("data-col-index"),
-                  10
-                );
-                const col = columns[colIndex];
-                rows.sort((a, b) => {
-                  let valA = a[col.key],
-                    valB = b[col.key];
-                  if (col.numeric) {
-                    valA = parseFloat(valA);
-                    valB = parseFloat(valB);
-                    return valB - valA;
-                  } else {
-                    if (valA < valB) return 1;
-                    if (valA > valB) return -1;
-                    return 0;
-                  }
-                });
-                renderTable(
-                  titleElement,
-                  subtitleElement,
-                  tableContainer,
-                  rows
-                );
-              });
-            });
-          }
-
-          finalPairs.forEach((card) => {
-            const [folder1, folder2] = card.pairKey.split("|");
-            const cardDiv = document.createElement("div");
-            cardDiv.className = "pair-card";
-            outputContainer.appendChild(cardDiv);
-
-            const cardTitle = document.createElement("h2");
-            cardTitle.textContent = `${folder1} ↔ ${folder2}(購入個数×利益/消費疲労値(往復): ${card.avgRatio})`;
-            cardDiv.appendChild(cardTitle);
-
-            {
-              const set = card.AtoB;
-              const subtitle = document.createElement("h3");
-              subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
-              cardDiv.appendChild(subtitle);
-              const tableContainer = document.createElement("div");
-              cardDiv.appendChild(tableContainer);
-              renderTable(cardTitle, subtitle, tableContainer, set.rows);
-            }
-            {
-              const set = card.BtoA;
-              const subtitle = document.createElement("h3");
-              subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
-              cardDiv.appendChild(subtitle);
-              const tableContainer = document.createElement("div");
-              cardDiv.appendChild(tableContainer);
-              renderTable(cardTitle, subtitle, tableContainer, set.rows);
-            }
           });
         }
 
-        recalculateAndRender();
+        finalPairs.forEach((card) => {
+          const [folder1, folder2] = card.pairKey.split("|");
+          const cardDiv = document.createElement("div");
+          cardDiv.className = "pair-card";
+          outputContainer.appendChild(cardDiv);
+
+          const cardTitle = document.createElement("h2");
+          cardTitle.textContent = `${folder1} ↔ ${folder2}(購入個数×利益/消費疲労値(往復): ${card.avgRatio})`;
+          cardDiv.appendChild(cardTitle);
+
+          // A→B
+          {
+            const set = card.AtoB;
+            const subtitle = document.createElement("h3");
+            subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
+            cardDiv.appendChild(subtitle);
+
+            // 仕入れ書枚数入力欄
+            const factorDiv = document.createElement("div");
+            factorDiv.innerHTML = `仕入れ書枚数: <input type="number" min="0" value="0" class="factorInput">`;
+            cardDiv.appendChild(factorDiv);
+
+            const factorRatio = document.createElement("div");
+            factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): (仕入れ書枚数を入力してください)`;
+            cardDiv.appendChild(factorRatio);
+
+            const tableContainer = document.createElement("div");
+            cardDiv.appendChild(tableContainer);
+
+            // 元のテーブル(仕入れ書なし)
+            renderTable(cardTitle, subtitle, tableContainer, set.rows);
+
+            const factorInput = factorDiv.querySelector(".factorInput");
+
+            factorInput.addEventListener("input", () => {
+              const n = parseInt(factorInput.value, 10) || 0;
+              const factor = n + 1;
+              // 再計算するが、テーブルは変更しない。ratioだけ更新
+              const newRatio = recalcWithFactor(
+                set.originalItems,
+                factor,
+                set.fatigueVal
+              );
+              factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): ${newRatio}`;
+            });
+          }
+
+          // B→A
+          {
+            const set = card.BtoA;
+            const subtitle = document.createElement("h3");
+            subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
+            cardDiv.appendChild(subtitle);
+
+            const factorDiv = document.createElement("div");
+            factorDiv.innerHTML = `仕入れ書枚数: <input type="number" min="0" value="0" class="factorInput">`;
+            cardDiv.appendChild(factorDiv);
+
+            const factorRatio = document.createElement("div");
+            factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): (仕入れ書枚数を入力してください)`;
+            cardDiv.appendChild(factorRatio);
+
+            const tableContainer = document.createElement("div");
+            cardDiv.appendChild(tableContainer);
+
+            // 元のテーブル(仕入れ書なし)
+            renderTable(cardTitle, subtitle, tableContainer, set.rows);
+
+            const factorInput = factorDiv.querySelector(".factorInput");
+            factorInput.addEventListener("input", () => {
+              const n = parseInt(factorInput.value, 10) || 0;
+              const factor = n + 1;
+              const newRatio = recalcWithFactor(
+                set.originalItems,
+                factor,
+                set.fatigueVal
+              );
+              factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): ${newRatio}`;
+            });
+          }
+        });
 
         // 設定モーダル
         const settingsButton = document.getElementById("settingsButton");
@@ -513,8 +580,8 @@ document.addEventListener("DOMContentLoaded", function () {
           };
           localStorage.setItem("userSettings", JSON.stringify(newSettings));
 
-          modal.style.display = "none";
-          recalculateAndRender();
+          // 設定変更後はリロードで再計算
+          location.reload();
         });
       });
   });
