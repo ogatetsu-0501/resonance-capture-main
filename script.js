@@ -176,6 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const folderTax = folderSettings[folderName].tax;
           const productTaxAdj = productSettings[productName].taxAdjust || 0;
           const effectiveTax = folderTax - productTaxAdj;
+          // 税率計算前の値に直接掛け算
           const newVal = Math.round(oldValue * (1 + effectiveTax / 100));
           return newVal;
         }
@@ -262,9 +263,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   itemsForCapCalc.push({
                     productName,
                     priceA,
+                    priceB,
                     trendA: buyMapA[productName].trendA,
                     multiplierA: buyMapA[productName].multiplierA,
-                    priceB,
                     trendB: sellMapB[productName].trendB,
                     multiplierB: sellMapB[productName].multiplierB,
                     displayQtyA,
@@ -281,6 +282,8 @@ document.addEventListener("DOMContentLoaded", function () {
               let remain = capacity;
               let totalProfitTimesQuantity = 0;
               const finalRows = [];
+              let totalPurchase = 0;
+              let totalSell = 0;
 
               for (const item of itemsForCapCalc) {
                 let usedQty = item.quantityA;
@@ -291,6 +294,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   remain -= usedQty;
                   totalProfitTimesQuantity +=
                     usedQty * (item.profit < 0 ? 0 : item.profit);
+                  totalPurchase += usedQty * item.priceA;
+                  totalSell += usedQty * item.priceB;
                 }
                 finalRows.push({ ...item, quantityA: usedQty });
               }
@@ -304,6 +309,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   sumRatio: sumRatio,
                   rows: finalRows,
                   originalItems: itemsForCapCalc,
+                  totalPurchase: totalPurchase,
+                  totalSell: totalSell,
                 });
               }
             }
@@ -312,6 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function recalcWithFactor(originalItems, factor, fatigueVal) {
+          // factor倍した数量で再度capacity適用
           const recalced = originalItems.map((item) => {
             const newQty = Math.floor(item.displayQtyA * factor);
             return { ...item, quantityA: newQty };
@@ -320,6 +328,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
           let remain = capacity;
           let totalProfitTimesQuantity = 0;
+          let totalPurchase = 0;
+          let totalSell = 0;
           for (const item of recalced) {
             let usedQty = item.quantityA;
             if (remain <= 0) {
@@ -329,10 +339,12 @@ document.addEventListener("DOMContentLoaded", function () {
               remain -= usedQty;
               totalProfitTimesQuantity +=
                 usedQty * (item.profit < 0 ? 0 : item.profit);
+              totalPurchase += usedQty * item.priceA;
+              totalSell += usedQty * item.priceB;
             }
           }
           const sumRatio = totalProfitTimesQuantity / fatigueVal;
-          return sumRatio;
+          return { sumRatio, totalPurchase, totalSell };
         }
 
         const resultSets = doBaseCalculation();
@@ -427,75 +439,118 @@ document.addEventListener("DOMContentLoaded", function () {
           cardTitle.textContent = `${folder1} ↔ ${folder2}(購入個数×利益/消費疲労値(往復): ${card.avgRatio})`;
           cardDiv.appendChild(cardTitle);
 
-          // A→B
+          // A→B表示
           {
             const set = card.AtoB;
             const subtitle = document.createElement("h3");
             subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
             cardDiv.appendChild(subtitle);
 
+            // 総購入金額表示
+            const totalPurchaseDiv = document.createElement("div");
+            totalPurchaseDiv.textContent = `総購入金額: ${Math.round(
+              set.totalPurchase
+            )}`;
+            cardDiv.appendChild(totalPurchaseDiv);
+
+            // 総売却金額表示
+            const totalSellDiv = document.createElement("div");
+            totalSellDiv.textContent = `総売却金額: ${Math.round(
+              set.totalSell
+            )}`;
+            cardDiv.appendChild(totalSellDiv);
+
             // 仕入れ書枚数入力欄
             const factorDiv = document.createElement("div");
             factorDiv.innerHTML = `仕入れ書枚数: <input type="number" min="0" value="0" class="factorInput">`;
             cardDiv.appendChild(factorDiv);
 
+            // 仕入れ書使用後の割合表示
             const factorRatio = document.createElement("div");
             factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): (仕入れ書枚数を入力してください)`;
             cardDiv.appendChild(factorRatio);
 
-            const tableContainer = document.createElement("div");
-            cardDiv.appendChild(tableContainer);
-
-            // 元のテーブル(仕入れ書なし)
-            renderTable(cardTitle, subtitle, tableContainer, set.rows);
-
+            // イベントリスナー設定
             const factorInput = factorDiv.querySelector(".factorInput");
 
             factorInput.addEventListener("input", () => {
               const n = parseInt(factorInput.value, 10) || 0;
               const factor = n + 1;
-              // 再計算するが、テーブルは変更しない。ratioだけ更新
-              const newRatio = recalcWithFactor(
+              const result = recalcWithFactor(
                 set.originalItems,
                 factor,
                 set.fatigueVal
               );
-              factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): ${newRatio}`;
+              factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): ${result.sumRatio}`;
+              totalPurchaseDiv.textContent = `総購入金額: ${Math.round(
+                result.totalPurchase
+              )}`;
+              totalSellDiv.textContent = `総売却金額: ${Math.round(
+                result.totalSell
+              )}`;
             });
+
+            // テーブル表示
+            const tableContainer = document.createElement("div");
+            cardDiv.appendChild(tableContainer);
+            renderTable(cardTitle, subtitle, tableContainer, set.rows);
           }
 
-          // B→A
+          // B→A表示
           {
             const set = card.BtoA;
             const subtitle = document.createElement("h3");
             subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
             cardDiv.appendChild(subtitle);
 
+            // 総購入金額表示
+            const totalPurchaseDiv = document.createElement("div");
+            totalPurchaseDiv.textContent = `総購入金額: ${Math.round(
+              set.totalPurchase
+            )}`;
+            cardDiv.appendChild(totalPurchaseDiv);
+
+            // 総売却金額表示
+            const totalSellDiv = document.createElement("div");
+            totalSellDiv.textContent = `総売却金額: ${Math.round(
+              set.totalSell
+            )}`;
+            cardDiv.appendChild(totalSellDiv);
+
+            // 仕入れ書枚数入力欄
             const factorDiv = document.createElement("div");
             factorDiv.innerHTML = `仕入れ書枚数: <input type="number" min="0" value="0" class="factorInput">`;
             cardDiv.appendChild(factorDiv);
 
+            // 仕入れ書使用後の割合表示
             const factorRatio = document.createElement("div");
             factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): (仕入れ書枚数を入力してください)`;
             cardDiv.appendChild(factorRatio);
 
-            const tableContainer = document.createElement("div");
-            cardDiv.appendChild(tableContainer);
-
-            // 元のテーブル(仕入れ書なし)
-            renderTable(cardTitle, subtitle, tableContainer, set.rows);
-
+            // イベントリスナー設定
             const factorInput = factorDiv.querySelector(".factorInput");
+
             factorInput.addEventListener("input", () => {
               const n = parseInt(factorInput.value, 10) || 0;
               const factor = n + 1;
-              const newRatio = recalcWithFactor(
+              const result = recalcWithFactor(
                 set.originalItems,
                 factor,
                 set.fatigueVal
               );
-              factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): ${newRatio}`;
+              factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): ${result.sumRatio}`;
+              totalPurchaseDiv.textContent = `総購入金額: ${Math.round(
+                result.totalPurchase
+              )}`;
+              totalSellDiv.textContent = `総売却金額: ${Math.round(
+                result.totalSell
+              )}`;
             });
+
+            // テーブル表示
+            const tableContainer = document.createElement("div");
+            cardDiv.appendChild(tableContainer);
+            renderTable(cardTitle, subtitle, tableContainer, set.rows);
           }
         });
 
