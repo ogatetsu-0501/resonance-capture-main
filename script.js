@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
     "シュグリシティ",
     "フリーポートNo.7",
     "マンド鉱山",
+    "鉄路同盟前哨基地",
+    "ワンダーランド",
+    "荒地駅",
   ];
 
   const allData = [];
