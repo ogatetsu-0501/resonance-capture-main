@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
     storedSettings.capacity != null ? storedSettings.capacity : 1000;
   let productSettings = storedSettings.productSettings || {};
 
-  // 各フォルダのnewestTimeを格納する配列
   const newestTimes = [];
 
   const promises = folders.map((folderName) => {
@@ -103,12 +102,9 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // 最も古い日時を求める
-    // newestTimesには各フォルダの最新データの日付が入っているので、
-    // ここでその中から最も古い(最小)日時を求める
     let oldestTimeDisplay = document.getElementById("oldestTimeDisplay");
     if (newestTimes.length > 0) {
-      let oldestTime = newestTimes.reduce((a, b) => (a < b ? a : b)); // 最小の日時
+      let oldestTime = newestTimes.reduce((a, b) => (a < b ? a : b));
       oldestTimeDisplay.textContent = `最も古い日時: ${oldestTime.toLocaleString()}`;
     } else {
       oldestTimeDisplay.textContent = "最も古い日時: 取得できませんでした";
@@ -180,8 +176,8 @@ document.addEventListener("DOMContentLoaded", function () {
           const folderTax = folderSettings[folderName].tax;
           const productTaxAdj = productSettings[productName].taxAdjust || 0;
           const effectiveTax = folderTax - productTaxAdj;
-          const base = Math.round(oldValue / 1.1);
-          const newVal = Math.round(base * (1 + effectiveTax / 100));
+          // 税率計算前の値に直接掛け算
+          const newVal = Math.round(oldValue * (1 + effectiveTax / 100));
           return newVal;
         }
 
@@ -197,8 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return newQty;
         }
 
-        function recalculateAndRender() {
-          outputContainer.innerHTML = "";
+        function doBaseCalculation() {
           const resultSets = [];
           for (let i = 0; i < allData.length; i++) {
             for (let j = 0; j < allData.length; j++) {
@@ -268,9 +263,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   itemsForCapCalc.push({
                     productName,
                     priceA,
+                    priceB,
                     trendA: buyMapA[productName].trendA,
                     multiplierA: buyMapA[productName].multiplierA,
-                    priceB,
                     trendB: sellMapB[productName].trendB,
                     multiplierB: sellMapB[productName].multiplierB,
                     displayQtyA,
@@ -287,8 +282,9 @@ document.addEventListener("DOMContentLoaded", function () {
               let remain = capacity;
               let totalProfitTimesQuantity = 0;
               const finalRows = [];
+              let totalPurchase = 0;
+              let totalSell = 0;
 
-              // 全商品を表示するため全アイテムをfinalRowsに入れるがquantityAは上限考慮
               for (const item of itemsForCapCalc) {
                 let usedQty = item.quantityA;
                 if (remain <= 0) {
@@ -298,6 +294,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   remain -= usedQty;
                   totalProfitTimesQuantity +=
                     usedQty * (item.profit < 0 ? 0 : item.profit);
+                  totalPurchase += usedQty * item.priceA;
+                  totalSell += usedQty * item.priceB;
                 }
                 finalRows.push({ ...item, quantityA: usedQty });
               }
@@ -310,130 +308,251 @@ document.addEventListener("DOMContentLoaded", function () {
                   fatigueVal: fatigueValueCommon,
                   sumRatio: sumRatio,
                   rows: finalRows,
+                  originalItems: itemsForCapCalc,
+                  totalPurchase: totalPurchase,
+                  totalSell: totalSell,
                 });
               }
             }
           }
+          return resultSets;
+        }
 
-          const pairsMap = {};
-          resultSets.forEach((set) => {
-            const pairKey = [set.aFolderName, set.bFolderName].sort().join("|");
-            if (!pairsMap[pairKey]) {
-              pairsMap[pairKey] = { AtoB: null, BtoA: null };
-            }
-            const [baseA, baseB] = [set.aFolderName, set.bFolderName].sort();
-            if (set.aFolderName === baseA && set.bFolderName === baseB) {
-              pairsMap[pairKey].AtoB = set;
-            } else {
-              pairsMap[pairKey].BtoA = set;
-            }
+        function recalcWithFactor(originalItems, factor, fatigueVal) {
+          // factor倍した数量で再度capacity適用
+          const recalced = originalItems.map((item) => {
+            const newQty = Math.floor(item.displayQtyA * factor);
+            return { ...item, quantityA: newQty };
           });
+          recalced.sort((a, b) => b.profitForCalc - a.profitForCalc);
 
-          const finalPairs = [];
-          for (const key in pairsMap) {
-            const pair = pairsMap[key];
-            if (pair.AtoB && pair.BtoA) {
-              const avgRatio = (pair.AtoB.sumRatio + pair.BtoA.sumRatio) / 2;
-              finalPairs.push({
-                pairKey: key,
-                AtoB: pair.AtoB,
-                BtoA: pair.BtoA,
-                avgRatio,
-              });
+          let remain = capacity;
+          let totalProfitTimesQuantity = 0;
+          let totalPurchase = 0;
+          let totalSell = 0;
+          for (const item of recalced) {
+            let usedQty = item.quantityA;
+            if (remain <= 0) {
+              usedQty = 0;
+            } else {
+              if (usedQty > remain) usedQty = remain;
+              remain -= usedQty;
+              totalProfitTimesQuantity +=
+                usedQty * (item.profit < 0 ? 0 : item.profit);
+              totalPurchase += usedQty * item.priceA;
+              totalSell += usedQty * item.priceB;
             }
           }
+          const sumRatio = totalProfitTimesQuantity / fatigueVal;
+          return { sumRatio, totalPurchase, totalSell };
+        }
 
-          finalPairs.sort((a, b) => b.avgRatio - a.avgRatio);
+        const resultSets = doBaseCalculation();
 
-          function renderTable(
-            titleElement,
-            subtitleElement,
-            tableContainer,
-            rows
-          ) {
-            rows.sort((a, b) => parseFloat(b.priceA) - parseFloat(a.priceA));
-            let html = "<table><thead><tr>";
-            columns.forEach((col, i) => {
-              html += `<th data-col-index="${i}">${col.name}</th>`;
+        // pairsMap作成
+        const pairsMap = {};
+        resultSets.forEach((set) => {
+          const pairKey = [set.aFolderName, set.bFolderName].sort().join("|");
+          if (!pairsMap[pairKey]) {
+            pairsMap[pairKey] = { AtoB: null, BtoA: null };
+          }
+          const [baseA, baseB] = [set.aFolderName, set.bFolderName].sort();
+          if (set.aFolderName === baseA && set.bFolderName === baseB) {
+            pairsMap[pairKey].AtoB = set;
+          } else {
+            pairsMap[pairKey].BtoA = set;
+          }
+        });
+
+        const finalPairs = [];
+        for (const key in pairsMap) {
+          const pair = pairsMap[key];
+          if (pair.AtoB && pair.BtoA) {
+            const avgRatio = (pair.AtoB.sumRatio + pair.BtoA.sumRatio) / 2;
+            finalPairs.push({
+              pairKey: key,
+              AtoB: pair.AtoB,
+              BtoA: pair.BtoA,
+              avgRatio,
             });
-            html += "</tr></thead><tbody>";
-            rows.forEach((item) => {
-              html += "<tr>";
-              columns.forEach((col) => {
-                let val = item[col.key];
-                if (col.key === "trendA" || col.key === "trendB") {
-                  val = convertTrend(val);
+          }
+        }
+
+        finalPairs.sort((a, b) => b.avgRatio - a.avgRatio);
+
+        function renderTable(
+          titleElement,
+          subtitleElement,
+          tableContainer,
+          rows
+        ) {
+          rows.sort((a, b) => parseFloat(b.priceA) - parseFloat(a.priceA));
+          let html = "<table><thead><tr>";
+          columns.forEach((col, i) => {
+            html += `<th data-col-index="${i}">${col.name}</th>`;
+          });
+          html += "</tr></thead><tbody>";
+          rows.forEach((item) => {
+            html += "<tr>";
+            columns.forEach((col) => {
+              let val = item[col.key];
+              if (col.key === "trendA" || col.key === "trendB") {
+                val = convertTrend(val);
+              }
+              html += `<td>${val}</td>`;
+            });
+            html += "</tr>";
+          });
+          html += "</tbody></table>";
+          tableContainer.innerHTML = html;
+
+          const thList = tableContainer.querySelectorAll("th");
+          thList.forEach((th) => {
+            th.addEventListener("click", () => {
+              const colIndex = parseInt(th.getAttribute("data-col-index"), 10);
+              const col = columns[colIndex];
+              rows.sort((a, b) => {
+                let valA = a[col.key],
+                  valB = b[col.key];
+                if (col.numeric) {
+                  valA = parseFloat(valA);
+                  valB = parseFloat(valB);
+                  return valB - valA;
+                } else {
+                  if (valA < valB) return 1;
+                  if (valA > valB) return -1;
+                  return 0;
                 }
-                html += `<td>${val}</td>`;
               });
-              html += "</tr>";
+              renderTable(titleElement, subtitleElement, tableContainer, rows);
             });
-            html += "</tbody></table>";
-            tableContainer.innerHTML = html;
-
-            const thList = tableContainer.querySelectorAll("th");
-            thList.forEach((th) => {
-              th.addEventListener("click", () => {
-                const colIndex = parseInt(
-                  th.getAttribute("data-col-index"),
-                  10
-                );
-                const col = columns[colIndex];
-                rows.sort((a, b) => {
-                  let valA = a[col.key],
-                    valB = b[col.key];
-                  if (col.numeric) {
-                    valA = parseFloat(valA);
-                    valB = parseFloat(valB);
-                    return valB - valA;
-                  } else {
-                    if (valA < valB) return 1;
-                    if (valA > valB) return -1;
-                    return 0;
-                  }
-                });
-                renderTable(
-                  titleElement,
-                  subtitleElement,
-                  tableContainer,
-                  rows
-                );
-              });
-            });
-          }
-
-          finalPairs.forEach((card) => {
-            const [folder1, folder2] = card.pairKey.split("|");
-            const cardDiv = document.createElement("div");
-            cardDiv.className = "pair-card";
-            outputContainer.appendChild(cardDiv);
-
-            const cardTitle = document.createElement("h2");
-            cardTitle.textContent = `${folder1} ↔ ${folder2}(購入個数×利益/消費疲労値(往復): ${card.avgRatio})`;
-            cardDiv.appendChild(cardTitle);
-
-            {
-              const set = card.AtoB;
-              const subtitle = document.createElement("h3");
-              subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
-              cardDiv.appendChild(subtitle);
-              const tableContainer = document.createElement("div");
-              cardDiv.appendChild(tableContainer);
-              renderTable(cardTitle, subtitle, tableContainer, set.rows);
-            }
-            {
-              const set = card.BtoA;
-              const subtitle = document.createElement("h3");
-              subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
-              cardDiv.appendChild(subtitle);
-              const tableContainer = document.createElement("div");
-              cardDiv.appendChild(tableContainer);
-              renderTable(cardTitle, subtitle, tableContainer, set.rows);
-            }
           });
         }
 
-        recalculateAndRender();
+        finalPairs.forEach((card) => {
+          const [folder1, folder2] = card.pairKey.split("|");
+          const cardDiv = document.createElement("div");
+          cardDiv.className = "pair-card";
+          outputContainer.appendChild(cardDiv);
+
+          const cardTitle = document.createElement("h2");
+          cardTitle.textContent = `${folder1} ↔ ${folder2}(購入個数×利益/消費疲労値(往復): ${card.avgRatio})`;
+          cardDiv.appendChild(cardTitle);
+
+          // A→B表示
+          {
+            const set = card.AtoB;
+            const subtitle = document.createElement("h3");
+            subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
+            cardDiv.appendChild(subtitle);
+
+            // 総購入金額表示
+            const totalPurchaseDiv = document.createElement("div");
+            totalPurchaseDiv.textContent = `総購入金額: ${Math.round(
+              set.totalPurchase
+            )}`;
+            cardDiv.appendChild(totalPurchaseDiv);
+
+            // 総売却金額表示
+            const totalSellDiv = document.createElement("div");
+            totalSellDiv.textContent = `総売却金額: ${Math.round(
+              set.totalSell
+            )}`;
+            cardDiv.appendChild(totalSellDiv);
+
+            // 仕入れ書枚数入力欄
+            const factorDiv = document.createElement("div");
+            factorDiv.innerHTML = `仕入れ書枚数: <input type="number" min="0" value="0" class="factorInput">`;
+            cardDiv.appendChild(factorDiv);
+
+            // 仕入れ書使用後の割合表示
+            const factorRatio = document.createElement("div");
+            factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): (仕入れ書枚数を入力してください)`;
+            cardDiv.appendChild(factorRatio);
+
+            // イベントリスナー設定
+            const factorInput = factorDiv.querySelector(".factorInput");
+
+            factorInput.addEventListener("input", () => {
+              const n = parseInt(factorInput.value, 10) || 0;
+              const factor = n + 1;
+              const result = recalcWithFactor(
+                set.originalItems,
+                factor,
+                set.fatigueVal
+              );
+              factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): ${result.sumRatio}`;
+              totalPurchaseDiv.textContent = `総購入金額: ${Math.round(
+                result.totalPurchase
+              )}`;
+              totalSellDiv.textContent = `総売却金額: ${Math.round(
+                result.totalSell
+              )}`;
+            });
+
+            // テーブル表示
+            const tableContainer = document.createElement("div");
+            cardDiv.appendChild(tableContainer);
+            renderTable(cardTitle, subtitle, tableContainer, set.rows);
+          }
+
+          // B→A表示
+          {
+            const set = card.BtoA;
+            const subtitle = document.createElement("h3");
+            subtitle.textContent = `${set.aFolderName} → ${set.bFolderName}(消費疲労値${set.fatigueVal}) 購入個数×利益/消費疲労値(片道): ${set.sumRatio}`;
+            cardDiv.appendChild(subtitle);
+
+            // 総購入金額表示
+            const totalPurchaseDiv = document.createElement("div");
+            totalPurchaseDiv.textContent = `総購入金額: ${Math.round(
+              set.totalPurchase
+            )}`;
+            cardDiv.appendChild(totalPurchaseDiv);
+
+            // 総売却金額表示
+            const totalSellDiv = document.createElement("div");
+            totalSellDiv.textContent = `総売却金額: ${Math.round(
+              set.totalSell
+            )}`;
+            cardDiv.appendChild(totalSellDiv);
+
+            // 仕入れ書枚数入力欄
+            const factorDiv = document.createElement("div");
+            factorDiv.innerHTML = `仕入れ書枚数: <input type="number" min="0" value="0" class="factorInput">`;
+            cardDiv.appendChild(factorDiv);
+
+            // 仕入れ書使用後の割合表示
+            const factorRatio = document.createElement("div");
+            factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): (仕入れ書枚数を入力してください)`;
+            cardDiv.appendChild(factorRatio);
+
+            // イベントリスナー設定
+            const factorInput = factorDiv.querySelector(".factorInput");
+
+            factorInput.addEventListener("input", () => {
+              const n = parseInt(factorInput.value, 10) || 0;
+              const factor = n + 1;
+              const result = recalcWithFactor(
+                set.originalItems,
+                factor,
+                set.fatigueVal
+              );
+              factorRatio.textContent = `仕入れ書使用後の購入個数×利益/消費疲労値(片道): ${result.sumRatio}`;
+              totalPurchaseDiv.textContent = `総購入金額: ${Math.round(
+                result.totalPurchase
+              )}`;
+              totalSellDiv.textContent = `総売却金額: ${Math.round(
+                result.totalSell
+              )}`;
+            });
+
+            // テーブル表示
+            const tableContainer = document.createElement("div");
+            cardDiv.appendChild(tableContainer);
+            renderTable(cardTitle, subtitle, tableContainer, set.rows);
+          }
+        });
 
         // 設定モーダル
         const settingsButton = document.getElementById("settingsButton");
@@ -516,8 +635,8 @@ document.addEventListener("DOMContentLoaded", function () {
           };
           localStorage.setItem("userSettings", JSON.stringify(newSettings));
 
-          modal.style.display = "none";
-          recalculateAndRender();
+          // 設定変更後はリロードで再計算
+          location.reload();
         });
       });
   });
