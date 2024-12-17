@@ -7,9 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
     "シュグリシティ",
     "フリーポートNo.7",
     "マンド鉱山",
-    "鉄路同盟前哨基地",
-    "ワンダーランド",
-    "荒地駅",
   ];
 
   const allData = [];
@@ -47,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
     storedSettings.capacity != null ? storedSettings.capacity : 1000;
   let productSettings = storedSettings.productSettings || {};
 
-  // 各フォルダのnewestTimeを格納する配列
   const newestTimes = [];
 
   const promises = folders.map((folderName) => {
@@ -103,12 +99,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // 最も古い日時を求める
-    // newestTimesには各フォルダの最新データの日付が入っているので、
-    // ここでその中から最も古い(最小)日時を求める
+    // 最も古い日時を求めて表示
     let oldestTimeDisplay = document.getElementById("oldestTimeDisplay");
     if (newestTimes.length > 0) {
-      let oldestTime = newestTimes.reduce((a, b) => (a < b ? a : b)); // 最小の日時
+      let oldestTime = newestTimes.reduce((a, b) => (a < b ? a : b));
       oldestTimeDisplay.textContent = `最も古い日時: ${oldestTime.toLocaleString()}`;
     } else {
       oldestTimeDisplay.textContent = "最も古い日時: 取得できませんでした";
@@ -176,12 +170,13 @@ document.addEventListener("DOMContentLoaded", function () {
           { key: "multiplierB", name: "売り倍率", numeric: true },
         ];
 
+        // 修正：税率計算前の値が入っているのでそのまま掛け算
         function recalcPrice(oldValue, folderName, productName) {
           const folderTax = folderSettings[folderName].tax;
           const productTaxAdj = productSettings[productName].taxAdjust || 0;
           const effectiveTax = folderTax - productTaxAdj;
-          const base = Math.round(oldValue / 1.1);
-          const newVal = Math.round(base * (1 + effectiveTax / 100));
+          // そのまま掛け算
+          const newVal = Math.round(oldValue * (1 + effectiveTax / 100));
           return newVal;
         }
 
@@ -288,7 +283,6 @@ document.addEventListener("DOMContentLoaded", function () {
               let totalProfitTimesQuantity = 0;
               const finalRows = [];
 
-              // 全商品を表示するため全アイテムをfinalRowsに入れるがquantityAは上限考慮
               for (const item of itemsForCapCalc) {
                 let usedQty = item.quantityA;
                 if (remain <= 0) {
