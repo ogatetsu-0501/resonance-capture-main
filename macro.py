@@ -88,7 +88,7 @@ def check_device():
     print(f"Connected to device: {device.serial}")
     return device
 
-WAIT_TIME = 1  # タップや入力の後、少し待つ秒数
+WAIT_TIME = 2  # タップや入力の後、少し待つ秒数
 
 def tap(device, x, y):
     # 画面上の(x, y)をタップする
@@ -118,6 +118,7 @@ def execute_linkage(device, link_codes, password):
         print(f"Processing linkage with code: {link_code}")
         tap(device, 1350, 50)   # 設定や入力画面へ行くボタンをタップ
         tap(device, 818, 344)   # コード入力欄へ行くためのタップ
+        time.sleep(5)
         send_text(device, link_code)  # リンクコードを入力
         tap(device, 1516, 844)  # OKボタンを押す
         tap(device, 789, 449)   # パスワード入力欄へ行くためのタップ
@@ -228,7 +229,6 @@ if __name__ == "__main__":
             connect_to_mumu()          # MuMu Playerへ接続
             device = check_device()    # デバイス取得
             start_game(device)         # ゲームを起動
-
             # リンク用のデータ(コードと座標のセット)
             linkage_data = [
                 ("Re733761K103494q", (810, 190)),
