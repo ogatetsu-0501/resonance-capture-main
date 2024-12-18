@@ -1,34 +1,70 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ペア表示ツール</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<h1>ペア表示ツール</h1>
-<!-- 最も古い日時表示用 -->
-<h2 id="oldestTimeDisplay"></h2>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ペア表示ツール</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>ペア表示ツール</h1>
+    <!-- 最も古い日時表示用 -->
+    <h2 id="oldestTimeDisplay"></h2>
 
-<button id="settingsButton">設定</button>
-<div id="outputContainer"></div>
+    <button id="settingsButton">設定</button>
+    <div id="outputContainer"></div>
 
-<div id="settingsModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>設定</h2>
-    <p>フォルダ別税率・販売個数倍率・特産品倍率、積載上限、商品別軽減率などを設定してください。</p>
-    <h3>フォルダ別設定</h3>
-    <div id="folderSettings"></div>
-    <h3>全体設定</h3>
-    <label>積載上限: <input type="number" id="capacityInput" min="1" value="1000"></label>
-    <h3>商品別設定（買いデータに存在する商品のみ）</h3>
-    <div id="productSettings"></div>
-    <button id="saveSettings">保存</button>
-  </div>
-</div>
+    <!-- 設定モーダル -->
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>設定</h2>
+        <p>
+          フォルダ別税率・販売個数倍率・特産品倍率、積載上限、商品別軽減率などを設定してください。
+        </p>
 
-<script src="script.js"></script>
-</body>
+        <!-- フォルダ別設定 -->
+        <h3>フォルダ別設定</h3>
+        <table id="folderSettingsTable">
+          <thead>
+            <tr>
+              <th>フォルダ名</th>
+              <th>税率 (%)</th>
+              <th>販売個数倍率 (%)</th>
+              <th>特産品販売個数倍率 (%)</th>
+            </tr>
+          </thead>
+          <tbody id="folderSettingsBody">
+            <!-- JavaScriptで動的に生成 -->
+          </tbody>
+        </table>
+
+        <!-- 全体設定 -->
+        <h3>全体設定</h3>
+        <div class="overall-settings">
+          <label for="capacityInput">積載上限:</label>
+          <input type="number" id="capacityInput" min="1" value="1000" />
+        </div>
+
+        <!-- 商品別設定 -->
+        <h3>商品別設定（買いデータに存在する商品のみ）</h3>
+        <table id="productSettingsTable">
+          <thead>
+            <tr>
+              <th>商品名</th>
+              <th>税率軽減 (%)</th>
+              <th>個数加算 (%)</th>
+            </tr>
+          </thead>
+          <tbody id="productSettingsBody">
+            <!-- JavaScriptで動的に生成 -->
+          </tbody>
+        </table>
+
+        <button id="saveSettings">保存</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
 </html>

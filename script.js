@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const defaultFolderQty = 0;
   const defaultFolderSpec = 0;
   let folderSettings = {};
+
+  // 初期設定のロード
   folders.forEach((f) => {
     folderSettings[f] = {
       tax:
@@ -50,7 +52,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const newestTimes = [];
 
-  const promises = folders.map((folderName) => {
+  // 各フォルダのデータをフェッチ
+  const folderPromises = folders.map((folderName) => {
     const csvUrl = `価格/${folderName}/output.csv`;
     return fetch(csvUrl)
       .then((res) => {
@@ -63,15 +66,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const timeIndex = headers.indexOf("更新時間");
         const sellBuyIndex = headers.indexOf("売りor買い");
         const productIndex = headers.indexOf("商品名");
+
         if (timeIndex === -1 || sellBuyIndex === -1 || productIndex === -1) {
           console.error("必要な列が不足");
           return;
         }
+
         let newestTime = null;
         let newestRows = [];
+
         for (let i = 1; i < lines.length; i++) {
           const row = lines[i].split(",").map((c) => c.trim());
           if (row.length === 1 && row[0] === "") continue;
+
           const t = new Date(row[timeIndex]);
           if (newestTime === null) {
             newestTime = t;
@@ -85,24 +92,47 @@ document.addEventListener("DOMContentLoaded", function () {
             }
           }
         }
+
         const sellRows = [],
           buyRows = [];
         newestRows.forEach((r) => {
           if (r[sellBuyIndex] === "売り") sellRows.push(r);
           else buyRows.push(r);
         });
+
         allData.push({ folderName, headers, sellRows, buyRows });
         if (newestTime) newestTimes.push(newestTime);
       });
   });
 
-  let allProductsSet = new Set();
-  Promise.all(promises).then(() => {
+  // life_skill.csvをフェッチして商品名リストを取得
+  const lifeSkillPromise = fetch("価格/life_skill.csv") // パスを適切に変更してください
+    .then((res) => {
+      if (!res.ok) throw new Error("life_skill.csv取得失敗");
+      return res.text();
+    })
+    .then((data) => {
+      const lifeSkillProducts = data
+        .split("\n")
+        .map((line) => line.trim().replace(/,$/, "")); // 各行のトリムと末尾のカンマ削除
+      return new Set(lifeSkillProducts.filter((name) => name !== "")); // 空行を除外
+    })
+    .catch((err) => {
+      console.error(err);
+      return new Set(); // エラー時は空のセットを返す
+    });
+
+  // フォルダデータとlife_skillデータを同時に処理
+  Promise.all([...folderPromises, lifeSkillPromise]).then((results) => {
+    // 最後の結果がlifeSkillProductsSet
+    const lifeSkillProductsSet = results[results.length - 1];
+
     if (allData.length === 0) {
       console.error("データなし");
       return;
     }
 
+    // 最も古い日時の表示
     let oldestTimeDisplay = document.getElementById("oldestTimeDisplay");
     if (newestTimes.length > 0) {
       let oldestTime = newestTimes.reduce((a, b) => (a < b ? a : b));
@@ -111,7 +141,8 @@ document.addEventListener("DOMContentLoaded", function () {
       oldestTimeDisplay.textContent = "最も古い日時: 取得できませんでした";
     }
 
-    fetch("価格/ConsumptionFatigueLevel.csv")
+    // ConsumptionFatigueLevel.csvのフェッチ
+    fetch("価格/ConsumptionFatigueLevel.csv") // パスを適切に変更してください
       .then((res) => {
         if (!res.ok) throw new Error("ConsumptionFatigueLevel.csv取得失敗");
         return res.text();
@@ -122,10 +153,12 @@ document.addEventListener("DOMContentLoaded", function () {
           .map((l) => l.split(",").map((c) => c.trim()));
         const fatigueHeader = flines[0].slice(1);
         const fatigueMap = {};
+
         for (let i = 1; i < flines.length; i++) {
           const row = flines[i];
           const bFolderName = row[0];
           fatigueMap[bFolderName] = {};
+
           for (let j = 1; j < row.length; j++) {
             const aFolderName = fatigueHeader[j - 1];
             fatigueMap[bFolderName][aFolderName] = row[j];
@@ -141,13 +174,37 @@ document.addEventListener("DOMContentLoaded", function () {
         const specialIndex = headers.indexOf("特産品");
 
         // 買いデータに登場する商品のみ対象
+        let allProductsSet = new Set();
         allData.forEach((d) => {
           d.buyRows.forEach((r) => {
             allProductsSet.add(r[pIndex]);
           });
         });
-        const allProducts = Array.from(allProductsSet);
-        allProducts.forEach((prod) => {
+
+        // メインウィンドウでの計算には全ての買いデータの商品を使用
+        const allProductsForMain = Array.from(allProductsSet);
+
+        // life_skill.csvに含まれる商品名のみを設定モーダルの「商品別設定」に表示
+        const allProductsForSettings = Array.from(allProductsSet).filter(
+          (prod) => lifeSkillProductsSet.has(prod)
+        );
+
+        // life_skill.csvに含まれる商品が設定モーダルに存在しない場合の警告
+        if (allProductsForSettings.length === 0) {
+          console.warn(
+            "life_skill.csvに含まれる商品が買いデータに存在しません。"
+          );
+        }
+
+        // 全ての買いデータの商品に対してデフォルト設定を適用（未設定のもの）
+        allProductsForMain.forEach((prod) => {
+          if (!productSettings[prod]) {
+            productSettings[prod] = { taxAdjust: 0, qtyAdjust: 0 };
+          }
+        });
+
+        // life_skill.csvに含まれる商品で設定が存在しないものにデフォルト設定を適用
+        allProductsForSettings.forEach((prod) => {
           if (!productSettings[prod]) {
             productSettings[prod] = { taxAdjust: 0, qtyAdjust: 0 };
           }
@@ -155,12 +212,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const outputContainer = document.getElementById("outputContainer");
 
+        // 傾向値の変換
         function convertTrend(value) {
           if (value === "-1") return "↘";
           if (value === "1") return "↗";
           return value;
         }
 
+        // テーブルのカラム定義
         const columns = [
           { key: "productName", name: "商品名", numeric: false },
           { key: "profit", name: "利益", numeric: true },
@@ -173,15 +232,16 @@ document.addEventListener("DOMContentLoaded", function () {
           { key: "multiplierB", name: "売り倍率", numeric: true },
         ];
 
+        // 税率再計算関数
         function recalcPrice(oldValue, folderName, productName) {
           const folderTax = folderSettings[folderName].tax;
           const productTaxAdj = productSettings[productName].taxAdjust || 0;
           const effectiveTax = folderTax - productTaxAdj;
-          // 税率計算前の値に直接掛け算
           const newVal = Math.round(oldValue * (1 + effectiveTax / 100));
           return newVal;
         }
 
+        // 販売個数再計算関数
         function recalcQuantity(origQty, folderName, productName, isSpecial) {
           const folderQ = folderSettings[folderName].qty;
           const productQ = productSettings[productName].qtyAdjust || 0;
@@ -194,6 +254,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return newQty;
         }
 
+        // 基本計算関数
         function doBaseCalculation() {
           const resultSets = [];
           for (let i = 0; i < allData.length; i++) {
@@ -309,7 +370,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   fatigueVal: fatigueValueCommon,
                   sumRatio: sumRatio,
                   rows: finalRows,
-                  originalItems: itemsForCapCalc,
+                  originalItems: itemsForCapCalc, // 仕入れ書再計算用の元データ
                   totalPurchase: totalPurchase,
                   totalSell: totalSell,
                 });
@@ -319,6 +380,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return resultSets;
         }
 
+        // 仕入れ書再計算関数
         function recalcWithFactor(originalItems, factor, fatigueVal) {
           // factor倍した数量で再度capacity適用
           const recalced = originalItems.map((item) => {
@@ -365,6 +427,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
 
+        // finalPairs作成
         const finalPairs = [];
         for (const key in pairsMap) {
           const pair = pairsMap[key];
@@ -381,6 +444,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         finalPairs.sort((a, b) => b.avgRatio - a.avgRatio);
 
+        // テーブルレンダリング関数
         function renderTable(
           titleElement,
           subtitleElement,
@@ -430,6 +494,7 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
 
+        // finalPairsをレンダリング
         finalPairs.forEach((card) => {
           const [folder1, folder2] = card.pairKey.split("|");
           const cardDiv = document.createElement("div");
@@ -473,7 +538,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // イベントリスナー設定
             const factorInput = factorDiv.querySelector(".factorInput");
-
             factorInput.addEventListener("input", () => {
               const n = parseInt(factorInput.value, 10) || 0;
               const factor = n + 1;
@@ -530,7 +594,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // イベントリスナー設定
             const factorInput = factorDiv.querySelector(".factorInput");
-
             factorInput.addEventListener("input", () => {
               const n = parseInt(factorInput.value, 10) || 0;
               const factor = n + 1;
@@ -555,41 +618,113 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
 
-        // 設定モーダル
+        // 設定モーダルの要素取得
         const settingsButton = document.getElementById("settingsButton");
         const modal = document.getElementById("settingsModal");
         const closeBtn = modal.querySelector(".close");
         const saveBtn = document.getElementById("saveSettings");
-        const folderSettingsDiv = document.getElementById("folderSettings");
-        const productSettingsDiv = document.getElementById("productSettings");
+        const folderSettingsBody =
+          document.getElementById("folderSettingsBody");
+        const productSettingsBody = document.getElementById(
+          "productSettingsBody"
+        );
         const capacityInput = document.getElementById("capacityInput");
 
+        // 設定のレンダリング関数
         function renderSettings() {
-          folderSettingsDiv.innerHTML = "";
+          // フォルダ別設定テーブルの生成
+          folderSettingsBody.innerHTML = "";
           folders.forEach((f) => {
             const fs = folderSettings[f];
-            const d = document.createElement("div");
-            d.innerHTML = `<strong>${f}</strong><br>
-                  税率(%):<input type="number" min="0" max="100" class="fTax" data-folder="${f}" value="${fs.tax}">
-                  販売個数倍率(%):<input type="number" min="0" max="1000" class="fQty" data-folder="${f}" value="${fs.qty}">
-                  特産品販売個数倍率(%):<input type="number" min="0" max="1000" class="fSpec" data-folder="${f}" value="${fs.spec}">`;
-            folderSettingsDiv.appendChild(d);
+            const tr = document.createElement("tr");
+
+            // フォルダ名
+            const tdName = document.createElement("td");
+            tdName.textContent = f;
+            tr.appendChild(tdName);
+
+            // 税率入力
+            const tdTax = document.createElement("td");
+            const taxInput = document.createElement("input");
+            taxInput.type = "number";
+            taxInput.min = "0";
+            taxInput.max = "100";
+            taxInput.className = "fTax";
+            taxInput.setAttribute("data-folder", f);
+            taxInput.value = fs.tax;
+            tdTax.appendChild(taxInput);
+            tr.appendChild(tdTax);
+
+            // 販売個数倍率入力
+            const tdQty = document.createElement("td");
+            const qtyInput = document.createElement("input");
+            qtyInput.type = "number";
+            qtyInput.min = "0";
+            qtyInput.max = "1000";
+            qtyInput.className = "fQty";
+            qtyInput.setAttribute("data-folder", f);
+            qtyInput.value = fs.qty;
+            tdQty.appendChild(qtyInput);
+            tr.appendChild(tdQty);
+
+            // 特産品販売個数倍率入力
+            const tdSpec = document.createElement("td");
+            const specInput = document.createElement("input");
+            specInput.type = "number";
+            specInput.min = "0";
+            specInput.max = "1000";
+            specInput.className = "fSpec";
+            specInput.setAttribute("data-folder", f);
+            specInput.value = fs.spec;
+            tdSpec.appendChild(specInput);
+            tr.appendChild(tdSpec);
+
+            folderSettingsBody.appendChild(tr);
           });
 
+          // 全体設定
           capacityInput.value = capacity;
 
-          productSettingsDiv.innerHTML = "";
-          allProducts.forEach((prod) => {
+          // 商品別設定テーブルの生成（life_skill.csvに含まれる商品名のみ）
+          productSettingsBody.innerHTML = "";
+          allProductsForSettings.forEach((prod) => {
             const ps = productSettings[prod];
-            const d = document.createElement("div");
-            d.innerHTML = `<strong>${prod}</strong> 税率軽減(%):<input type="number" class="pTax" data-product="${prod}" value="${ps.taxAdjust}">
-                  個数加算(%):<input type="number" class="pQty" data-product="${prod}" value="${ps.qtyAdjust}">`;
-            productSettingsDiv.appendChild(d);
+            const tr = document.createElement("tr");
+
+            // 商品名
+            const tdName = document.createElement("td");
+            tdName.textContent = prod;
+            tr.appendChild(tdName);
+
+            // 税率軽減入力
+            const tdPTax = document.createElement("td");
+            const pTaxInput = document.createElement("input");
+            pTaxInput.type = "number";
+            pTaxInput.min = "0";
+            pTaxInput.className = "pTax";
+            pTaxInput.setAttribute("data-product", prod);
+            pTaxInput.value = ps.taxAdjust;
+            tdPTax.appendChild(pTaxInput);
+            tr.appendChild(tdPTax);
+
+            // 個数加算入力
+            const tdPQty = document.createElement("td");
+            const pQtyInput = document.createElement("input");
+            pQtyInput.type = "number";
+            pQtyInput.min = "0";
+            pQtyInput.className = "pQty";
+            pQtyInput.setAttribute("data-product", prod);
+            pQtyInput.value = ps.qtyAdjust;
+            tdPQty.appendChild(pQtyInput);
+            tr.appendChild(tdPQty);
+
+            productSettingsBody.appendChild(tr);
           });
         }
 
         renderSettings();
 
+        // モーダル表示・非表示の制御
         settingsButton.addEventListener("click", () => {
           modal.style.display = "block";
         });
@@ -600,7 +735,9 @@ document.addEventListener("DOMContentLoaded", function () {
           if (e.target === modal) modal.style.display = "none";
         });
 
+        // 設定の保存
         saveBtn.addEventListener("click", () => {
+          // フォルダ別設定の保存
           const fTaxInputs = document.querySelectorAll(".fTax");
           const fQtyInputs = document.querySelectorAll(".fQty");
           const fSpecInputs = document.querySelectorAll(".fSpec");
@@ -616,8 +753,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const f = inp.getAttribute("data-folder");
             folderSettings[f].spec = parseFloat(inp.value) || 0;
           });
+
+          // 全体設定の保存
           capacity = parseFloat(capacityInput.value) || 1000;
 
+          // 商品別設定の保存（life_skill.csvに含まれる商品名のみ）
           const pTaxInputs = document.querySelectorAll(".pTax");
           const pQtyInputs = document.querySelectorAll(".pQty");
           pTaxInputs.forEach((inp) => {
@@ -629,6 +769,7 @@ document.addEventListener("DOMContentLoaded", function () {
             productSettings[p].qtyAdjust = parseFloat(inp.value) || 0;
           });
 
+          // 新しい設定をローカルストレージに保存
           const newSettings = {
             folderSettings: folderSettings,
             capacity: capacity,
@@ -639,6 +780,9 @@ document.addEventListener("DOMContentLoaded", function () {
           // 設定変更後はリロードで再計算
           location.reload();
         });
+      })
+      .catch((err) => {
+        console.error("設定データの読み込み中にエラーが発生しました:", err);
       });
   });
 });
