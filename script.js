@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "鉄路同盟前哨基地",
     "ワンダーランド",
     "荒地駅",
+    "雲岫橋基地",
   ];
 
   const allData = [];
