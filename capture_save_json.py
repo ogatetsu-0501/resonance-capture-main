@@ -34,7 +34,7 @@ class Capture:
                 print(f"データを {output_file} に保存しました")
                 
                 # 保存後にCSV書き出し処理を実行
-                self.process_and_save_csv(output_file)
+                self.process_and_append_csv(output_file)
 
             except Exception as e:
                 print(f"保存エラー: {e}")
@@ -46,8 +46,8 @@ class Capture:
         with open(filepath, "r", encoding="utf-8") as f:
             return json.load(f)
 
-    def process_and_save_csv(self, raw_response_file):
-        """raw_response.bin と JSON を解析し CSV を保存"""
+    def process_and_append_csv(self, raw_response_file):
+        """raw_response.bin と JSON を解析し CSV に追加"""
         try:
             # raw_response.bin をロード
             with open(raw_response_file, "rb") as f:
@@ -117,6 +117,18 @@ class Capture:
                                 "更新時間": timestamp
                             })
 
+            # 新しい "買い" 商品名を収集
+            new_buy_products = {row["商品名"] for row in results if row["売りor買い"] == "買い"}
+
+            # 既存の "買い" 商品名を収集
+            existing_buy_products = self.collect_existing_buy_products()
+
+            # 結合してユニークな "買い" 商品名を作成
+            all_buy_products = existing_buy_products.union(new_buy_products)
+
+            # 既存のoutput.csvファイルをフィルタリング
+            self.filter_existing_csv(all_buy_products)
+
             # 都市ごとのデータをCSVに保存
             for city in city_counter.keys():
                 city_results = [row for row in results if row["都市名"] == city]
@@ -124,6 +136,56 @@ class Capture:
 
         except Exception as e:
             print(f"CSV出力処理でエラーが発生しました: {e}")
+
+    def collect_existing_buy_products(self):
+        """価格フォルダ内のすべてのoutput.csvから"買い"の商品名を収集"""
+        buy_products = set()
+        for root, dirs, files in os.walk(self.base_dir):
+            for file in files:
+                if file == "output.csv":
+                    csv_path = os.path.join(root, file)
+                    try:
+                        with open(csv_path, "r", encoding="utf-8") as csvfile:
+                            reader = csv.DictReader(csvfile)
+                            for row in reader:
+                                if row.get("売りor買い") == "買い":
+                                    product_name = row.get("商品名")
+                                    if product_name:
+                                        buy_products.add(product_name)
+                    except Exception as e:
+                        print(f"既存のCSVファイル {csv_path} の読み取り中にエラーが発生しました: {e}")
+        return buy_products
+
+    def filter_existing_csv(self, valid_products):
+        """すべてのoutput.csvからvalid_productsに含まれない"商品名"の行を削除"""
+        for root, dirs, files in os.walk(self.base_dir):
+            for file in files:
+                if file == "output.csv":
+                    csv_path = os.path.join(root, file)
+                    try:
+                        with open(csv_path, "r", encoding="utf-8") as csvfile:
+                            reader = list(csv.DictReader(csvfile))
+                            fieldnames = reader[0].keys() if reader else []
+                        
+                        # フィルタリング: "買い" 以外は valid_products に含まれるかチェック
+                        filtered_rows = []
+                        for row in reader:
+                            if row.get("売りor買い") == "買い" or row.get("商品名") in valid_products:
+                                filtered_rows.append(row)
+                        
+                        # 一時ファイルに保存
+                        temp_path = csv_path + ".tmp"
+                        with open(temp_path, "w", newline="", encoding="utf-8") as csvfile:
+                            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                            writer.writeheader()
+                            writer.writerows(filtered_rows)
+                        
+                        # 元のファイルを置き換え
+                        os.replace(temp_path, csv_path)
+                        print(f"{csv_path} をフィルタリングしました")
+                    
+                    except Exception as e:
+                        print(f"既存のCSVファイル {csv_path} のフィルタリング中にエラーが発生しました: {e}")
 
     def save_to_city_csv(self, data, city):
         """都市ごとにデータを output.csv に追記保存"""
@@ -141,7 +203,6 @@ class Capture:
                 writer.writeheader()  # ファイルが存在しない場合はヘッダーを追加
             writer.writerows(data)
         print(f"{output_csv} にデータを保存しました")
-
 
 # mitmproxyのアドオンとして登録
 addons = [Capture()]
