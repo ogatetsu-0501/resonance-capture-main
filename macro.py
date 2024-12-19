@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 import json
 import subprocess
+import pygetwindow as gw
 
-# 小学生でもわかるように、全ての行にコメントを付けます。
 # ADBツールのパスを環境変数に追加する(コンピュータがADBを見つけられるようにする)
 ADB_PATH = r"C:\\Program Files\\Netease\\MuMuPlayerGlobal-12.0\\shell"
 os.environ["PATH"] += os.pathsep + ADB_PATH  # PATHにADBの場所を追加する
@@ -23,6 +23,23 @@ def restart_adb_service():
 restart_adb_service()  # ADBサービスを再起動しておく
 client = AdbClient(host="127.0.0.1", port=5037)  # ADBクライアントを作る
 
+# MuMu Playerを最小化する関数
+def minimize_mumu_player():
+    print("Minimizing MuMu Player...")
+    try:
+        # MuMu Playerのウィンドウを探して最小化
+        windows = gw.getWindowsWithTitle("MuMu")
+        if windows:
+            for window in windows:
+                window.minimize()
+            print("MuMu Player minimized.")
+        else:
+            print("MuMu Player window not found.")
+    except Exception as e:
+        # 最小化に失敗した場合のエラー
+        print(f"Failed to minimize MuMu Player: {e}")
+        exit()
+
 # MuMu Playerを再起動する関数
 def restart_mumu_player():
     # MuMu Playerを再起動するよ
@@ -38,6 +55,7 @@ def restart_mumu_player():
         # ADBを使ってMuMu Playerとつなげる（リモート接続）
         client.remote_connect("127.0.0.1", 7555)
         print("MuMu Player restarted and reconnected successfully.")
+        minimize_mumu_player()  # 再起動後に最小化する
     except subprocess.CalledProcessError as e:
         # MuMuPlayer.exeを終了できなかった場合のエラー
         print(f"Failed to restart MuMu Player: {e.output}")
@@ -225,7 +243,7 @@ if __name__ == "__main__":
         if current_time >= next_execution_time:
             # 一定時間ごとにやりたい処理(15分ごと)
             next_execution_time = current_time + timedelta(minutes=15)
-            restart_mumu_player()      # MuMu Player再起動
+            restart_mumu_player()      # MuMu Player再起動して最小化
             connect_to_mumu()          # MuMu Playerへ接続
             device = check_device()    # デバイス取得
             start_game(device)         # ゲームを起動
