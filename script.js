@@ -225,7 +225,8 @@ document.addEventListener("DOMContentLoaded", function () {
           { key: "profit", name: "利益", numeric: true },
           { key: "displayQtyA", name: "販売個数", numeric: true },
           { key: "priceA", name: "買い値段", numeric: true },
-          { key: "priceB", name: "売り値段", numeric: true },
+          { key: "priceB_original", name: "売り値段 (元)", numeric: true },
+          { key: "priceB_adjusted", name: "売り値段 (調整後)", numeric: true },
           { key: "trendA", name: "買い傾向", numeric: false },
           { key: "multiplierA", name: "買い倍率", numeric: true },
           { key: "trendB", name: "売り傾向", numeric: false },
@@ -305,11 +306,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     dataA.folderName,
                     productName
                   );
-                  const priceB = recalcPrice(
-                    sellMapB[productName].origPriceB,
-                    dataB.folderName,
-                    productName
-                  );
+                  const priceB_original = sellMapB[productName].origPriceB;
+
+                  // 新しい priceB_adjusted の計算
+                  const priceA_with_tax =
+                    buyMapA[productName].origPriceA *
+                    (1 + folderSettings[dataA.folderName].tax / 100);
+                  const priceDifference = priceB_original - priceA_with_tax;
+                  const adjustedValue =
+                    priceDifference < 0
+                      ? 0
+                      : Math.round(
+                          priceDifference *
+                            (folderSettings[dataB.folderName].tax / 100)
+                        ); // 修正箇所: Bフォルダの税率を使用
+                  const priceB_adjusted = priceB_original - adjustedValue;
+
+                  const profit = priceB_adjusted - priceA;
+                  const profitForCalc = profit < 0 ? 0 : profit;
 
                   const adjQtyA = recalcQuantity(
                     buyMapA[productName].origQtyA,
@@ -319,20 +333,18 @@ document.addEventListener("DOMContentLoaded", function () {
                   );
                   const displayQtyA = Math.floor(adjQtyA);
 
-                  const originalProfit = priceB - priceA;
-                  const profitForCalc = originalProfit < 0 ? 0 : originalProfit;
-
                   itemsForCapCalc.push({
                     productName,
                     priceA,
-                    priceB,
+                    priceB_original, // 元の売り値段
+                    priceB_adjusted, // 調整後の売り値段
                     trendA: buyMapA[productName].trendA,
                     multiplierA: buyMapA[productName].multiplierA,
                     trendB: sellMapB[productName].trendB,
                     multiplierB: sellMapB[productName].multiplierB,
                     displayQtyA,
                     quantityA: displayQtyA,
-                    profit: originalProfit,
+                    profit,
                     profitForCalc,
                     fatigue: fVal,
                   });
@@ -357,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   totalProfitTimesQuantity +=
                     usedQty * (item.profit < 0 ? 0 : item.profit);
                   totalPurchase += usedQty * item.priceA;
-                  totalSell += usedQty * item.priceB;
+                  totalSell += usedQty * item.priceB_original; // 総売却金額には元の priceB を使用
                 }
                 finalRows.push({ ...item, quantityA: usedQty });
               }
@@ -403,7 +415,7 @@ document.addEventListener("DOMContentLoaded", function () {
               totalProfitTimesQuantity +=
                 usedQty * (item.profit < 0 ? 0 : item.profit);
               totalPurchase += usedQty * item.priceA;
-              totalSell += usedQty * item.priceB;
+              totalSell += usedQty * item.priceB_original; // 総売却金額には元の priceB を使用
             }
           }
           const sumRatio = totalProfitTimesQuantity / fatigueVal;
