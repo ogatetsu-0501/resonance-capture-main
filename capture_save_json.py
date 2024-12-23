@@ -34,7 +34,7 @@ class Capture:
                     f.write(flow.response.content)
                 print(f"データを {output_file} に保存しました。")
 
-                # 保存したバイナリファイルを読み込み、MessagePackファイルに追加
+                # 保存したバイナリファイルを読み込み、JSONデータとして扱う
                 with open(output_file, "rb") as f:
                     response_data = json.load(f)
                 self.process_and_append_msgpack(response_data)
