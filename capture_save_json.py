@@ -1,7 +1,7 @@
 import os
 import json
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Capture:
     def __init__(self):
@@ -213,7 +213,7 @@ class Capture:
                         print(f"既存のCSVファイル {csv_path} のフィルタリング中にエラーが発生しました: {e}")
 
     def save_to_city_csv(self, data, city):
-        """都市ごとにデータを output.csv に追記保存"""
+        """都市ごとにデータを output.csv に追記保存し、1週間以上前の行を削除"""
         fieldnames = ["都市名", "売りor買い", "商品名", "値段", "傾向", "倍率", "販売個数", "特産品", "更新時間"]
         city_dir = os.path.join(self.base_dir, city)  # 都市ごとのフォルダ
         if not os.path.exists(city_dir):
@@ -223,6 +223,10 @@ class Capture:
 
         file_exists = os.path.exists(output_csv)
         try:
+            # 既存のデータを読み込み、1週間以上前の行を削除
+            if file_exists:
+                self.remove_old_entries(output_csv)
+
             with open(output_csv, "a", newline="", encoding="utf-8") as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 if not file_exists:
@@ -231,6 +235,43 @@ class Capture:
             print(f"{output_csv} にデータを保存しました")
         except Exception as e:
             print(f"{output_csv} へのデータ保存中にエラーが発生しました: {e}")
+
+    def remove_old_entries(self, csv_path):
+        """
+        指定されたCSVファイルから、'更新時間' が1週間以上前の行を削除します。
+        """
+        try:
+            with open(csv_path, "r", encoding="utf-8") as csvfile:
+                reader = list(csv.DictReader(csvfile))
+                fieldnames = reader[0].keys() if reader else []
+            
+            # 現在の日時から1週間前の日時を計算
+            one_week_ago = datetime.now() - timedelta(weeks=1)
+            
+            # フィルタリング: '更新時間' が1週間以内の行のみを保持
+            filtered_rows = []
+            for row in reader:
+                try:
+                    update_time = datetime.strptime(row.get("更新時間", ""), "%Y-%m-%d %H:%M:%S")
+                    if update_time >= one_week_ago:
+                        filtered_rows.append(row)
+                except ValueError:
+                    # 日時のパースに失敗した場合、その行をスキップ
+                    print(f"無効な日時形式の行をスキップしました: {row}")
+            
+            # 一時ファイルに保存
+            temp_path = csv_path + ".tmp"
+            with open(temp_path, "w", newline="", encoding="utf-8") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(filtered_rows)
+            
+            # 元のファイルを置き換え
+            os.replace(temp_path, csv_path)
+            print(f"{csv_path} から1週間以上前のデータを削除しました")
+        
+        except Exception as e:
+            print(f"{csv_path} のフィルタリング中にエラーが発生しました: {e}")
 
 # mitmproxyのアドオンとして登録
 addons = [Capture()]
