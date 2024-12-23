@@ -1,54 +1,60 @@
 import os
 import json
-import csv
+import msgpack
 from datetime import datetime, timedelta
 
 class Capture:
     def __init__(self):
-        # 保存先のフォルダを定義
-        self.base_dir = "価格"  # ベースフォルダ名を変更
-        self.json_file = "HomeGoodsQuotationFactory_translated.json"
-        self.factory_json_file = "HomeGoodsFactory.json"
-        self.sale_items_file = "sale_item.csv"  # sale_item.csvのファイル名
-        # 保存先フォルダが存在しない場合は作成
+        # データを保存するフォルダの名前
+        self.base_dir = "価格"  # フォルダ名を「価格」に設定
+        self.msgpack_file = os.path.join(self.base_dir, "market_data.msgpack")  # MessagePackファイルのパス
+        self.json_file = "HomeGoodsQuotationFactory_translated.json"  # JSONファイルの名前
+        self.factory_json_file = "HomeGoodsFactory.json"  # 工場JSONファイルの名前
+        self.sale_items_file = "sale_item.csv"  # 販売アイテムCSVファイルの名前
+
+        # データを保存するフォルダが存在しない場合は作成する
         if not os.path.exists(self.base_dir):
             os.makedirs(self.base_dir)
+            print(f"フォルダ '{self.base_dir}' を作成しました。")
 
     def response(self, flow):
         """
-        HTTPレスポンスデータをそのまま保存し、CSV出力処理を実行する。
+        HTTPレスポンスデータを保存し、MessagePackファイルに追加する処理を実行します。
         """
-        # ターゲットURLとパラメータ
+        # 監視するターゲットのURLとメソッド
         target_url = "https://jp-prd-rzns.gameduchy.com/api/"
         target_method = "method=station.goods_info"
 
-        # 条件: 指定のURLおよびメソッドを含むリクエスト
+        # リクエストがターゲットのURLとメソッドに一致するか確認
         if flow.request.url.startswith(target_url) and target_method in flow.request.content.decode("utf-8"):
             try:
-                # 保存先のファイル名を生成
+                # レスポンスデータをバイナリファイルとして保存
                 output_file = os.path.join(self.base_dir, "raw_response.bin")
-                
-                # レスポンスデータをそのまま保存
                 with open(output_file, "wb") as f:
                     f.write(flow.response.content)
-                
-                print(f"データを {output_file} に保存しました")
-                
-                # 保存後にCSV書き出し処理を実行
-                self.process_and_append_csv(output_file)
+                print(f"データを {output_file} に保存しました。")
+
+                # 保存したバイナリファイルを読み込み、MessagePackファイルに追加
+                with open(output_file, "rb") as f:
+                    response_data = json.load(f)
+                self.process_and_append_msgpack(response_data)
 
             except Exception as e:
-                print(f"保存エラー: {e}")
+                print(f"データ保存中にエラーが発生しました: {e}")
 
     def load_json_file(self, filepath):
-        """指定されたJSONファイルをロード"""
+        """
+        指定されたJSONファイルを読み込みます。
+        """
         if not os.path.exists(filepath):
-            raise FileNotFoundError(f"{filepath} が見つかりません")
+            raise FileNotFoundError(f"{filepath} が見つかりません。")
         with open(filepath, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def load_sale_items(self):
-        """sale_item.csvから商品名をロード"""
+        """
+        sale_item.csvから商品名を読み込みます。
+        """
         sale_items_path = os.path.join(self.base_dir, self.sale_items_file)
         sale_items = set()
         if not os.path.exists(sale_items_path):
@@ -56,46 +62,38 @@ class Capture:
             return sale_items
         try:
             with open(sale_items_path, "r", encoding="utf-8") as f:
-                reader = csv.reader(f)
-                for row in reader:
-                    # 空行や不要なスペースを除去
-                    if row:
-                        item = row[0].strip()
-                        if item:
-                            sale_items.add(item)
-            print(f"sale_item.csv から {len(sale_items)} 件のアイテムをロードしました。")
+                for line in f:
+                    item = line.strip()
+                    if item:
+                        sale_items.add(item)
+            print(f"{self.sale_items_file} から {len(sale_items)} 件のアイテムをロードしました。")
         except Exception as e:
             print(f"{self.sale_items_file} の読み取り中にエラーが発生しました: {e}")
         return sale_items
 
-    def process_and_append_csv(self, raw_response_file):
-        """raw_response.bin と JSON を解析し CSV に追加"""
+    def process_and_append_msgpack(self, response_data):
+        """
+        レスポンスデータとJSONデータを解析し、MessagePackファイルに追加します。
+        古いデータ（1週間以上前）は削除します。
+        """
         try:
-            # raw_response.bin をロード
-            with open(raw_response_file, "rb") as f:
-                response_data = json.loads(f.read())
-
-            # HomeGoodsQuotationFactory_translated.json をロード
+            # JSONファイルを読み込む
             reference_data = self.load_json_file(self.json_file)
-
-            # HomeGoodsFactory.json をロード
             factory_data = self.load_json_file(self.factory_json_file)
-
-            # sale_item.csv をロード
             sale_items = self.load_sale_items()
 
-            # データ処理
+            # データを保存するリストを作成
             results = []
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+            # レスポンスデータから価格情報を取得
             goods_price = response_data.get("goods_price", {})
-            city_counter = {}
 
             for price_type in ["sell_price", "buy_price"]:
                 price_data = goods_price.get(price_type, {})
                 for id_key, price_info in price_data.items():
                     try:
-                        # リスト内で該当する ID を検索
+                        # 参照データから該当するIDを検索
                         reference_item = next(
                             (item for item in reference_data if int(item.get("id", 0)) == int(id_key)),
                             None
@@ -109,7 +107,7 @@ class Capture:
                         goods_id = reference_item.get("goodsId")
                         num = reference_item.get("num")  # 販売個数を取得
 
-                        # HomeGoodsFactory.json から特産品情報を検索
+                        # 工場データから特産品情報を検索
                         speciality = "通常品"
                         if goods_id:
                             factory_item = next(
@@ -127,9 +125,10 @@ class Capture:
                                 print(f"廃棄データをスキップしました: ID {id_key}, 都市名 {city}")
                                 continue
 
+                            # 売りまたは買いに応じて取引タイプを設定
                             transaction_type = "買い" if price_type == "sell_price" else "売り"
 
-                            city_counter[city] = city_counter.get(city, 0) + 1
+                            # データをリストに追加
                             results.append({
                                 "都市名": city,
                                 "売りor買い": transaction_type,
@@ -142,136 +141,69 @@ class Capture:
                                 "更新時間": timestamp
                             })
 
-            # 新しい "買い" 商品名を収集
-            new_buy_products = {row["商品名"] for row in results if row["売りor買い"] == "買い"}
+            # 既存のMessagePackデータを読み込む
+            existing_data = self.load_from_msgpack(self.msgpack_file)
 
-            # 既存の "買い" 商品名を収集
-            existing_buy_products = self.collect_existing_buy_products()
+            # 新しいデータを追加
+            existing_data.extend(results)
 
-            # 結合してユニークな "買い" 商品名を作成
-            all_buy_products = existing_buy_products.union(new_buy_products)
-
-            # 既存のoutput.csvファイルをフィルタリング
-            self.filter_existing_csv(all_buy_products, sale_items)
-
-            # 都市ごとのデータをCSVに保存
-            for city in city_counter.keys():
-                city_results = [row for row in results if row["都市名"] == city]
-                self.save_to_city_csv(city_results, city)
-
-        except Exception as e:
-            print(f"CSV出力処理でエラーが発生しました: {e}")
-
-    def collect_existing_buy_products(self):
-        """価格フォルダ内のすべてのoutput.csvから"買い"の商品名を収集"""
-        buy_products = set()
-        for root, dirs, files in os.walk(self.base_dir):
-            for file in files:
-                if file == "output.csv":
-                    csv_path = os.path.join(root, file)
-                    try:
-                        with open(csv_path, "r", encoding="utf-8") as csvfile:
-                            reader = csv.DictReader(csvfile)
-                            for row in reader:
-                                if row.get("売りor買い") == "買い":
-                                    product_name = row.get("商品名")
-                                    if product_name:
-                                        buy_products.add(product_name)
-                    except Exception as e:
-                        print(f"既存のCSVファイル {csv_path} の読み取り中にエラーが発生しました: {e}")
-        return buy_products
-
-    def filter_existing_csv(self, valid_buy_products, sale_items):
-        """すべてのoutput.csvからvalid_buy_productsに含まれず、sale_itemsにも含まれない"商品名"の行を削除"""
-        for root, dirs, files in os.walk(self.base_dir):
-            for file in files:
-                if file == "output.csv":
-                    csv_path = os.path.join(root, file)
-                    try:
-                        with open(csv_path, "r", encoding="utf-8") as csvfile:
-                            reader = list(csv.DictReader(csvfile))
-                            fieldnames = reader[0].keys() if reader else []
-                        
-                        # フィルタリング: "買い" 以外は valid_buy_products または sale_items に含まれるかチェック
-                        filtered_rows = []
-                        for row in reader:
-                            if (row.get("売りor買い") == "買い") or (row.get("商品名") in valid_buy_products) or (row.get("商品名") in sale_items):
-                                filtered_rows.append(row)
-                        
-                        # 一時ファイルに保存
-                        temp_path = csv_path + ".tmp"
-                        with open(temp_path, "w", newline="", encoding="utf-8") as csvfile:
-                            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                            writer.writeheader()
-                            writer.writerows(filtered_rows)
-                        
-                        # 元のファイルを置き換え
-                        os.replace(temp_path, csv_path)
-                        print(f"{csv_path} をフィルタリングしました")
-                    
-                    except Exception as e:
-                        print(f"既存のCSVファイル {csv_path} のフィルタリング中にエラーが発生しました: {e}")
-
-    def save_to_city_csv(self, data, city):
-        """都市ごとにデータを output.csv に追記保存し、1週間以上前の行を削除"""
-        fieldnames = ["都市名", "売りor買い", "商品名", "値段", "傾向", "倍率", "販売個数", "特産品", "更新時間"]
-        city_dir = os.path.join(self.base_dir, city)  # 都市ごとのフォルダ
-        if not os.path.exists(city_dir):
-            os.makedirs(city_dir)  # 都市フォルダがない場合は作成
-
-        output_csv = os.path.join(city_dir, "output.csv")  # 都市フォルダ内のoutput.csv
-
-        file_exists = os.path.exists(output_csv)
-        try:
-            # 既存のデータを読み込み、1週間以上前の行を削除
-            if file_exists:
-                self.remove_old_entries(output_csv)
-
-            with open(output_csv, "a", newline="", encoding="utf-8") as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                if not file_exists:
-                    writer.writeheader()  # ファイルが存在しない場合はヘッダーを追加
-                writer.writerows(data)
-            print(f"{output_csv} にデータを保存しました")
-        except Exception as e:
-            print(f"{output_csv} へのデータ保存中にエラーが発生しました: {e}")
-
-    def remove_old_entries(self, csv_path):
-        """
-        指定されたCSVファイルから、'更新時間' が1週間以上前の行を削除します。
-        """
-        try:
-            with open(csv_path, "r", encoding="utf-8") as csvfile:
-                reader = list(csv.DictReader(csvfile))
-                fieldnames = reader[0].keys() if reader else []
-            
-            # 現在の日時から1週間前の日時を計算
+            # 古いデータ（1週間以上前）を削除
             one_week_ago = datetime.now() - timedelta(weeks=1)
-            
-            # フィルタリング: '更新時間' が1週間以内の行のみを保持
-            filtered_rows = []
-            for row in reader:
-                try:
-                    update_time = datetime.strptime(row.get("更新時間", ""), "%Y-%m-%d %H:%M:%S")
-                    if update_time >= one_week_ago:
-                        filtered_rows.append(row)
-                except ValueError:
-                    # 日時のパースに失敗した場合、その行をスキップ
-                    print(f"無効な日時形式の行をスキップしました: {row}")
-            
-            # 一時ファイルに保存
-            temp_path = csv_path + ".tmp"
-            with open(temp_path, "w", newline="", encoding="utf-8") as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                writer.writeheader()
-                writer.writerows(filtered_rows)
-            
-            # 元のファイルを置き換え
-            os.replace(temp_path, csv_path)
-            print(f"{csv_path} から1週間以上前のデータを削除しました")
-        
+            filtered_data = [entry for entry in existing_data if self.is_recent(entry["更新時間"], one_week_ago)]
+
+            # フィルタリングされたデータをMessagePackファイルに保存
+            self.save_to_msgpack(filtered_data, self.msgpack_file)
+            print(f"MessagePackファイルにデータを保存しました。現在のデータ数: {len(filtered_data)}")
+
         except Exception as e:
-            print(f"{csv_path} のフィルタリング中にエラーが発生しました: {e}")
+            print(f"MessagePackへの保存中にエラーが発生しました: {e}")
+
+    def is_recent(self, update_time_str, cutoff_datetime):
+        """
+        更新時間が1週間以内かどうかを確認します。
+        """
+        try:
+            update_time = datetime.strptime(update_time_str, "%Y-%m-%d %H:%M:%S")
+            return update_time >= cutoff_datetime
+        except ValueError:
+            # 日時の形式が正しくない場合は古いデータとみなす
+            print(f"無効な日時形式のデータをスキップしました: {update_time_str}")
+            return False
+
+    def save_to_msgpack(self, data, filepath):
+        """
+        データをMessagePack形式でファイルに保存します。
+        """
+        try:
+            with open(filepath, "wb") as f:
+                packed = msgpack.packb(data, use_bin_type=True)
+                f.write(packed)
+            print(f"データを {filepath} にMessagePack形式で保存しました。")
+        except Exception as e:
+            print(f"MessagePack保存中にエラーが発生しました: {e}")
+
+    def load_from_msgpack(self, filepath):
+        """
+        MessagePack形式のファイルからデータを読み込みます。
+        ファイルが存在しない場合は空のリストを返します。
+        """
+        if not os.path.exists(filepath):
+            print(f"{filepath} が見つかりません。新しいファイルを作成します。")
+            return []
+        try:
+            with open(filepath, "rb") as f:
+                data = msgpack.unpackb(f.read(), raw=False)
+            print(f"{filepath} からデータを読み込みました。データ数: {len(data)}")
+            return data
+        except Exception as e:
+            print(f"MessagePack読み込み中にエラーが発生しました: {e}")
+            return []
+
+    def __del__(self):
+        """
+        クラスのインスタンスが削除される際に呼ばれます。必要に応じてクリーンアップ処理を行います。
+        """
+        print("Captureクラスのインスタンスが削除されました。")
 
 # mitmproxyのアドオンとして登録
 addons = [Capture()]
