@@ -1,101 +1,63 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- ページの文字コードをUTF-8に設定 -->
+    <!-- 文字コードをUTF-8に設定 -->
     <meta charset="UTF-8" />
-    <!-- ページのタイトルを設定 -->
-    <title>@msgpack/msgpack 3.x (ESM) を読み込む例 + モーダル設定</title>
-
-    <!-- モーダル用の簡易CSSをここに追加 -->
+    <!-- タイトル -->
+    <title>設定ページの例</title>
+    <!-- 簡易CSS -->
     <style>
-      /* モーダルの背景を少し半透明にするための設定 */
+      /* モーダルの背景を半透明にして中央表示する */
       .modal-overlay {
-        position: fixed; /* 画面全体を覆う */
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒背景 */
-        display: none; /* 初期表示は非表示 */
-        justify-content: center; /* 中央揃え（横） */
-        align-items: center; /* 中央揃え（縦） */
-        z-index: 9999; /* モーダルが他要素の上にくるように */
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none; /* 初期は非表示 */
+        justify-content: center;
+        align-items: center;
       }
-
-      /* モーダルの本体部分をカード状に表示 */
+      /* モーダルの内容をカード風に */
       .modal-content {
-        background-color: #fff; /* 白い背景 */
-        padding: 20px; /* 内側余白 */
-        border-radius: 8px; /* 角を丸く */
-        min-width: 300px; /* 横幅をある程度確保 */
-        max-height: 80vh; /* 高さを画面の8割まで */
-        overflow-y: auto; /* 縦方向のスクロールを表示 */
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        min-width: 300px;
       }
-
-      /* テーブルをそれっぽく表示するためのスタイル */
+      /* テーブルの罫線などの設定 */
       table {
-        border-collapse: collapse; /* 罫線をまとめる */
-        width: 100%; /* 幅をテーブルの親に合わせる */
-        margin-bottom: 20px; /* 下に余白 */
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
       }
       table,
       th,
       td {
-        border: 1px solid #ccc; /* 薄い罫線 */
+        border: 1px solid #ccc;
       }
       th,
       td {
         padding: 8px;
         text-align: left;
       }
-
-      /* モーダルの中のボタンの配置を右側にまとめる */
+      /* ボタン置き場を右寄せ */
       .modal-actions {
         text-align: right;
       }
     </style>
   </head>
   <body>
-    <!-- -------------------------------
-       ここからもともとの index.html 内容
-       ------------------------------- -->
-    <!-- 計算結果を表示するセクション -->
-    <div id="results">
-      <h2>計算結果</h2>
-
-      <!-- 指定時間を入力するフォーム -->
-      <div id="time-input">
-        <label for="specified-time">指定時間:</label>
-        <input
-          type="datetime-local"
-          id="specified-time"
-          name="specified-time"
-        />
-        <button id="update-time">更新</button>
-      </div>
-
-      <h3>都市名リスト</h3>
-      <ul id="city-list">
-        計算中...
-      </ul>
-      <h3>各都市のデータ</h3>
-      <div id="city-data">計算中...</div>
-    </div>
-
-    <!-- -------------------------------
-       ここからモーダル (設定画面)
-       ------------------------------- -->
-
-    <!-- 「設定を開く」ボタンを作っておく -->
+    <!-- 設定を開くボタン -->
     <button id="open-settings-btn">設定を開く</button>
 
     <!-- モーダルのオーバーレイ -->
     <div class="modal-overlay" id="settings-modal">
-      <!-- モーダルの本体部分 -->
       <div class="modal-content">
         <h2>設定</h2>
 
-        <!-- 積載上限を入力 -->
+        <!-- 積載上限入力欄 -->
         <label for="maxLoadInput">積載上限:</label>
         <input type="number" id="maxLoadInput" min="0" />
         <hr />
@@ -112,14 +74,13 @@
             </tr>
           </thead>
           <tbody id="city-setting-table-body">
-            <!-- JSで動的に行を追加します -->
+            <!-- JavaScriptで行を動的生成 -->
           </tbody>
         </table>
-
         <hr />
 
-        <!-- 商品別設定 (life_skill.csv) -->
-        <h3>商品別設定</h3>
+        <!-- 商品別設定 -->
+        <h3>商品別設定 (life_skill.csv)</h3>
         <table>
           <thead>
             <tr>
@@ -129,10 +90,9 @@
             </tr>
           </thead>
           <tbody id="product-setting-table-body">
-            <!-- JSで動的に行を追加します -->
+            <!-- JavaScriptで行を動的生成 -->
           </tbody>
         </table>
-
         <hr />
 
         <!-- 交渉設定 -->
@@ -184,7 +144,7 @@
           </tbody>
         </table>
 
-        <!-- モーダル内のボタン類 -->
+        <!-- ボタン配置 -->
         <div class="modal-actions">
           <button id="save-settings-btn">保存</button>
           <button id="close-settings-btn">閉じる</button>
@@ -192,13 +152,7 @@
       </div>
     </div>
 
-    <!-- -------------------------------
-       ここでJSファイルを読み込み
-       ------------------------------- -->
-
-    <!-- メインのscript.js（そのまま） -->
-    <script type="module" src="script.js"></script>
-    <!-- モーダル設定やローカルストレージ処理をする settings.js -->
+    <!-- 設定スクリプト（script.jsとは別ファイル） -->
     <script type="module" src="settings.js"></script>
   </body>
 </html>
