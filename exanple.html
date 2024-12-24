@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>交渉シミュレーション</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    h1, h2 {
+      margin-bottom: 10px;
+    }
+    .param-section, .result-section {
+      margin-bottom: 30px;
+    }
+    .param-section label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .param-section input {
+      width: 60px;
+      text-align: right;
+    }
+    .btn-run {
+      margin-top: 10px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 600px;
+    }
+    table, th, td {
+      border: 1px solid #aaa;
+    }
+    th, td {
+      text-align: center;
+      padding: 5px;
+    }
+    th {
+      background-color: #f7f7f7;
+    }
+  </style>
+</head>
+<body>
+  <h1>交渉シミュレーション</h1>
+  <div class="param-section">
+    <h2>パラメータ設定</h2>
+    <label>初期交渉%: <input id="initialNegotiationPercent" type="number" value="0"/> %</label>
+    <label>初期交渉成功率: <input id="initialSuccessRate" type="number" value="70"/> %</label>
+    <label>初期交渉疲労値: <input id="initialFatigue" type="number" value="0"/> </label>
+    <label>疲労値の増加量: <input id="fatigueIncrement" type="number" value="10"/> </label>
+    <label>変動幅(成功時 交渉%増加): <input id="negotiationPercentStep" type="number" value="10"/> %</label>
+    <label>交渉上限回数: <input id="maxNegotiations" type="number" value="5"/> 回</label>
+    <label>交渉%の上限: <input id="maxNegotiationPercent" type="number" value="20"/> %</label>
+    <label>失敗時加算成功率: <input id="failureBonusRate" type="number" value="5"/> %</label>
+    <label>初回成功率加算: <input id="firstTimeBonusRate" type="number" value="10"/> %</label>
+
+    <button class="btn-run" onclick="runSimulation()">シミュレーション実行</button>
+  </div>
+
+  <div class="result-section">
+    <h2>結果</h2>
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>交渉回数</th>
+          <th>交渉% 期待値</th>
+          <th>交渉疲労値 期待値</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 結果を表示 -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    /**
+     * シミュレーションを実行するメイン関数
+     */
+    function runSimulation() {
+      // HTML入力からパラメータを取得
+      const initialNegotiationPercent = parseFloat(document.getElementById('initialNegotiationPercent').value) || 0;
+      const initialSuccessRate        = parseFloat(document.getElementById('initialSuccessRate').value) || 70;
+      const initialFatigue            = parseFloat(document.getElementById('initialFatigue').value) || 0;
+      const fatigueIncrement          = parseFloat(document.getElementById('fatigueIncrement').value) || 10;
+      const negotiationPercentStep    = parseFloat(document.getElementById('negotiationPercentStep').value) || 10;
+      const maxNegotiations           = parseInt(document.getElementById('maxNegotiations').value) || 5;
+      const maxNegotiationPercent     = parseFloat(document.getElementById('maxNegotiationPercent').value) || 20;
+      const failureBonusRate          = parseFloat(document.getElementById('failureBonusRate').value) || 5;
+      const firstTimeBonusRate        = parseFloat(document.getElementById('firstTimeBonusRate').value) || 10;
+
+      // 分岐結果を全て格納する配列
+      // 各要素は以下のような構造を持つ:
+      // {
+      //   path: "S, F, S, ...",           // 成功/失敗を列挙したもの
+      //   probability: 0.XX,             // この分岐の到達確率
+      //   states: [                      // 交渉回数ごと(1回目,2回目,...)の状態
+      //     {
+      //       successRate,              // (次回)基礎成功率
+      //       adjustedSuccessRate,      // 実際の判定に使った成功率
+      //       negotiationPercent,       // 交渉%
+      //       fatigue,                  // 交渉疲労値
+      //       isSuccess                 // 今回が成功か失敗か
+      //     },
+      //     ...
+      //   ]
+      // }
+      let allBranches = [];
+
+      /**
+       * 再帰的に全分岐を生成して計算する
+       * @param {number} currentRound - 現在の交渉回数 (1〜maxNegotiations)
+       * @param {Object} prevState - 前回交渉までの状態
+       * @param {Array} pathStates - これまでの交渉状態を配列で保持
+       * @param {string} pathStr - "S" or "F" の列挙 (例: "S,S,F")
+       * @param {number} accumulatedProbability - ここまでの累積確率
+       */
+      function simulateBranches(currentRound, prevState, pathStates, pathStr, accumulatedProbability) {
+        // 交渉回数が maxNegotiations を超えたら、分岐を確定させて保存
+        if (currentRound > maxNegotiations) {
+          allBranches.push({
+            path: pathStr,
+            probability: accumulatedProbability,
+            states: pathStates
+          });
+          return;
+        }
+
+        // 今回の交渉成功率 (基礎成功率)
+        let baseSuccessRate = prevState.successRate;
+        // 今回の判定用成功率
+        let adjustedSuccessRate = 0;
+
+        if (currentRound === 1) {
+          // 初回交渉: 判定用成功率 = 成功率 + 初回成功率加算
+          adjustedSuccessRate = baseSuccessRate + firstTimeBonusRate;
+        } else {
+          // 前回成功なら: 判定用成功率 = 成功率
+          // 前回失敗なら: 判定用成功率 = 成功率 + 失敗時加算成功率
+          adjustedSuccessRate = prevState.isSuccess
+            ? baseSuccessRate
+            : baseSuccessRate + failureBonusRate;
+        }
+
+        // 成功確率(%)は最大100%になる可能性もあるが、本仕様では特に上限指定ないためそのまま
+        // ただし下限は0%に固定すると記載があるためマイナスにはならないようにする
+        adjustedSuccessRate = Math.max(0, adjustedSuccessRate);
+
+        // 成功確率(小数)を計算
+        const successProb = Math.min(adjustedSuccessRate / 100, 1.0);
+        const failureProb = 1 - successProb;
+
+        // ----------------------------
+        // 成功分岐
+        // ----------------------------
+        {
+          const newNegotiationPercent = Math.min(
+            prevState.negotiationPercent + negotiationPercentStep,
+            maxNegotiationPercent
+          );
+
+          // 交渉疲労値の増加: 交渉%が20%未満の場合のみ +10
+          let newFatigue = prevState.fatigue;
+          if (prevState.negotiationPercent < maxNegotiationPercent) {
+            newFatigue += fatigueIncrement;
+          }
+
+          // 前回交渉成功時: 今回成功 -> 次回の成功率 = 前回成功率 -10%
+          // 前回交渉失敗時: 今回成功 -> 次回の成功率 = 前回成功率 -10%
+          // いずれにせよ「成功時: 成功率 = 前回の成功率 -10%」なので:
+          let newSuccessRate = Math.max(0, baseSuccessRate - 10);
+
+          const successState = {
+            successRate: newSuccessRate,        // 次回の基礎成功率
+            adjustedSuccessRate: adjustedSuccessRate,
+            negotiationPercent: newNegotiationPercent,
+            fatigue: newFatigue,
+            isSuccess: true
+          };
+
+          simulateBranches(
+            currentRound + 1,
+            successState,
+            [...pathStates, successState],
+            pathStr ? pathStr + ",S" : "S",
+            accumulatedProbability * successProb
+          );
+        }
+
+        // ----------------------------
+        // 失敗分岐
+        // ----------------------------
+        {
+          // 失敗時は交渉%は変化しない
+          const newNegotiationPercent = prevState.negotiationPercent;
+
+          // 交渉疲労値の増加: 交渉%が20%未満の場合のみ +10
+          let newFatigue = prevState.fatigue;
+          if (prevState.negotiationPercent < maxNegotiationPercent) {
+            newFatigue += fatigueIncrement;
+          }
+
+          // 前回失敗時: 今回失敗 -> 次回成功率 = 前回成功率 (変わらない)
+          // 前回成功時: 今回失敗 -> 次回成功率 = 前回成功率 (変わらない)
+          // いずれにしても失敗時は「成功率 = 前回の成功率」
+          let newSuccessRate = baseSuccessRate;
+
+          const failureState = {
+            successRate: newSuccessRate,
+            adjustedSuccessRate: adjustedSuccessRate,
+            negotiationPercent: newNegotiationPercent,
+            fatigue: newFatigue,
+            isSuccess: false
+          };
+
+          simulateBranches(
+            currentRound + 1,
+            failureState,
+            [...pathStates, failureState],
+            pathStr ? pathStr + ",F" : "F",
+            accumulatedProbability * failureProb
+          );
+        }
+      }
+
+      // 初期状態 (交渉開始前の仮の状態) を用意
+      // → 1回目交渉用に使う
+      const initialState = {
+        successRate: initialSuccessRate,
+        negotiationPercent: initialNegotiationPercent,
+        fatigue: initialFatigue,
+        isSuccess: false  // 1回目は前回がないので仮にfalseとしておく
+      };
+
+      allBranches = [];
+      // 1回目の交渉からスタート
+      simulateBranches(
+        1,
+        initialState,
+        [],
+        "",
+        1.0
+      );
+
+      // ---- ここから期待値計算 ----
+      // 各交渉回数 i (=1〜maxNegotiations) に対して、
+      // 分岐ごとに「その時点の交渉%」「交渉疲労値」を取り出し、確率重みをかけて合計 → 期待値を算出
+      // ただし、states[i-1] が存在しない場合は、その分岐は i 回目を行っていない(=最大回数を超えている) ということなので考慮外
+      const expectedResultsByRound = [];
+
+      for (let round = 1; round <= maxNegotiations; round++) {
+        let sumNegotiationPercent = 0;
+        let sumFatigue = 0;
+        let sumProbability = 0;
+
+        allBranches.forEach(branch => {
+          // branch.states[round-1] : round回目の交渉終了時点の状態
+          const state = branch.states[round - 1];
+          if (!state) {
+            // その分岐は round 回目まで到達していない(= もう終了している)
+            return;
+          }
+          const prob = branch.probability * (
+            // 注意: branch.probability は "全ラウンドを通した最終確率"。
+            // しかし、すべてのラウンドの成功/失敗をかけ合わせてできた確率が branch.probability。
+            // round 回目を実行できた時点での確率 = branch.probability でも問題なく扱える。
+            1
+          );
+          sumNegotiationPercent += state.negotiationPercent * prob;
+          sumFatigue += state.fatigue * prob;
+          sumProbability += prob;
+        });
+
+        // 期待値 = 合計 / sumProbability
+        // ただし分岐が全くない(= sumProbability=0)ケースはほぼ起きないが、一応ガード
+        let expNegotiationPercent = sumProbability > 0 ? sumNegotiationPercent / sumProbability : 0;
+        let expFatigue = sumProbability > 0 ? sumFatigue / sumProbability : 0;
+
+        expectedResultsByRound.push({
+          round,
+          negotiationPercent: expNegotiationPercent,
+          fatigue: expFatigue
+        });
+      }
+
+      // ---- 結果をテーブルに表示 ----
+      const resultsTableBody = document.querySelector("#resultsTable tbody");
+      resultsTableBody.innerHTML = "";
+
+      expectedResultsByRound.forEach(res => {
+        const tr = document.createElement("tr");
+        const tdRound = document.createElement("td");
+        tdRound.textContent = res.round;
+        const tdNegotiationPercent = document.createElement("td");
+        tdNegotiationPercent.textContent = res.negotiationPercent.toFixed(2) + " %";
+        const tdFatigue = document.createElement("td");
+        tdFatigue.textContent = res.fatigue.toFixed(2);
+
+        tr.appendChild(tdRound);
+        tr.appendChild(tdNegotiationPercent);
+        tr.appendChild(tdFatigue);
+        resultsTableBody.appendChild(tr);
+      });
+
+      // ---- デバッグ用に分岐を console に表示 ----
+      console.log("=== 全分岐の結果 ===");
+      allBranches.forEach(branch => {
+        // 各交渉ラウンドの状態をまとめて表示
+        // path, probability, states[*]
+        console.log("Path:", branch.path, 
+                    "Probability:", branch.probability.toFixed(6));
+        branch.states.forEach((st, idx) => {
+          console.log(
+            `  Round ${idx + 1}:`,
+            `SuccessRate=${st.successRate}%`,
+            `AdjustedSuccessRate=${st.adjustedSuccessRate}%`,
+            `Negotiation%=${st.negotiationPercent}%`,
+            `Fatigue=${st.fatigue}`,
+            `Result=${st.isSuccess ? "S" : "F"}`
+          );
+        });
+      });
+      console.log("=== 期待値 ===");
+      expectedResultsByRound.forEach(res => {
+        console.log(
+          `Round ${res.round}: Expected Negotiation% = ${res.negotiationPercent.toFixed(2)}%,`,
+          `Expected Fatigue = ${res.fatigue.toFixed(2)}`
+        );
+      });
+    }
+  </script>
+</body>
+</html>

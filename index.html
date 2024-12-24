@@ -1,72 +1,32 @@
 <!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ペア表示ツール</title>
-    <!-- msgpack-liteライブラリをCDNから読み込み -->
-    <script src="https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <h1>ペア表示ツール</h1>
-    <!-- 最も古い日時表示用 -->
-    <h2 id="oldestTimeDisplay"></h2>
+<html>
+<head>
+  <!-- ここでは文字コードをUTF-8に設定しています -->
+  <meta charset="UTF-8" />
+  <!-- このページのタイトルを決めます -->
+  <title>@msgpack/msgpack 3.x (ESM) を読み込む例</title>
+</head>
+<body>
 
-    <button id="settingsButton">設定</button>
-    <div id="outputContainer"></div>
-
-    <!-- 設定モーダル -->
-    <div id="settingsModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>設定</h2>
-        <p>
-          フォルダ別税率・販売個数倍率・特産品倍率、積載上限、商品別軽減率などを設定してください。
-        </p>
-
-        <!-- フォルダ別設定 -->
-        <h3>フォルダ別設定</h3>
-        <table id="folderSettingsTable">
-          <thead>
-            <tr>
-              <th>フォルダ名</th>
-              <th>税率 (%)</th>
-              <th>販売個数倍率 (%)</th>
-              <th>特産品販売個数倍率 (%)</th>
-            </tr>
-          </thead>
-          <tbody id="folderSettingsBody">
-            <!-- JavaScriptで動的に生成 -->
-          </tbody>
-        </table>
-
-        <!-- 全体設定 -->
-        <h3>全体設定</h3>
-        <div class="overall-settings">
-          <label for="capacityInput">積載上限:</label>
-          <input type="number" id="capacityInput" min="1" value="1000" />
-        </div>
-
-        <!-- 商品別設定 -->
-        <h3>商品別設定（買いデータに存在する商品のみ）</h3>
-        <table id="productSettingsTable">
-          <thead>
-            <tr>
-              <th>商品名</th>
-              <th>税率軽減 (%)</th>
-              <th>個数加算 (%)</th>
-            </tr>
-          </thead>
-          <tbody id="productSettingsBody">
-            <!-- JavaScriptで動的に生成 -->
-          </tbody>
-        </table>
-
-        <button id="saveSettings">保存</button>
-      </div>
+  <!-- 計算結果を表示するセクション -->
+  <div id="results">
+    <h2>計算結果</h2>
+    
+    <!-- 指定時間を入力するフォーム -->
+    <div id="time-input">
+      <label for="specified-time">指定時間:</label>
+      <input type="datetime-local" id="specified-time" name="specified-time">
+      <button id="update-time">更新</button>
     </div>
+    
+    <h3>都市名リスト</h3>
+    <ul id="city-list">計算中...</ul>
+    <h3>各都市のデータ</h3>
+    <div id="city-data">計算中...</div>
+  </div>
 
-    <script src="script.js"></script>
-  </body>
+  <!-- ESM形式のスクリプトとして読み込みます -->
+  <script type="module" src="script.js"></script>
+
+</body>
 </html>
