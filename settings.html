@@ -1,68 +1,79 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <!-- 文字コードをUTF-8に設定 -->
-    <meta charset="UTF-8" />
-    <!-- タイトル -->
-    <title>設定ページの例</title>
-    <!-- 簡易CSS -->
-    <style>
-      /* モーダルの背景を半透明にして中央表示する */
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: none; /* 初期は非表示 */
-        justify-content: center;
-        align-items: center;
-      }
-      /* モーダルの内容をカード風に */
-      .modal-content {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        min-width: 300px;
-      }
-      /* テーブルの罫線などの設定 */
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-      }
-      table,
-      th,
-      td {
-        border: 1px solid #ccc;
-      }
-      th,
-      td {
-        padding: 8px;
-        text-align: left;
-      }
-      /* ボタン置き場を右寄せ */
-      .modal-actions {
-        text-align: right;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- 設定を開くボタン -->
-    <button id="open-settings-btn">設定を開く</button>
+<head>
+  <!-- 文字コードをUTF-8に設定 -->
+  <meta charset="UTF-8">
+  <!-- タイトル設定 -->
+  <title>設定ページの例</title>
+  <!-- 簡単なスタイルを定義（必要に応じてCSSファイルを分割可能） -->
+  <style>
+    /* モーダルの背景を少し半透明にするための設定 */
+    .modal-overlay {
+      position: fixed;           /* 常に画面全体に表示 */
+      top: 0;                    /* 画面上端に位置 */
+      left: 0;                   /* 画面左端に位置 */
+      width: 100%;              /* 幅を画面全体に */
+      height: 100%;             /* 高さを画面全体に */
+      background-color: rgba(0,0,0,0.5); /* 半透明の黒背景 */
+      display: none;            /* 初期状態は非表示 */
+      justify-content: center;  /* 中央揃え */
+      align-items: center;      /* 中央揃え */
+    }
 
-    <!-- モーダルのオーバーレイ -->
-    <div class="modal-overlay" id="settings-modal">
-      <div class="modal-content">
-        <h2>設定</h2>
+    /* モーダルの中身をカードっぽく表示 */
+    .modal-content {
+      background-color: #fff;    /* 白背景 */
+      padding: 20px;            /* 内側余白 */
+      border-radius: 8px;       /* 角を少し丸くする */
+      min-width: 300px;         /* 幅をある程度確保 */
+    }
 
-        <!-- 積載上限入力欄 -->
+    /* テーブルの見た目を少し整える */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    /* 閉じるボタンなど */
+    .modal-actions {
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 設定ボタン -->
+  <button id="open-settings-btn">
+    設定を開く
+  </button>
+
+  <!-- モーダルのオーバーレイ -->
+  <div class="modal-overlay" id="settings-modal">
+    <!-- モーダルのコンテンツ -->
+    <div class="modal-content">
+      <h2>設定</h2>
+      
+      <!-- ここに設定フォームを置きます -->
+      <div id="settings-form-area">
+        <!-- フォーム要素は settings.js 側で動的に生成してもOKですが、ここではサンプルとしてHTMLに直接書きます -->
+        
+        <!-- 積載上限 -->
         <label for="maxLoadInput">積載上限:</label>
         <input type="number" id="maxLoadInput" min="0" />
+        
         <hr />
-
-        <!-- 都市別設定 -->
+        
+        <!-- ユニークな都市名を行ヘッダーとした設定(例) -->
         <h3>都市別設定</h3>
         <table>
           <thead>
@@ -74,12 +85,20 @@
             </tr>
           </thead>
           <tbody id="city-setting-table-body">
-            <!-- JavaScriptで行を動的生成 -->
+            <!-- ここにJSで行を追加してもOK。例として1行だけ置いておく -->
+            <tr>
+              <td>サンプル都市1</td>
+              <td><input type="number" id="city1Tax" /></td>
+              <td><input type="number" id="city1QtyRate" /></td>
+              <td><input type="number" id="city1SpecialQtyRate" /></td>
+            </tr>
+            <!-- 必要に応じて行を増やせます -->
           </tbody>
         </table>
+        
         <hr />
-
-        <!-- 商品別設定 -->
+        
+        <!-- /価格/life_skill.csv に入っている商品名を行ヘッダーとしての設定(例) -->
         <h3>商品別設定 (life_skill.csv)</h3>
         <table>
           <thead>
@@ -90,18 +109,25 @@
             </tr>
           </thead>
           <tbody id="product-setting-table-body">
-            <!-- JavaScriptで行を動的生成 -->
+            <!-- サンプルとして1行だけ -->
+            <tr>
+              <td>サンプル商品A</td>
+              <td><input type="number" id="productAReducedTax" /></td>
+              <td><input type="number" id="productAQtyRate" /></td>
+            </tr>
+            <!-- 必要に応じて行を増やせます -->
           </tbody>
         </table>
+        
         <hr />
-
-        <!-- 交渉設定 -->
+        
+        <!-- 値引き、値上げに関わる交渉設定 -->
         <h3>交渉設定</h3>
         <table>
           <thead>
             <tr>
               <th></th>
-              <th>設定値</th>
+              <th>値引き / 値上げ</th>
             </tr>
           </thead>
           <tbody>
@@ -143,16 +169,18 @@
             </tr>
           </tbody>
         </table>
-
-        <!-- ボタン配置 -->
-        <div class="modal-actions">
-          <button id="save-settings-btn">保存</button>
-          <button id="close-settings-btn">閉じる</button>
-        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <!-- 設定を保存するボタン -->
+        <button id="save-settings-btn">保存</button>
+        <!-- モーダルを閉じるボタン -->
+        <button id="close-settings-btn">閉じる</button>
       </div>
     </div>
+  </div>
 
-    <!-- 設定スクリプト（script.jsとは別ファイル） -->
-    <script type="module" src="settings.js"></script>
-  </body>
+  <!-- 設定用スクリプトを読み込む（script.js とは別ファイル） -->
+  <script type="module" src="settings.js"></script>
+</body>
 </html>

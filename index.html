@@ -135,51 +135,61 @@
 
         <hr />
 
-        <!-- 交渉設定 -->
+        <!-- 交渉設定（値引き／値上げ） -->
         <h3>交渉設定</h3>
         <table>
           <thead>
             <tr>
-              <th></th>
-              <th>設定値</th>
+              <th>項目</th>
+              <th>値引き</th>  <!-- ここを「値引き設定」列 -->
+              <th>値上げ</th>  <!-- ここを「値上げ設定」列 -->
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>初期交渉%</td>
-              <td><input type="number" id="initialNegotiationRate" /></td>
+              <td><input type="number" id="initialNegotiationRateDiscount" /></td>
+              <td><input type="number" id="initialNegotiationRateMarkUp" /></td>
             </tr>
             <tr>
               <td>初期交渉成功率(%)</td>
-              <td><input type="number" id="initialSuccessRate" /></td>
+              <td><input type="number" id="initialSuccessRateDiscount" /></td>
+              <td><input type="number" id="initialSuccessRateMarkUp" /></td>
             </tr>
             <tr>
               <td>初期交渉疲労値</td>
-              <td><input type="number" id="initialFatigue" /></td>
+              <td><input type="number" id="initialFatigueDiscount" /></td>
+              <td><input type="number" id="initialFatigueMarkUp" /></td>
             </tr>
             <tr>
               <td>疲労値の増加量</td>
-              <td><input type="number" id="fatigueIncrement" /></td>
+              <td><input type="number" id="fatigueIncrementDiscount" /></td>
+              <td><input type="number" id="fatigueIncrementMarkUp" /></td>
             </tr>
             <tr>
               <td>変動幅(成功時 交渉%増加)(%)</td>
-              <td><input type="number" id="negotiationIncrement" /></td>
+              <td><input type="number" id="negotiationIncrementDiscount" /></td>
+              <td><input type="number" id="negotiationIncrementMarkUp" /></td>
             </tr>
             <tr>
               <td>交渉上限回数</td>
-              <td><input type="number" id="maxNegotiations" /></td>
+              <td><input type="number" id="maxNegotiationsDiscount" /></td>
+              <td><input type="number" id="maxNegotiationsMarkUp" /></td>
             </tr>
             <tr>
               <td>交渉%の上限(%)</td>
-              <td><input type="number" id="negotiationRateLimit" /></td>
+              <td><input type="number" id="negotiationRateLimitDiscount" /></td>
+              <td><input type="number" id="negotiationRateLimitMarkUp" /></td>
             </tr>
             <tr>
               <td>失敗時加算成功率(%)</td>
-              <td><input type="number" id="failBonusSuccess" /></td>
+              <td><input type="number" id="failBonusSuccessDiscount" /></td>
+              <td><input type="number" id="failBonusSuccessMarkUp" /></td>
             </tr>
             <tr>
               <td>初回成功率加算(%)</td>
-              <td><input type="number" id="firstTimeBonusSuccess" /></td>
+              <td><input type="number" id="firstTimeBonusSuccessDiscount" /></td>
+              <td><input type="number" id="firstTimeBonusSuccessMarkUp" /></td>
             </tr>
           </tbody>
         </table>
