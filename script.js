@@ -9,7 +9,8 @@ import {
 console.log("スクリプト開始！(ESM版)");
 
 // -------------------------------------------
-// 1) 既存のコード (MessagePackの取得、表示用関数など)
+// ① 既存のコード (MessagePackの取得、表示用関数など)
+//    （省略せず、すべて残します）
 // -------------------------------------------
 
 // 総売上額を計算する関数
@@ -199,7 +200,7 @@ let globalCityList = [];
 let globalLatestTimeMap = new Map();
 
 // -------------------------------------------
-// 2) 交渉シミュレーションの正式実装 (再帰的全分岐)
+// ② 交渉シミュレーションの正式実装 (再帰的全分岐)
 // -------------------------------------------
 
 // 値引き(Discount) の 交渉% / 疲労値 期待値
@@ -211,6 +212,198 @@ let markUpExpectPct = [];
 let markUpExpectFatigue = [];
 
 /**
+ * 交渉シミュレーションを実行する共通関数
+ * @param {Object} params - シミュレーションパラメータ
+ * @returns {Object} - 期待値結果
+ */
+function simulateNegotiation(params) {
+  const {
+    initialNegotiationPercent,
+    initialSuccessRate,
+    initialFatigue,
+    fatigueIncrement,
+    negotiationPercentStep,
+    maxNegotiations,
+    maxNegotiationPercent,
+    failureBonusRate,
+    firstTimeBonusRate,
+  } = params;
+
+  let allBranches = [];
+
+  /**
+   * 再帰的に全分岐を生成して計算する
+   * @param {number} currentRound - 現在の交渉回数 (1〜maxNegotiations)
+   * @param {Object} prevState - 前回交渉までの状態
+   * @param {Array} pathStates - これまでの交渉状態を配列で保持
+   * @param {string} pathStr - "S" or "F" の列挙 (例: "S,S,F")
+   * @param {number} accumulatedProbability - ここまでの累積確率
+   */
+  function simulateBranches(
+    currentRound,
+    prevState,
+    pathStates,
+    pathStr,
+    accumulatedProbability
+  ) {
+    // 交渉回数が maxNegotiations を超えたら、分岐を確定させて保存
+    if (currentRound > maxNegotiations) {
+      allBranches.push({
+        path: pathStr,
+        probability: accumulatedProbability,
+        states: pathStates,
+      });
+      return;
+    }
+
+    // 今回の交渉成功率 (基礎成功率)
+    let baseSuccessRate = prevState.successRate;
+    // 今回の判定用成功率
+    let adjustedSuccessRate = 0;
+
+    if (currentRound === 1) {
+      // 初回交渉: 判定用成功率 = 成功率 + 初回成功率加算
+      adjustedSuccessRate = baseSuccessRate + firstTimeBonusRate;
+    } else {
+      // 前回成功なら: 判定用成功率 = 成功率
+      // 前回失敗なら: 判定用成功率 = 成功率 + 失敗時加算成功率
+      adjustedSuccessRate = prevState.isSuccess
+        ? baseSuccessRate
+        : baseSuccessRate + failureBonusRate;
+    }
+
+    // 成功率は最低0%
+    adjustedSuccessRate = Math.max(0, adjustedSuccessRate);
+
+    // 成功確率を計算 (最大1.0)
+    const successProb = Math.min(adjustedSuccessRate / 100, 1.0);
+    const failureProb = 1 - successProb;
+
+    // ----------------------------
+    // 成功分岐
+    // ----------------------------
+    {
+      // 交渉%を negotiationPercentStep だけ上げ、上限にクリップ
+      const newNegotiationPercent = Math.min(
+        prevState.negotiationPercent + negotiationPercentStep,
+        maxNegotiationPercent
+      );
+
+      // 疲労値を条件付きで増加
+      let newFatigue = prevState.fatigue;
+      if (prevState.negotiationPercent < maxNegotiationPercent) {
+        newFatigue += fatigueIncrement;
+      }
+
+      // 次回成功率を減少
+      let newSuccessRate = Math.max(0, baseSuccessRate - 10);
+
+      const successState = {
+        successRate: newSuccessRate, // 次回の基礎成功率
+        adjustedSuccessRate: adjustedSuccessRate,
+        negotiationPercent: newNegotiationPercent,
+        fatigue: newFatigue,
+        isSuccess: true,
+      };
+
+      // 再帰的に次のラウンドをシミュレート
+      simulateBranches(
+        currentRound + 1,
+        successState,
+        [...pathStates, successState],
+        pathStr ? pathStr + ",S" : "S",
+        accumulatedProbability * successProb
+      );
+    }
+
+    // ----------------------------
+    // 失敗分岐
+    // ----------------------------
+    {
+      // 交渉%は変化しない
+      const newNegotiationPercent = prevState.negotiationPercent;
+
+      // 疲労値を条件付きで増加
+      let newFatigue = prevState.fatigue;
+      if (prevState.negotiationPercent < maxNegotiationPercent) {
+        newFatigue += fatigueIncrement;
+      }
+
+      // 次回成功率は変わらない
+      let newSuccessRate = baseSuccessRate;
+
+      const failureState = {
+        successRate: newSuccessRate,
+        adjustedSuccessRate: adjustedSuccessRate,
+        negotiationPercent: newNegotiationPercent,
+        fatigue: newFatigue,
+        isSuccess: false,
+      };
+
+      // 再帰的に次のラウンドをシミュレート
+      simulateBranches(
+        currentRound + 1,
+        failureState,
+        [...pathStates, failureState],
+        pathStr ? pathStr + ",F" : "F",
+        accumulatedProbability * failureProb
+      );
+    }
+  }
+
+  // 初期状態を定義
+  const initialState = {
+    successRate: initialSuccessRate,
+    negotiationPercent: initialNegotiationPercent,
+    fatigue: initialFatigue,
+    isSuccess: false, // 初回は前回がないので仮にfalseとしておく
+  };
+
+  // シミュレーション開始
+  simulateBranches(1, initialState, [], "", 1.0);
+
+  // ---- ここから期待値計算 ----
+  // 各交渉回数 i (=1〜maxNegotiations) に対して、
+  // 分岐ごとに「その時点の交渉%」「交渉疲労値」を取り出し、確率重みをかけて合計 → 期待値を算出
+  // ただし、states[i-1] が存在しない場合は、その分岐は i 回目を行っていない(=最大回数を超えている) ということなので考慮外
+  const expectedResultsByRound = [];
+
+  for (let round = 1; round <= maxNegotiations; round++) {
+    let sumNegotiationPercent = 0;
+    let sumFatigue = 0;
+    let sumProbability = 0;
+
+    allBranches.forEach((branch) => {
+      // branch.states[round-1] : round回目の交渉終了時点の状態
+      const state = branch.states[round - 1];
+      if (!state) {
+        // その分岐は round 回目まで到達していない(= もう終了している)
+        return;
+      }
+      const prob = branch.probability; // この分岐の到達確率
+      sumNegotiationPercent += state.negotiationPercent * prob;
+      sumFatigue += state.fatigue * prob;
+      sumProbability += prob;
+    });
+
+    // 期待値 = 合計 / sumProbability
+    // ただし分岐が全くない(= sumProbability=0)ケースはほぼ起きないが、一応ガード
+    let expNegotiationPercent =
+      sumProbability > 0 ? sumNegotiationPercent / sumProbability : 0;
+    let expFatigue = sumProbability > 0 ? sumFatigue / sumProbability : 0;
+
+    expectedResultsByRound.push({
+      round,
+      negotiationPercent: expNegotiationPercent,
+      fatigue: expFatigue,
+    });
+  }
+
+  // ---- 結果を返す ----
+  return expectedResultsByRound;
+}
+
+/**
  * 値引き交渉シミュレーション (再帰実装)
  */
 function runDiscountSimulation() {
@@ -218,6 +411,7 @@ function runDiscountSimulation() {
   const mySettings = localStorage.getItem("mySettings") || "{}";
   const settingsData = JSON.parse(mySettings);
 
+  // negotiation.discount の設定を取得
   const d =
     settingsData.negotiation && settingsData.negotiation.discount
       ? settingsData.negotiation.discount
@@ -232,113 +426,25 @@ function runDiscountSimulation() {
   const failureBonusRate = parseFloat(d.failBonusSuccess) || 5;
   const firstTimeBonusRate = parseFloat(d.firstTimeBonusSuccess) || 10;
 
-  let allBranches = [];
-
-  function simulateDiscountBranches(round, prev, pathStates, pathStr, accProb) {
-    if (round > maxNegotiations) {
-      allBranches.push({
-        path: pathStr,
-        probability: accProb,
-        states: pathStates,
-      });
-      return;
-    }
-    let baseSuccessRate = prev.successRate;
-    let adjustedSuccessRate = 0;
-
-    if (round === 1) {
-      adjustedSuccessRate = baseSuccessRate + firstTimeBonusRate;
-    } else {
-      adjustedSuccessRate = prev.isSuccess
-        ? baseSuccessRate
-        : baseSuccessRate + failureBonusRate;
-    }
-    adjustedSuccessRate = Math.max(0, adjustedSuccessRate);
-
-    const successProb = Math.min(adjustedSuccessRate / 100, 1.0);
-    const failureProb = 1 - successProb;
-
-    // 成功
-    {
-      const newNegotiationPercent = Math.min(
-        prev.negotiationPercent + negotiationPercentStep,
-        maxNegotiationPercent
-      );
-      let newFatigue = prev.fatigue + fatigueIncrement;
-      let newSuccessRate = Math.max(0, baseSuccessRate - 10);
-
-      const successState = {
-        successRate: newSuccessRate,
-        adjustedSuccessRate: adjustedSuccessRate,
-        negotiationPercent: newNegotiationPercent,
-        fatigue: newFatigue,
-        isSuccess: true,
-      };
-      simulateDiscountBranches(
-        round + 1,
-        successState,
-        [...pathStates, successState],
-        pathStr ? pathStr + ",S" : "S",
-        accProb * successProb
-      );
-    }
-
-    // 失敗
-    {
-      const newNegotiationPercent = prev.negotiationPercent;
-      let newFatigue = prev.fatigue + fatigueIncrement;
-      let newSuccessRate = baseSuccessRate;
-
-      const failState = {
-        successRate: newSuccessRate,
-        adjustedSuccessRate: adjustedSuccessRate,
-        negotiationPercent: newNegotiationPercent,
-        fatigue: newFatigue,
-        isSuccess: false,
-      };
-      simulateDiscountBranches(
-        round + 1,
-        failState,
-        [...pathStates, failState],
-        pathStr ? pathStr + ",F" : "F",
-        accProb * failureProb
-      );
-    }
-  }
-
-  const initialState = {
-    successRate: initialSuccessRate,
-    negotiationPercent: initialNegotiationPercent,
-    fatigue: initialFatigue,
-    isSuccess: false,
+  // シミュレーションパラメータを設定
+  const params = {
+    initialNegotiationPercent,
+    initialSuccessRate,
+    initialFatigue,
+    fatigueIncrement,
+    negotiationPercentStep,
+    maxNegotiations,
+    maxNegotiationPercent,
+    failureBonusRate,
+    firstTimeBonusRate,
   };
-  allBranches = [];
-  simulateDiscountBranches(1, initialState, [], "", 1.0);
 
-  let pctByRound = [];
-  let fatByRound = [];
-  for (let round = 1; round <= maxNegotiations; round++) {
-    let sumPct = 0,
-      sumFat = 0,
-      sumProb = 0;
-    allBranches.forEach((branch) => {
-      const st = branch.states[round - 1];
-      if (!st) return;
-      const prob = branch.probability;
-      sumPct += st.negotiationPercent * prob;
-      sumFat += st.fatigue * prob;
-      sumProb += prob;
-    });
-    let avgPct = sumProb > 0 ? sumPct / sumProb : 0;
-    let avgFat = sumProb > 0 ? sumFat / sumProb : 0;
-    pctByRound[round] = avgPct;
-    fatByRound[round] = avgFat;
-  }
-  pctByRound[0] = initialNegotiationPercent;
-  fatByRound[0] = initialFatigue;
+  // シミュレーションを実行
+  const expectedResults = simulateNegotiation(params);
 
-  discountExpectPct = pctByRound;
-  discountExpectFatigue = fatByRound;
+  // 結果をグローバル変数に保存
+  discountExpectPct = expectedResults.map((res) => res.negotiationPercent);
+  discountExpectFatigue = expectedResults.map((res) => res.fatigue);
 
   console.log("=== 値引き(Discount)シミュレーション(正式) ===");
   console.log("discountExpectPct:", discountExpectPct);
@@ -349,14 +455,15 @@ function runDiscountSimulation() {
  * 値上げ交渉シミュレーション (再帰実装)
  */
 function runMarkUpSimulation() {
+  // ローカルストレージ (mySettings) 読み込み
   const mySettings = localStorage.getItem("mySettings") || "{}";
   const settingsData = JSON.parse(mySettings);
 
+  // negotiation.markUp の設定を取得
   const m =
     settingsData.negotiation && settingsData.negotiation.markUp
       ? settingsData.negotiation.markUp
       : {};
-
   const initialNegotiationPercent = parseFloat(m.initialRate) || 0;
   const initialSuccessRate = parseFloat(m.initialSuccess) || 70;
   const initialFatigue = parseFloat(m.initialFatigue) || 0;
@@ -367,112 +474,25 @@ function runMarkUpSimulation() {
   const failureBonusRate = parseFloat(m.failBonusSuccess) || 5;
   const firstTimeBonusRate = parseFloat(m.firstTimeBonusSuccess) || 10;
 
-  let allBranches = [];
-
-  function simulateMarkUpBranches(round, prev, pathStates, pathStr, accProb) {
-    if (round > maxNegotiations) {
-      allBranches.push({
-        path: pathStr,
-        probability: accProb,
-        states: pathStates,
-      });
-      return;
-    }
-    let baseSuccessRate = prev.successRate;
-    let adjustedSuccessRate = 0;
-    if (round === 1) {
-      adjustedSuccessRate = baseSuccessRate + firstTimeBonusRate;
-    } else {
-      adjustedSuccessRate = prev.isSuccess
-        ? baseSuccessRate
-        : baseSuccessRate + failureBonusRate;
-    }
-    adjustedSuccessRate = Math.max(0, adjustedSuccessRate);
-
-    const successProb = Math.min(adjustedSuccessRate / 100, 1.0);
-    const failureProb = 1 - successProb;
-
-    // 成功
-    {
-      const newNegotiationPercent = Math.min(
-        prev.negotiationPercent + negotiationPercentStep,
-        maxNegotiationPercent
-      );
-      let newFatigue = prev.fatigue + fatigueIncrement;
-      let newSuccessRate = Math.max(0, baseSuccessRate - 10);
-
-      const successState = {
-        successRate: newSuccessRate,
-        adjustedSuccessRate: adjustedSuccessRate,
-        negotiationPercent: newNegotiationPercent,
-        fatigue: newFatigue,
-        isSuccess: true,
-      };
-      simulateMarkUpBranches(
-        round + 1,
-        successState,
-        [...pathStates, successState],
-        pathStr ? pathStr + ",S" : "S",
-        accProb * successProb
-      );
-    }
-
-    // 失敗
-    {
-      const newNegotiationPercent = prev.negotiationPercent;
-      let newFatigue = prev.fatigue + fatigueIncrement;
-      let newSuccessRate = baseSuccessRate;
-
-      const failState = {
-        successRate: newSuccessRate,
-        adjustedSuccessRate: adjustedSuccessRate,
-        negotiationPercent: newNegotiationPercent,
-        fatigue: newFatigue,
-        isSuccess: false,
-      };
-      simulateMarkUpBranches(
-        round + 1,
-        failState,
-        [...pathStates, failState],
-        pathStr ? pathStr + ",F" : "F",
-        accProb * failureProb
-      );
-    }
-  }
-
-  const initialState = {
-    successRate: initialSuccessRate,
-    negotiationPercent: initialNegotiationPercent,
-    fatigue: initialFatigue,
-    isSuccess: false,
+  // シミュレーションパラメータを設定
+  const params = {
+    initialNegotiationPercent,
+    initialSuccessRate,
+    initialFatigue,
+    fatigueIncrement,
+    negotiationPercentStep,
+    maxNegotiations,
+    maxNegotiationPercent,
+    failureBonusRate,
+    firstTimeBonusRate,
   };
-  allBranches = [];
-  simulateMarkUpBranches(1, initialState, [], "", 1.0);
 
-  let pctByRound = [];
-  let fatByRound = [];
-  for (let round = 1; round <= maxNegotiations; round++) {
-    let sumPct = 0,
-      sumFat = 0,
-      sumProb = 0;
-    allBranches.forEach((branch) => {
-      const st = branch.states[round - 1];
-      if (!st) return;
-      const prob = branch.probability;
-      sumPct += st.negotiationPercent * prob;
-      sumFat += st.fatigue * prob;
-      sumProb += prob;
-    });
-    let avgPct = sumProb > 0 ? sumPct / sumProb : 0;
-    let avgFat = sumProb > 0 ? sumFat / sumProb : 0;
-    pctByRound[round] = avgPct;
-    fatByRound[round] = avgFat;
-  }
-  pctByRound[0] = initialNegotiationPercent;
-  fatByRound[0] = initialFatigue;
+  // シミュレーションを実行
+  const expectedResults = simulateNegotiation(params);
 
-  markUpExpectPct = pctByRound;
-  markUpExpectFatigue = fatByRound;
+  // 結果をグローバル変数に保存
+  markUpExpectPct = expectedResults.map((res) => res.negotiationPercent);
+  markUpExpectFatigue = expectedResults.map((res) => res.fatigue);
 
   console.log("=== 値上げ(MarkUp)シミュレーション(正式) ===");
   console.log("markUpExpectPct:", markUpExpectPct);
@@ -480,12 +500,21 @@ function runMarkUpSimulation() {
 }
 
 // -------------------------------------------
-// 3) 販売個数倍率・値引き/値上げ価格付与・最終利益計算など (例)
+// ③ 販売個数倍率・値引き/値上げ価格付与・最終利益計算など
+//     （完全な実装を含む）
 // -------------------------------------------
 
-// ここでは例として、最新時間の「買い」データに販売個数倍率を計算する関数
+// グローバルマップ: 都市ごとの買いデータと売りデータを保持
+let mathGlobalCityDataMap = new Map(); // 都市ごとの最新時間buy/sellをまとめる
+let globalCityBuySellList = []; // cityA/cityB階層で最終的に集約
+
+/**
+ * 販売個数倍率を計算する関数
+ * @param {Array} cityBuyData - 都市の買いデータ
+ * @param {string} cityName - 都市名
+ */
 function processBuyDataRates(cityBuyData, cityName) {
-  // ローカルストレージから設定
+  // ローカルストレージから設定を取得
   const savedDataString = localStorage.getItem("mySettings") || "{}";
   const settingsData = JSON.parse(savedDataString);
 
@@ -518,14 +547,19 @@ function processBuyDataRates(cityBuyData, cityName) {
     item.計算後販売個数 = calcCount;
     item.仕入れ書販売個数 = calcCountReceipt;
 
-    console.log(
-      `[${cityName}] 商品=${item.商品名} 販売個数→計算後=${calcCount}, 仕入れ書=${calcCountReceipt}`
-    );
+    // console.log(
+    //   `[${cityName}] 商品=${item.商品名} 販売個数→計算後=${calcCount}, 仕入れ書=${calcCountReceipt}`
+    // );
   });
 }
 
-// 値引き買い値段リストを付与 (discountExpectPctを使って計算する例)
+/**
+ * 値引き買い値段リストを付与する関数
+ * @param {Array} cityBuyData - 都市の買いデータ
+ * @param {string} cityName - 都市名
+ */
 function fillDiscountBuyPriceLists(cityBuyData, cityName) {
+  // ローカルストレージから設定を取得
   const savedDataString = localStorage.getItem("mySettings") || "{}";
   const settingsData = JSON.parse(savedDataString);
 
@@ -541,7 +575,7 @@ function fillDiscountBuyPriceLists(cityBuyData, cityName) {
   cityBuyData.forEach((item) => {
     const originalPrice = item.値段;
 
-    // 商品軽減税率
+    // 商品の減税率
     let productReducedTax = 0;
     if (
       settingsData.product &&
@@ -552,52 +586,51 @@ function fillDiscountBuyPriceLists(cityBuyData, cityName) {
     }
 
     let list = [];
-    // discountExpectPct[n] で n回目の値引き%期待値を使う (疲労値は discountExpectFatigue[n])
+    // discountExpectPct[n] で n回目の値引き%期待値を使う
     discountExpectPct.forEach((pct, idx) => {
-      const discountedPart = (1 - pct / 100) * originalPrice;
+      const discountedPart = (1 - pct / 100) * originalPrice; // 値引き後の価格
       const finalPrice =
-        discountedPart * (1 + (cityTaxRate - productReducedTax) / 100);
-      const rounded = Math.round(finalPrice * 100) / 100;
+        discountedPart * (1 + (cityTaxRate - productReducedTax) / 100); // 税率を考慮
+      const rounded = Math.round(finalPrice * 100) / 100; // 小数点以下2桁に丸める
       list.push(rounded);
-      console.log(
-        `[${cityName}] 商品=${item.商品名} (n=${idx}) => 値引き買い値=${rounded}`
-      );
+      // console.log(
+      //   `[${cityName}] 商品=${item.商品名} (n=${idx}) => 値引き買い値=${rounded}`
+      // );
     });
-    item.値引き買い値段リスト = list;
+    item.値引き買い値段リスト = list; // リストをアイテムに追加
   });
 }
 
-// 値上げ売り値段リストを付与 (markUpExpectPctを使う例)
+/**
+ * 値上げ売り値段リストを付与する関数
+ * @param {Array} citySellData - 都市の売りデータ
+ */
 function fillMarkUpSellPriceLists(citySellData) {
   citySellData.forEach((item) => {
     const originalPrice = item.値段;
     let list = [];
+    // markUpExpectPct[m] で m回目の値上げ%期待値を使う
     markUpExpectPct.forEach((pct, idx) => {
-      const newPrice = (1 + pct / 100) * originalPrice;
-      const rounded = Math.round(newPrice * 100) / 100;
+      const newPrice = (1 + pct / 100) * originalPrice; // 値上げ後の価格
+      const rounded = Math.round(newPrice * 100) / 100; // 小数点以下2桁に丸める
       list.push(rounded);
-      console.log(
-        `[${item.都市名}] 商品=${item.商品名} (m=${idx}) => 値上げ売り値=${rounded}`
-      );
+      // console.log(
+      //   `[${item.都市名}] 商品=${item.商品名} (m=${idx}) => 値上げ売り値=${rounded}`
+      // );
     });
-    item.値上げ売り値段リスト = list;
+    item.値上げ売り値段リスト = list; // リストをアイテムに追加
   });
 }
 
-// 最終利益をまとめる (あくまで例: cityA->cityB の順で計算)
-let mathGlobalCityDataMap = new Map(); // 都市ごとの最新時間buy/sellをまとめる
-let globalCityBuySellList = []; // cityA/cityB階層で最終的に集約
-
-async function loadConsumptionFatigue() {
-  // CSVをfetchして、(cityB, cityA) => 疲労値 などを作る例
-  // 省略可能
-}
-
-// 都市売買リストを作り、(値上げ - 値引き) の最終利益を計算
+/**
+ * 都市売買リストを作り、(売り - 買い) の最終利益を計算する関数
+ */
 function processCityBuySellList() {
+  // ローカルストレージから設定を取得
   const savedDataString = localStorage.getItem("mySettings") || "{}";
   const settingsData = JSON.parse(savedDataString);
 
+  // 全ての都市のペア (順列) を作成
   const pairs = [];
   for (let i = 0; i < globalCityList.length; i++) {
     for (let j = 0; j < globalCityList.length; j++) {
@@ -617,6 +650,7 @@ function processCityBuySellList() {
     const buyItems = cityAData.buyData || [];
     const sellItems = cityBData.sellData || [];
 
+    // ローカルストレージから都市Bの税率を取得
     let cityBTaxRate = 0;
     if (
       settingsData.city &&
@@ -626,14 +660,21 @@ function processCityBuySellList() {
       cityBTaxRate = Number(settingsData.city[cityB].tax);
     }
 
-    // ここで CSV疲労値などもあれば読み込んで pairContainer.疲労値 = ... とか可能
+    // --- ここで CSVの疲労値を cityB行, cityA列 から取得 ---
+    let fatigueValue = 0;
+    if (consumptionFatigueMap.has(cityB)) {
+      const rowMap = consumptionFatigueMap.get(cityB); // { cityA: 値, cityA2: 値, ... }
+      if (rowMap.get(cityA) != null) {
+        fatigueValue = rowMap.get(cityA);
+      }
+    }
 
-    // cityA & cityB 用のコンテナ
+    // ペア用のコンテナを作成
     const pairContainer = {
       cityA: cityA,
       cityB: cityB,
-      疲労値: 0, // CSVなどから取得可
-      items: [],
+      疲労値: fatigueValue, // CSVから取得した疲労値を追加
+      items: [], // ここに商品ごとのデータを追加
     };
 
     buyItems.forEach((buyItem) => {
@@ -661,34 +702,43 @@ function processCityBuySellList() {
           const buyVal = discountBuyList[n];
           const sellVal = markUpSellList[m];
           let profit = sellVal - buyVal;
-          // (売り-買い)が正なら 税率を考慮
+          // 利益が正の場合、税率を考慮
           if (profit > 0) {
             const factor = 1 - (cityBTaxRate - productReducedTax) / 100;
             profit = profit * factor;
           }
-          profit = Math.round(profit * 100) / 100;
-          resultRows.push({ n, m, 最終利益: profit });
+          profit = Math.round(profit * 100) / 100; // 小数点以下2桁に丸める
+
+          resultRows.push({
+            n,
+            m,
+            最終利益: profit,
+          });
         }
       }
 
+      // 商品ごとのデータを items に追加
       pairContainer.items.push({
         商品名: productName,
-        // 買い側
+
+        // 買い側の情報
         買い傾向: buyItem.傾向 || "不明",
         買い倍率: buyItem.倍率 || "未設定",
         計算後販売個数: buyItem.計算後販売個数 || 0,
         仕入れ書販売個数: buyItem.仕入れ書販売個数 || 0,
         値引き買い値段リスト: discountBuyList,
 
-        // 売り側
+        // 売り側の情報
         売り傾向: sellItem.傾向 || "不明",
         売り倍率: sellItem.倍率 || "未設定",
         値上げ売り値段リスト: markUpSellList,
 
+        // 利益計算結果
         利益計算リスト: resultRows,
       });
     });
 
+    // 作成したペアをグローバルリストに追加
     globalCityBuySellList.push(pairContainer);
   });
 
@@ -696,104 +746,375 @@ function processCityBuySellList() {
 }
 
 // -------------------------------------------
-// 4) main処理: fetch -> decode -> 既存表示 -> 交渉シミュレーション -> 値引き/値上げ計算
+// ④ CSVの疲労値を読み込む関数
+//     loadConsumptionFatigue() を完全実装
 // -------------------------------------------
-fetch("./価格/market_data.msgpack")
-  .then((response) => {
-    console.log("fetch応答ステータス:", response.status);
-    return response.arrayBuffer();
-  })
-  .then((arrayBuffer) => {
-    console.log("バイナリデータのサイズ:", arrayBuffer.byteLength);
 
-    const uint8Array = new Uint8Array(arrayBuffer);
-    const data = decode(uint8Array);
+// グローバルマップ: cityB -> { cityA: 疲労値, ... }
+let consumptionFatigueMap = new Map();
 
-    console.log("MessagePackデコード結果:", data);
-    console.log("JSON形式で見る:", JSON.stringify(data, null, 2));
+/**
+ * ConsumptionFatigueLevel.csv を fetch し、cityB行 × cityA列 = 疲労値 を consumptionFatigueMap に格納する関数
+ */
+async function loadConsumptionFatigue() {
+  try {
+    // CSVファイルをfetch
+    const response = await fetch("./価格/ConsumptionFatigueLevel.csv");
+    if (!response.ok) {
+      console.error(
+        "ConsumptionFatigueLevel.csv が取得できませんでした:",
+        response.status
+      );
+      return;
+    }
+    const csvText = await response.text();
 
-    // 既存の集計
-    const totalSales = calculateTotalSales(data);
-    const averagePrice = calculateAveragePrice(data);
-    const sellBuyCounts = countSellBuy(data);
+    // CSVを行ごとに分割
+    const lines = csvText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((l) => l);
+    if (lines.length < 2) {
+      console.error("ConsumptionFatigueLevel.csv の行が足りません。");
+      return;
+    }
 
-    console.log("総売上額:", totalSales);
-    console.log("平均値段:", averagePrice.toFixed(2));
-    console.log("売りの数:", sellBuyCounts.sell);
-    console.log("買いの数:", sellBuyCounts.buy);
+    // 1行目をヘッダーとして取得 (cityA)
+    const header = lines[0].split(",");
+    // header[0] は空または "CityB", その他が cityA
+    const cityAList = header.slice(1); // cityA1, cityA2, ...
 
-    // 都市リスト
-    const uniqueCityList = getUniqueCityList(data);
-    console.log("都市名リスト:", uniqueCityList);
-    globalCityList = uniqueCityList;
+    // 各行を処理して Map に格納
+    for (let i = 1; i < lines.length; i++) {
+      const row = lines[i].split(",");
+      const cityB = row[0]; // cityB名
+      const fatigueValues = row.slice(1); // cityAごとの疲労値
 
-    // 都市別データ
-    const cityDataMap = restructureDataByCity(data);
-    console.log("都市別データ:", cityDataMap);
-    globalCityDataMap = cityDataMap;
-
-    // 最新時間
-    const latestTimeMap = getLatestUpdateTimePerCity(cityDataMap);
-    console.log("各都市の最新時間:", latestTimeMap);
-    globalLatestTimeMap = latestTimeMap;
-
-    // デフォルト指定時間=今
-    const specifiedTime = new Date();
-
-    // HTML表示
-    displayCityList(uniqueCityList);
-    displayCityData(latestTimeMap, cityDataMap, uniqueCityList, specifiedTime);
-
-    // (A) まず再帰的な交渉シミュレーション(正式)を実行
-    runDiscountSimulation(); // 値引き
-    runMarkUpSimulation(); // 値上げ
-
-    // (B) 都市ごとに最新時間フィルタ→ 販売個数倍率, 値引き/値上げ計算
-    globalCityList.forEach((city) => {
-      const allCityData = cityDataMap.get(city);
-      if (!allCityData) return;
-
-      const cityTime = latestTimeMap.get(city);
-      if (!cityTime || cityTime.getTime() === new Date(0).getTime()) {
-        console.log(`都市「${city}」はデータが無いか最新時間がありません。`);
-        return;
-      }
-
-      // 最新時間と同じ更新時間のデータに絞る
-      const filteredCityData = allCityData.filter((item) => {
-        const d = new Date(item.更新時間.replace(" ", "T"));
-        return d.getTime() === cityTime.getTime();
+      const cityAMap = new Map();
+      cityAList.forEach((cityA, idx) => {
+        const valueStr = fatigueValues[idx];
+        const fatigueVal = Number(valueStr) || 0; // 数値に変換、NaNなら0
+        cityAMap.set(cityA, fatigueVal);
       });
 
-      // (1) 買いデータ
-      const cityBuyData = filteredCityData.filter(
-        (it) => it["売りor買い"] === "買い"
-      );
-      // 販売個数倍率を計算
-      processBuyDataRates(cityBuyData, city);
-      // 値引き買い値段リストを計算( discountExpectPct[n] を用いる )
-      fillDiscountBuyPriceLists(cityBuyData, city);
+      consumptionFatigueMap.set(cityB, cityAMap);
+    }
 
-      // (2) 売りデータ
-      const citySellData = filteredCityData.filter(
-        (it) => it["売りor買い"] === "売り"
-      );
-      // 値上げ売り値段リストを計算( markUpExpectPct[m] を用いる )
-      fillMarkUpSellPriceLists(citySellData);
+    console.log("=== consumptionFatigueMap ===", consumptionFatigueMap);
+  } catch (error) {
+    console.error(
+      "ConsumptionFatigueLevel.csv の読み込みでエラーが発生しました:",
+      error
+    );
+  }
+}
 
-      // mathGlobalCityDataMap に登録
-      mathGlobalCityDataMap.set(city, {
-        buyData: cityBuyData,
-        sellData: citySellData,
+// -------------------------------------------
+// ⑤ main処理: loadConsumptionFatigue() を呼び出してから fetch を実行
+// -------------------------------------------
+
+(async () => {
+  // (A) まず疲労値のCSVを読み込む
+  await loadConsumptionFatigue();
+
+  // (B) MessagePack の市場データを読み込む
+  fetch("./価格/market_data.msgpack")
+    .then((response) => {
+      console.log("fetch応答ステータス:", response.status);
+      return response.arrayBuffer();
+    })
+    .then((arrayBuffer) => {
+      console.log("バイナリデータのサイズ:", arrayBuffer.byteLength);
+
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const data = decode(uint8Array);
+
+      console.log("MessagePackデコード結果:", data);
+      // console.log("JSON形式で見る:", JSON.stringify(data, null, 2));
+
+      // --- 既存の集計 ---
+      const totalSales = calculateTotalSales(data);
+      const averagePrice = calculateAveragePrice(data);
+      const sellBuyCounts = countSellBuy(data);
+
+      console.log("総売上額:", totalSales);
+      console.log("平均値段:", averagePrice.toFixed(2));
+      console.log("売りの数:", sellBuyCounts.sell);
+      console.log("買いの数:", sellBuyCounts.buy);
+
+      // 都市リスト
+      const uniqueCityList = getUniqueCityList(data);
+      console.log("都市名リスト:", uniqueCityList);
+      globalCityList = uniqueCityList;
+
+      // 都市別データ
+      const cityDataMap = restructureDataByCity(data);
+      console.log("都市別データ:", cityDataMap);
+      globalCityDataMap = cityDataMap;
+
+      // 最新時間
+      const latestTimeMap = getLatestUpdateTimePerCity(cityDataMap);
+      console.log("各都市の最新時間:", latestTimeMap);
+      globalLatestTimeMap = latestTimeMap;
+
+      // デフォルト指定時間=今
+      const specifiedTime = new Date();
+
+      // HTML表示
+      displayCityList(uniqueCityList);
+      displayCityData(
+        latestTimeMap,
+        cityDataMap,
+        uniqueCityList,
+        specifiedTime
+      );
+
+      // (C) 交渉シミュレーションを実行
+      runDiscountSimulation(); // 値引き
+      runMarkUpSimulation(); // 値上げ
+
+      // (D) 都市ごとに最新時間フィルタ→ 販売個数倍率, 値引き/値上げ計算
+      globalCityList.forEach((city) => {
+        const allCityData = cityDataMap.get(city);
+        if (!allCityData) return;
+
+        const cityTime = latestTimeMap.get(city);
+        if (!cityTime || cityTime.getTime() === new Date(0).getTime()) {
+          console.log(`都市「${city}」はデータが無いか最新時間がありません。`);
+          return;
+        }
+
+        // 最新時間と同じ更新時間のデータに絞る
+        const filteredCityData = allCityData.filter((item) => {
+          const d = new Date(item.更新時間.replace(" ", "T"));
+          return d.getTime() === cityTime.getTime();
+        });
+
+        // (1) 買いデータ
+        const cityBuyData = filteredCityData.filter(
+          (it) => it["売りor買い"] === "買い"
+        );
+        // 販売個数倍率を計算
+        processBuyDataRates(cityBuyData, city);
+        // 値引き買い値段リストを計算( discountExpectPct[n] を用いる )
+        fillDiscountBuyPriceLists(cityBuyData, city);
+
+        // (2) 売りデータ
+        const citySellData = filteredCityData.filter(
+          (it) => it["売りor買い"] === "売り"
+        );
+        // 値上げ売り値段リストを計算( markUpExpectPct[m] を用いる )
+        fillMarkUpSellPriceLists(citySellData);
+
+        // mathGlobalCityDataMap に登録
+        mathGlobalCityDataMap.set(city, {
+          buyData: cityBuyData,
+          sellData: citySellData,
+        });
       });
+
+      // (E) 都市売買リストを作り、(売り - 買い) で最終利益を計算
+      processCityBuySellList();
+
+      // (F) 追加処理: 都市売買リストの利益計算と最適化
+      calculateProfits(); // 新しく追加した関数
+    })
+    .catch((error) => {
+      console.error("データを読み込めませんでした:", error);
     });
 
-    // (C) 都市売買リストを作り、(売り - 買い) で最終利益を計算 (例)
-    processCityBuySellList();
-  })
-  .catch((error) => {
-    console.error("データを読み込めませんでした:", error);
+  // スクリプト終了の合図
+  console.log("スクリプト終了！(ESM版)");
+})();
+
+// -------------------------------------------
+// ⑥ 追加処理: 都市売買リストの利益計算と最適化
+// -------------------------------------------
+
+/**
+ * 都市売買リストの利益計算と最適化を行う関数
+ */
+function calculateProfits() {
+  // ローカルストレージから設定を取得
+  const savedDataString = localStorage.getItem("mySettings") || "{}";
+  const settingsData = JSON.parse(savedDataString);
+  const maxLoad = parseFloat(settingsData.maxLoad) || 0;
+
+  // 各都市ペアを処理
+  globalCityBuySellList.forEach((pair) => {
+    const { cityA, cityB, 疲労値, items } = pair;
+
+    // 定義されている最大交渉回数
+    const maxNegotiations = discountExpectFatigue.length; // 例: 5
+
+    // 最大疲労値毎利益とその組み合わせを初期化
+    let maxFatiguePerProfit = -Infinity;
+    let optimalN = 0;
+    let optimalM = 0;
+
+    // 最大仕入れ書疲労値毎利益とその組み合わせを初期化
+    let maxPurchaseFatiguePerProfit = -Infinity;
+    let optimalNReceipt = 0;
+    let optimalMReceipt = 0;
+
+    // 全てのn,mの組み合わせを試す
+    for (let n = 0; n <= maxNegotiations; n++) {
+      for (let m = 0; m <= maxNegotiations; m++) {
+        // discountFatigue と markUpFatigue の設定
+        let discountFatigue = n > 0 ? discountExpectFatigue[n - 1] : 0;
+        let markUpFatigue = m > 0 ? markUpExpectFatigue[m - 1] : 0;
+
+        // 総疲労値の計算
+        const totalFatigue = 疲労値 + discountFatigue + markUpFatigue;
+
+        if (totalFatigue === 0) {
+          // 総疲労値が0の場合はスキップ
+          continue;
+        }
+
+        // ① 各 `(n, m)` 組み合わせごとに商品を並び替え
+        const sortedItems = [...items].sort((a, b) => {
+          // 商品Aの `(n, m)` の最終利益
+          const profitA =
+            a.利益計算リスト.find((row) => row.n === n && row.m === m)
+              ?.最終利益 || 0;
+          // 商品Bの `(n, m)` の最終利益
+          const profitB =
+            b.利益計算リスト.find((row) => row.n === n && row.m === m)
+              ?.最終利益 || 0;
+          return profitB - profitA; // 大きい順にソート
+        });
+
+        // 積載利益と仕入れ書積載利益の初期化
+        let loadCount = 0;
+        let loadProfit = 0;
+        let loadCountReceipt = 0;
+        let loadProfitReceipt = 0;
+
+        // ② 並び替えた順にmaxLoadを使って積載利益を計算
+        sortedItems.forEach((item) => {
+          // 各商品の `(n, m)` の最終利益を取得
+          const profitCalc = item.利益計算リスト.find(
+            (row) => row.n === n && row.m === m
+          );
+          const profit = profitCalc ? profitCalc.最終利益 : 0;
+
+          if (profit < 0) {
+            // 最終利益が0未満のものはスキップ
+            return;
+          }
+
+          // 計算後販売個数を使用して積載
+          const addCount = item.計算後販売個数;
+          let loadedUnits = 0;
+          if (loadCount + addCount > maxLoad) {
+            const remainingLoad = maxLoad - loadCount;
+            if (remainingLoad > 0) {
+              loadCount += remainingLoad;
+              loadProfit += remainingLoad * profit;
+              loadedUnits = remainingLoad;
+            }
+          } else {
+            loadCount += addCount;
+            loadProfit += addCount * profit;
+            loadedUnits = addCount;
+          }
+
+          if (loadedUnits > 0) {
+            console.log(
+              `【積載】商品: ${
+                item.商品名
+              }, 数量: ${loadedUnits}, 利益単価: ${profit}, 合計利益: ${
+                loadedUnits * profit
+              }`
+            );
+          }
+
+          // 仕入れ書販売個数を使用して積載
+          const addCountReceipt = item.仕入れ書販売個数;
+          let loadedUnitsReceipt = 0;
+          if (loadCountReceipt + addCountReceipt > maxLoad) {
+            const remainingLoadReceipt = maxLoad - loadCountReceipt;
+            if (remainingLoadReceipt > 0) {
+              loadCountReceipt += remainingLoadReceipt;
+              loadProfitReceipt += remainingLoadReceipt * profit;
+              loadedUnitsReceipt = remainingLoadReceipt;
+            }
+          } else {
+            loadCountReceipt += addCountReceipt;
+            loadProfitReceipt += addCountReceipt * profit;
+            loadedUnitsReceipt = addCountReceipt;
+          }
+
+          if (loadedUnitsReceipt > 0) {
+            console.log(
+              `【仕入れ書積載】商品: ${
+                item.商品名
+              }, 数量: ${loadedUnitsReceipt}, 利益単価: ${profit}, 合計利益: ${
+                loadedUnitsReceipt * profit
+              }`
+            );
+          }
+        });
+
+        // 積載利益と仕入れ書積載利益が0以下の場合はスキップ
+        if (loadProfit <= 0 && loadProfitReceipt <= 0) {
+          continue;
+        }
+
+        // ⑤ loadProfit / totalFatigue と loadProfitReceipt / totalFatigue を計算
+        const fatiguePerProfit = loadProfit / totalFatigue;
+        const purchaseFatiguePerProfit = loadProfitReceipt / totalFatigue;
+
+        // ⑥ 最大の疲労値毎利益を更新
+        if (fatiguePerProfit > maxFatiguePerProfit) {
+          maxFatiguePerProfit = fatiguePerProfit;
+          optimalN = n;
+          optimalM = m;
+        }
+
+        // 最大の仕入れ書疲労値毎利益を更新
+        if (purchaseFatiguePerProfit > maxPurchaseFatiguePerProfit) {
+          maxPurchaseFatiguePerProfit = purchaseFatiguePerProfit;
+          optimalNReceipt = n;
+          optimalMReceipt = m;
+        }
+
+        // コンソールに各組み合わせの結果を表示
+        console.log(`=== 組み合わせ n=${n}, m=${m} ===`);
+        console.log(`総疲労値: ${totalFatigue}`);
+        console.log(`積載利益: ${loadProfit}`);
+        console.log(`積載利益 / 総疲労値: ${fatiguePerProfit}`);
+        console.log(`仕入れ書積載利益: ${loadProfitReceipt}`);
+        console.log(`仕入れ書積載利益 / 総疲労値: ${purchaseFatiguePerProfit}`);
+      }
+    }
+
+    // ⑥ 最大の疲労値毎利益と最大仕入れ書疲労値毎利益をペアに設定
+    pair.最大疲労値毎利益 = maxFatiguePerProfit;
+    pair.値引き回数 = optimalN;
+    pair.値上げ回数 = optimalM;
+
+    pair.最大仕入れ書疲労値毎利益 = maxPurchaseFatiguePerProfit;
+    pair.仕入れ書値引き回数 = optimalNReceipt;
+    pair.仕入れ書値上げ回数 = optimalMReceipt;
+
+    // コンソールにペアの最終結果を表示
+    console.log(`=== 都市ペア ${cityA} -> ${cityB} の計算結果 ===`);
+    console.log(`最大疲労値毎利益: ${pair.最大疲労値毎利益}`);
+    console.log(
+      `値引き回数: ${pair.値引き回数}, 値上げ回数: ${pair.値上げ回数}`
+    );
+    console.log(`最大仕入れ書疲労値毎利益: ${pair.最大仕入れ書疲労値毎利益}`);
+    console.log(
+      `仕入れ書値引き回数: ${pair.仕入れ書値引き回数}, 仕入れ書値上げ回数: ${pair.仕入れ書値上げ回数}`
+    );
   });
 
-// スクリプト終了
-console.log("スクリプト終了！(ESM版)");
+  // -------------------------------------------
+  // 結果の表示（必要に応じて追加）
+  // -------------------------------------------
+
+  // ここではコンソールに結果を表示していますが、必要に応じてHTMLに表示することもできます。
+  console.log("=== 都市売買リストの最適化結果 ===", globalCityBuySellList);
+}
