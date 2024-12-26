@@ -1064,7 +1064,9 @@ function calculateProfits() {
                 loadedUnits * profit
               }`,
               cityA,
-              cityB
+              cityB,
+              n,
+              m
             );
           }
 
