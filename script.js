@@ -104,83 +104,83 @@ function displayCityList(cityList) {
 }
 
 // HTMLに各都市のデータを表示する関数
-function displayCityData(latestTimeMap, cityDataMap, cityList, specifiedTime) {
-  const cityDataElement = document.getElementById("city-data");
-  cityDataElement.innerHTML = "";
+// function displayCityData(latestTimeMap, cityDataMap, cityList, specifiedTime) {
+//   const cityDataElement = document.getElementById("city-data");
+//   cityDataElement.innerHTML = "";
 
-  cityList.forEach((city) => {
-    const citySection = document.createElement("section");
-    const cityHeader = document.createElement("h4");
-    cityHeader.textContent = city;
-    citySection.appendChild(cityHeader);
+//   cityList.forEach((city) => {
+//     const citySection = document.createElement("section");
+//     const cityHeader = document.createElement("h4");
+//     cityHeader.textContent = city;
+//     citySection.appendChild(cityHeader);
 
-    const data = cityDataMap.get(city);
-    if (!data) {
-      citySection.innerHTML += "<p>データなし</p>";
-      cityDataElement.appendChild(citySection);
-      return;
-    }
+//     const data = cityDataMap.get(city);
+//     if (!data) {
+//       citySection.innerHTML += "<p>データなし</p>";
+//       cityDataElement.appendChild(citySection);
+//       return;
+//     }
 
-    const latestTime = latestTimeMap.get(city);
-    if (latestTime.getTime() === new Date(0).getTime()) {
-      citySection.innerHTML += "<p>指定した時間以前のデータがありません</p>";
-      cityDataElement.appendChild(citySection);
-      return;
-    }
+//     const latestTime = latestTimeMap.get(city);
+//     if (latestTime.getTime() === new Date(0).getTime()) {
+//       citySection.innerHTML += "<p>指定した時間以前のデータがありません</p>";
+//       cityDataElement.appendChild(citySection);
+//       return;
+//     }
 
-    const timePara = document.createElement("p");
-    timePara.textContent = `都市時間: ${latestTime.toLocaleString()}`;
-    citySection.appendChild(timePara);
+//     const timePara = document.createElement("p");
+//     timePara.textContent = `都市時間: ${latestTime.toLocaleString()}`;
+//     citySection.appendChild(timePara);
 
-    const filteredCityData = data.filter((item) => {
-      const itemDate = new Date(item.更新時間.replace(" ", "T"));
-      return itemDate.getTime() === latestTime.getTime();
-    });
+//     const filteredCityData = data.filter((item) => {
+//       const itemDate = new Date(item.更新時間.replace(" ", "T"));
+//       return itemDate.getTime() === latestTime.getTime();
+//     });
 
-    const citySellData = filteredCityData.filter(
-      (item) => item["売りor買い"] === "売り"
-    );
-    const cityBuyData = filteredCityData.filter(
-      (item) => item["売りor買い"] === "買い"
-    );
+//     const citySellData = filteredCityData.filter(
+//       (item) => item["売りor買い"] === "売り"
+//     );
+//     const cityBuyData = filteredCityData.filter(
+//       (item) => item["売りor買い"] === "買い"
+//     );
 
-    const sellHeader = document.createElement("h5");
-    sellHeader.textContent = "売りデータ";
-    citySection.appendChild(sellHeader);
-    if (citySellData.length > 0) {
-      const sellList = document.createElement("ul");
-      citySellData.forEach((item) => {
-        const li = document.createElement("li");
-        li.textContent = `${item.商品名}: 値段=${item.値段}, 販売個数=${item.販売個数}`;
-        sellList.appendChild(li);
-      });
-      citySection.appendChild(sellList);
-    } else {
-      const noSell = document.createElement("p");
-      noSell.textContent = "売りデータなし";
-      citySection.appendChild(noSell);
-    }
+//     const sellHeader = document.createElement("h5");
+//     sellHeader.textContent = "売りデータ";
+//     citySection.appendChild(sellHeader);
+//     if (citySellData.length > 0) {
+//       const sellList = document.createElement("ul");
+//       citySellData.forEach((item) => {
+//         const li = document.createElement("li");
+//         li.textContent = `${item.商品名}: 値段=${item.値段}, 販売個数=${item.販売個数}`;
+//         sellList.appendChild(li);
+//       });
+//       citySection.appendChild(sellList);
+//     } else {
+//       const noSell = document.createElement("p");
+//       noSell.textContent = "売りデータなし";
+//       citySection.appendChild(noSell);
+//     }
 
-    const buyHeader = document.createElement("h5");
-    buyHeader.textContent = "買いデータ";
-    citySection.appendChild(buyHeader);
-    if (cityBuyData.length > 0) {
-      const buyList = document.createElement("ul");
-      cityBuyData.forEach((item) => {
-        const li = document.createElement("li");
-        li.textContent = `${item.商品名}: 値段=${item.値段}, 販売個数=${item.販売個数}`;
-        buyList.appendChild(li);
-      });
-      citySection.appendChild(buyList);
-    } else {
-      const noBuy = document.createElement("p");
-      noBuy.textContent = "買いデータなし";
-      citySection.appendChild(noBuy);
-    }
+//     const buyHeader = document.createElement("h5");
+//     buyHeader.textContent = "買いデータ";
+//     citySection.appendChild(buyHeader);
+//     if (cityBuyData.length > 0) {
+//       const buyList = document.createElement("ul");
+//       cityBuyData.forEach((item) => {
+//         const li = document.createElement("li");
+//         li.textContent = `${item.商品名}: 値段=${item.値段}, 販売個数=${item.販売個数}`;
+//         buyList.appendChild(li);
+//       });
+//       citySection.appendChild(buyList);
+//     } else {
+//       const noBuy = document.createElement("p");
+//       noBuy.textContent = "買いデータなし";
+//       citySection.appendChild(noBuy);
+//     }
 
-    cityDataElement.appendChild(citySection);
-  });
-}
+//     cityDataElement.appendChild(citySection);
+//   });
+// }
 
 // 更新ボタン (既存)
 document.getElementById("update-time").addEventListener("click", () => {
@@ -433,16 +433,16 @@ function runDiscountSimulation() {
   const firstTimeBonusRate = parseFloat(d.firstTimeBonusSuccess) || 10;
 
   // デバッグ用ログ
-  console.log("=== Discount Simulation Settings ===");
-  console.log("initialNegotiationPercent:", initialNegotiationPercent);
-  console.log("initialSuccessRate:", initialSuccessRate);
-  console.log("initialFatigue:", initialFatigue);
-  console.log("fatigueIncrement:", fatigueIncrement);
-  console.log("negotiationPercentStep:", negotiationPercentStep);
-  console.log("maxNegotiations:", maxNegotiations);
-  console.log("maxNegotiationPercent:", maxNegotiationPercent);
-  console.log("failureBonusRate:", failureBonusRate);
-  console.log("firstTimeBonusRate:", firstTimeBonusRate);
+  // console.log("=== Discount Simulation Settings ===");
+  // console.log("initialNegotiationPercent:", initialNegotiationPercent);
+  // console.log("initialSuccessRate:", initialSuccessRate);
+  // console.log("initialFatigue:", initialFatigue);
+  // console.log("fatigueIncrement:", fatigueIncrement);
+  // console.log("negotiationPercentStep:", negotiationPercentStep);
+  // console.log("maxNegotiations:", maxNegotiations);
+  // console.log("maxNegotiationPercent:", maxNegotiationPercent);
+  // console.log("failureBonusRate:", failureBonusRate);
+  // console.log("firstTimeBonusRate:", firstTimeBonusRate);
 
   // シミュレーションパラメータを設定
   const params = {
@@ -493,16 +493,16 @@ function runMarkUpSimulation() {
   const firstTimeBonusRate = parseFloat(m.firstTimeBonusSuccess) || 10;
 
   // デバッグ用ログ
-  console.log("=== MarkUp Simulation Settings ===");
-  console.log("initialNegotiationPercent:", initialNegotiationPercent);
-  console.log("initialSuccessRate:", initialSuccessRate);
-  console.log("initialFatigue:", initialFatigue);
-  console.log("fatigueIncrement:", fatigueIncrement);
-  console.log("negotiationPercentStep:", negotiationPercentStep);
-  console.log("maxNegotiations:", maxNegotiations);
-  console.log("maxNegotiationPercent:", maxNegotiationPercent);
-  console.log("failureBonusRate:", failureBonusRate);
-  console.log("firstTimeBonusRate:", firstTimeBonusRate);
+  // console.log("=== MarkUp Simulation Settings ===");
+  // console.log("initialNegotiationPercent:", initialNegotiationPercent);
+  // console.log("initialSuccessRate:", initialSuccessRate);
+  // console.log("initialFatigue:", initialFatigue);
+  // console.log("fatigueIncrement:", fatigueIncrement);
+  // console.log("negotiationPercentStep:", negotiationPercentStep);
+  // console.log("maxNegotiations:", maxNegotiations);
+  // console.log("maxNegotiationPercent:", maxNegotiationPercent);
+  // console.log("failureBonusRate:", failureBonusRate);
+  // console.log("firstTimeBonusRate:", firstTimeBonusRate);
 
   // シミュレーションパラメータを設定
   const params = {
@@ -891,13 +891,13 @@ async function loadConsumptionFatigue() {
       const specifiedTime = new Date();
 
       // HTML表示
-      displayCityList(uniqueCityList);
-      displayCityData(
-        latestTimeMap,
-        cityDataMap,
-        uniqueCityList,
-        specifiedTime
-      );
+      // displayCityList(uniqueCityList);
+      // displayCityData(
+      //   latestTimeMap,
+      //   cityDataMap,
+      //   uniqueCityList,
+      //   specifiedTime
+      // );
 
       // (C) 交渉シミュレーションを実行
       runDiscountSimulation(); // 値引き
@@ -1057,15 +1057,15 @@ function calculateProfits() {
           }
 
           if (loadedUnits > 0) {
-            console.log(
-              `【積載】商品: ${
-                item.商品名
-              }, 数量: ${loadedUnits}, 利益単価: ${profit}, 合計利益: ${
-                loadedUnits * profit
-              }`,
-              cityA,
-              cityB
-            );
+            // console.log(
+            //   `【積載】商品: ${
+            //     item.商品名
+            //   }, 数量: ${loadedUnits}, 利益単価: ${profit}, 合計利益: ${
+            //     loadedUnits * profit
+            //   }`,
+            //   cityA,
+            //   cityB
+            // );
           }
 
           // 仕入れ書販売個数を使用して積載
@@ -1085,13 +1085,13 @@ function calculateProfits() {
           }
 
           if (loadedUnitsReceipt > 0) {
-            console.log(
-              `【仕入れ書積載】商品: ${
-                item.商品名
-              }, 数量: ${loadedUnitsReceipt}, 利益単価: ${profit}, 合計利益: ${
-                loadedUnitsReceipt * profit
-              }`
-            );
+            // console.log(
+            //   `【仕入れ書積載】商品: ${
+            //     item.商品名
+            //   }, 数量: ${loadedUnitsReceipt}, 利益単価: ${profit}, 合計利益: ${
+            //     loadedUnitsReceipt * profit
+            //   }`
+            // );
           }
         });
 
@@ -1119,12 +1119,12 @@ function calculateProfits() {
         }
 
         // コンソールに各組み合わせの結果を表示
-        console.log(`=== 組み合わせ n=${n}, m=${m} ===`);
-        console.log(`総疲労値: ${totalFatigue}`);
-        console.log(`積載利益: ${loadProfit}`);
-        console.log(`積載利益 / 総疲労値: ${fatiguePerProfit}`);
-        console.log(`仕入れ書積載利益: ${loadProfitReceipt}`);
-        console.log(`仕入れ書積載利益 / 総疲労値: ${purchaseFatiguePerProfit}`);
+        // console.log(`=== 組み合わせ n=${n}, m=${m} ===`);
+        // console.log(`総疲労値: ${totalFatigue}`);
+        // console.log(`積載利益: ${loadProfit}`);
+        // console.log(`積載利益 / 総疲労値: ${fatiguePerProfit}`);
+        // console.log(`仕入れ書積載利益: ${loadProfitReceipt}`);
+        // console.log(`仕入れ書積載利益 / 総疲労値: ${purchaseFatiguePerProfit}`);
       }
     }
 
@@ -1138,15 +1138,15 @@ function calculateProfits() {
     pair.仕入れ書値上げ回数 = optimalMReceipt;
 
     // コンソールにペアの最終結果を表示
-    console.log(`=== 都市ペア ${cityA} -> ${cityB} の計算結果 ===`);
-    console.log(`最大疲労値毎利益: ${pair.最大疲労値毎利益}`);
-    console.log(
-      `値引き回数: ${pair.値引き回数}, 値上げ回数: ${pair.値上げ回数}`
-    );
-    console.log(`最大仕入れ書疲労値毎利益: ${pair.最大仕入れ書疲労値毎利益}`);
-    console.log(
-      `仕入れ書値引き回数: ${pair.仕入れ書値引き回数}, 仕入れ書値上げ回数: ${pair.仕入れ書値上げ回数}`
-    );
+    // console.log(`=== 都市ペア ${cityA} -> ${cityB} の計算結果 ===`);
+    // console.log(`最大疲労値毎利益: ${pair.最大疲労値毎利益}`);
+    // console.log(
+    //   `値引き回数: ${pair.値引き回数}, 値上げ回数: ${pair.値上げ回数}`
+    // );
+    // console.log(`最大仕入れ書疲労値毎利益: ${pair.最大仕入れ書疲労値毎利益}`);
+    // console.log(
+    //   `仕入れ書値引き回数: ${pair.仕入れ書値引き回数}, 仕入れ書値上げ回数: ${pair.仕入れ書値上げ回数}`
+    // );
   });
 
   // -------------------------------------------
@@ -1245,13 +1245,13 @@ function calculateRoundTripProfits() {
     processedPairs.add(reverseKey);
 
     // コンソールに往復利益を表示
-    console.log(
-      `【往復利益】都市A: ${cityA}, 都市B: ${cityB}, 往復利益期待値: ${roundTripExpectedProfit.toFixed(
-        2
-      )}, 仕入れ書往復利益期待値: ${purchaseRoundTripExpectedProfit.toFixed(
-        2
-      )}, 仕入れ書獲得利益: ${purchaseProfit.toFixed(2)}`
-    );
+    // console.log(
+    //   `【往復利益】都市A: ${cityA}, 都市B: ${cityB}, 往復利益期待値: ${roundTripExpectedProfit.toFixed(
+    //     2
+    //   )}, 仕入れ書往復利益期待値: ${purchaseRoundTripExpectedProfit.toFixed(
+    //     2
+    //   )}, 仕入れ書獲得利益: ${purchaseProfit.toFixed(2)}`
+    // );
   });
 
   // 新しいリストをグローバル変数に保存（必要に応じて）
@@ -1452,7 +1452,7 @@ async function fetchMarketData() {
     // 往復利益期待値の計算
     calculateRoundTripProfits();
   } catch (error) {
-    console.error("市場データの取得・処理中にエラーが発生しました:", error);
+    // console.error("市場データの取得・処理中にエラーが発生しました:", error);
   }
 }
 
