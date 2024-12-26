@@ -997,8 +997,8 @@ function calculateProfits() {
     for (let n = 0; n <= maxNegotiationsDiscount; n++) {
       for (let m = 0; m <= maxNegotiationsMarkUp; m++) {
         // discountFatigue と markUpFatigue の設定
-        let discountFatigue = n > 0 ? discountExpectFatigue[n - 1] : 0;
-        let markUpFatigue = m > 0 ? markUpExpectFatigue[m - 1] : 0;
+        let discountFatigue = n > 0 ? discountExpectFatigue[n] : 0;
+        let markUpFatigue = m > 0 ? markUpExpectFatigue[m] : 0;
 
         // 総疲労値の計算
         const totalFatigue = 疲労値 + discountFatigue + markUpFatigue;
