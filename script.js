@@ -1002,7 +1002,7 @@ function calculateProfits() {
 
         // 総疲労値の計算
         const totalFatigue = 疲労値 + discountFatigue + markUpFatigue;
-
+        console.log(totalFatigue, n, m);
         if (totalFatigue === 0) {
           // 総疲労値が0の場合はスキップ
           continue;
@@ -1105,7 +1105,7 @@ function calculateProfits() {
         // loadProfit / totalFatigue と loadProfitReceipt / totalFatigue を計算
         const fatiguePerProfit = loadProfit / totalFatigue;
         const purchaseFatiguePerProfit = loadProfitReceipt / totalFatigue;
-
+        console.log(fatiguePerProfit, purchaseFatiguePerProfit);
         // 最大の疲労値毎利益を更新
         if (fatiguePerProfit > maxFatiguePerProfit) {
           maxFatiguePerProfit = fatiguePerProfit;
