@@ -265,8 +265,22 @@
       <!-- モーダルの本体部分 -->
       <div class="modal-content">
         <h2>詳細情報</h2>
-        <!-- 商品リストを表示するテーブル -->
-        <table id="detailsTable">
+        <!-- 往路のセクション -->
+        <h3>往路: <span id="outboundRoute"></span></h3>
+        <table id="outboundDetailsTable">
+          <thead>
+            <tr>
+              <th>商品名</th>
+              <th>積載個数</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JavaScriptで動的に行を追加 -->
+          </tbody>
+        </table>
+        <!-- 復路のセクション -->
+        <h3>復路: <span id="returnRoute"></span></h3>
+        <table id="returnDetailsTable">
           <thead>
             <tr>
               <th>商品名</th>

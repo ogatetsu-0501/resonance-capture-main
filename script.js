@@ -1163,12 +1163,19 @@ function calculateProfits() {
 // ⑦ 詳細表示用モーダルの設定
 // -----------------------------
 
-// 詳細モーダルの要素を取得
+// モーダルの要素を取得
 const detailsModal = document.getElementById("details-modal");
 const closeDetailsBtn = document.getElementById("close-details-btn");
-const detailsTableBody = document
-  .getElementById("detailsTable")
+
+// 往路と復路のテーブルボディを取得
+const outboundDetailsTableBody = document
+  .getElementById("outboundDetailsTable")
   .querySelector("tbody");
+const returnDetailsTableBody = document
+  .getElementById("returnDetailsTable")
+  .querySelector("tbody");
+
+// 往復利益期待値を表示する段落を取得
 const roundTripProfitPara = document.getElementById("roundTripProfit");
 const purchaseRoundTripProfitPara = document.getElementById(
   "purchaseRoundTripProfit"
@@ -1213,27 +1220,20 @@ function addRowClickListeners() {
           2
         )}`;
 
-        // 商品ごとの積載個数を表示
-        detailsTableBody.innerHTML = ""; // 既存の内容をクリア
+        // 往路のルート情報を設定
+        outboundDetailsTableBody.innerHTML = ""; // 既存の内容をクリア
+        const outboundHeaderRow = document.createElement("tr");
+        const outboundHeaderCell = document.createElement("th");
+        outboundHeaderCell.colSpan = 2;
+        outboundHeaderCell.textContent = `往路: ${cityA} -> ${cityB}`;
+        outboundHeaderRow.appendChild(outboundHeaderCell);
+        outboundDetailsTableBody.appendChild(outboundHeaderRow);
 
-        // globalCityBuySellList から cityA->cityB と cityB->cityA のペアを検索
-        const forwardPair = globalCityBuySellList.find(
-          (p) => p.cityA === cityA && p.cityB === cityB
-        );
-        const reversePair = globalCityBuySellList.find(
-          (p) => p.cityA === cityB && p.cityB === cityA
-        );
-
-        let allItems = [];
-        if (forwardPair && forwardPair.items) {
-          allItems = allItems.concat(forwardPair.items);
-        }
-        if (reversePair && reversePair.items) {
-          allItems = allItems.concat(reversePair.items);
-        }
-
-        if (allItems.length > 0) {
-          allItems.forEach((item) => {
+        if (
+          matchingEntry.outboundItems &&
+          matchingEntry.outboundItems.length > 0
+        ) {
+          matchingEntry.outboundItems.forEach((item) => {
             const tr = document.createElement("tr");
 
             const tdProductName = document.createElement("td");
@@ -1241,19 +1241,52 @@ function addRowClickListeners() {
             tr.appendChild(tdProductName);
 
             const tdLoadedCount = document.createElement("td");
+            // 仕入れ書積載個数を表示
             tdLoadedCount.textContent = item.仕入れ書販売個数 || 0;
             tr.appendChild(tdLoadedCount);
 
-            detailsTableBody.appendChild(tr);
+            outboundDetailsTableBody.appendChild(tr);
           });
         } else {
-          // 該当する商品のデータがない場合
           const tr = document.createElement("tr");
           const td = document.createElement("td");
-          td.setAttribute("colspan", "2");
-          td.textContent = "積載商品データがありません。";
+          td.colSpan = 2;
+          td.textContent = "積載商品なし";
           tr.appendChild(td);
-          detailsTableBody.appendChild(tr);
+          outboundDetailsTableBody.appendChild(tr);
+        }
+
+        // 復路のルート情報を設定
+        returnDetailsTableBody.innerHTML = ""; // 既存の内容をクリア
+        const returnHeaderRow = document.createElement("tr");
+        const returnHeaderCell = document.createElement("th");
+        returnHeaderCell.colSpan = 2;
+        returnHeaderCell.textContent = `復路: ${cityB} -> ${cityA}`;
+        returnHeaderRow.appendChild(returnHeaderCell);
+        returnDetailsTableBody.appendChild(returnHeaderRow);
+
+        if (matchingEntry.returnItems && matchingEntry.returnItems.length > 0) {
+          matchingEntry.returnItems.forEach((item) => {
+            const tr = document.createElement("tr");
+
+            const tdProductName = document.createElement("td");
+            tdProductName.textContent = item.商品名;
+            tr.appendChild(tdProductName);
+
+            const tdLoadedCount = document.createElement("td");
+            // 仕入れ書積載個数を表示
+            tdLoadedCount.textContent = item.仕入れ書販売個数 || 0;
+            tr.appendChild(tdLoadedCount);
+
+            returnDetailsTableBody.appendChild(tr);
+          });
+        } else {
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          td.colSpan = 2;
+          td.textContent = "積載商品なし";
+          tr.appendChild(td);
+          returnDetailsTableBody.appendChild(tr);
         }
 
         // モーダルを表示
@@ -1318,15 +1351,6 @@ function calculateRoundTripProfits() {
       purchaseRoundTripExpectedProfit -
       (forwardPair.最大疲労値毎利益 + reversePair.最大疲労値毎利益) / 2;
 
-    // 仕入れ書往路値引き回数
-    const purchaseOutboundDiscountCount = forwardPair.仕入れ書値引き回数;
-    // 仕入れ書往路値上げ回数
-    const purchaseOutboundMarkUpCount = forwardPair.仕入れ書値上げ回数;
-    // 仕入れ書復路値引き回数
-    const purchaseReturnDiscountCount = reversePair.仕入れ書値引き回数;
-    // 仕入れ書復路値上げ回数
-    const purchaseReturnMarkUpCount = reversePair.仕入れ書値上げ回数;
-
     // 往復利益期待値: ペアの最大疲労値毎利益の平均
     const roundTripExpectedProfit =
       (forwardPair.最大疲労値毎利益 + reversePair.最大疲労値毎利益) / 2;
@@ -1342,10 +1366,13 @@ function calculateRoundTripProfits() {
       outboundMarkUpCount: outboundMarkUpCount,
       returnDiscountCount: returnDiscountCount,
       returnMarkUpCount: returnMarkUpCount,
-      purchaseOutboundDiscountCount: purchaseOutboundDiscountCount,
-      purchaseOutboundMarkUpCount: purchaseOutboundMarkUpCount,
-      purchaseReturnDiscountCount: purchaseReturnDiscountCount,
-      purchaseReturnMarkUpCount: purchaseReturnMarkUpCount,
+      purchaseOutboundDiscountCount: forwardPair.仕入れ書値引き回数,
+      purchaseOutboundMarkUpCount: forwardPair.仕入れ書値上げ回数,
+      purchaseReturnDiscountCount: reversePair.仕入れ書値引き回数,
+      purchaseReturnMarkUpCount: reversePair.仕入れ書値上げ回数,
+      // 往路と復路それぞれのアイテムを含める
+      outboundItems: forwardPair.items || [],
+      returnItems: reversePair.items || [],
     });
 
     // 処理済みとしてマーク
