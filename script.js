@@ -1002,7 +1002,7 @@ function calculateProfits() {
 
         // 総疲労値の計算
         const totalFatigue = 疲労値 + discountFatigue + markUpFatigue;
-        console.log(discountFatigue, n, markUpFatigue, m);
+        console.log(totalFatigue, discountFatigue, n, markUpFatigue, m);
         if (totalFatigue === 0) {
           // 総疲労値が0の場合はスキップ
           continue;
