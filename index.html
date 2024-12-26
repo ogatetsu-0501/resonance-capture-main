@@ -53,6 +53,12 @@
       .modal-actions {
         text-align: right;
       }
+
+      /* 往復利益期待値テーブルのスタイル調整 */
+      #roundTripResultsTable th,
+      #roundTripResultsTable td {
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -80,6 +86,23 @@
       </ul>
       <h3>各都市のデータ</h3>
       <div id="city-data">計算中...</div>
+
+      <!-- -------------------------------
+         ここから往復利益期待値表示セクションを追加
+         ------------------------------- -->
+      <h3>往復利益期待値</h3>
+      <table id="roundTripResultsTable">
+        <thead>
+          <tr>
+            <th>都市A</th>
+            <th>都市B</th>
+            <th>往復利益期待値</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 往復利益期待値を表示 -->
+        </tbody>
+      </table>
     </div>
 
     <!-- -------------------------------

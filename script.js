@@ -25,7 +25,7 @@ function calculateTotalSales(data) {
 function calculateAveragePrice(data) {
   // data中の「値段」を全部足して、件数で割る
   const totalPrice = data.reduce((sum, item) => sum + item.値段, 0);
-  return totalPrice / data.length;
+  return data.length > 0 ? totalPrice / data.length : 0;
 }
 
 // 売りと買いの商品の数をカウントする関数
@@ -211,10 +211,13 @@ let discountExpectFatigue = [];
 let markUpExpectPct = [];
 let markUpExpectFatigue = [];
 
+// グローバルRoundTripProfitsListの定義
+let globalRoundTripProfitsList = [];
+
 /**
  * 交渉シミュレーションを実行する共通関数
  * @param {Object} params - シミュレーションパラメータ
- * @returns {Object} - 期待値結果
+ * @returns {Array} - 期待値結果（0からmaxNegotiationsまで）
  */
 function simulateNegotiation(params) {
   const {
@@ -363,10 +366,14 @@ function simulateNegotiation(params) {
   simulateBranches(1, initialState, [], "", 1.0);
 
   // ---- ここから期待値計算 ----
-  // 各交渉回数 i (=1〜maxNegotiations) に対して、
-  // 分岐ごとに「その時点の交渉%」「交渉疲労値」を取り出し、確率重みをかけて合計 → 期待値を算出
-  // ただし、states[i-1] が存在しない場合は、その分岐は i 回目を行っていない(=最大回数を超えている) ということなので考慮外
   const expectedResultsByRound = [];
+
+  // n=0のケースを追加（値引きの場合）
+  expectedResultsByRound.push({
+    round: 0,
+    negotiationPercent: 0, // 値引き交渉回数n=0の場合、交渉%は0
+    fatigue: 0, // 疲労値も0
+  });
 
   for (let round = 1; round <= maxNegotiations; round++) {
     let sumNegotiationPercent = 0;
@@ -387,7 +394,6 @@ function simulateNegotiation(params) {
     });
 
     // 期待値 = 合計 / sumProbability
-    // ただし分岐が全くない(= sumProbability=0)ケースはほぼ起きないが、一応ガード
     let expNegotiationPercent =
       sumProbability > 0 ? sumNegotiationPercent / sumProbability : 0;
     let expFatigue = sumProbability > 0 ? sumFatigue / sumProbability : 0;
@@ -421,10 +427,22 @@ function runDiscountSimulation() {
   const initialFatigue = parseFloat(d.initialFatigue) || 0;
   const fatigueIncrement = parseFloat(d.fatigueIncrement) || 10;
   const negotiationPercentStep = parseFloat(d.negotiationIncrement) || 10;
-  const maxNegotiations = parseInt(d.maxNegotiations) || 5;
+  const maxNegotiations = parseInt(d.maxNegotiations) || 5; // ここを確認
   const maxNegotiationPercent = parseFloat(d.negotiationRateLimit) || 20;
   const failureBonusRate = parseFloat(d.failBonusSuccess) || 5;
   const firstTimeBonusRate = parseFloat(d.firstTimeBonusSuccess) || 10;
+
+  // デバッグ用ログ
+  console.log("=== Discount Simulation Settings ===");
+  console.log("initialNegotiationPercent:", initialNegotiationPercent);
+  console.log("initialSuccessRate:", initialSuccessRate);
+  console.log("initialFatigue:", initialFatigue);
+  console.log("fatigueIncrement:", fatigueIncrement);
+  console.log("negotiationPercentStep:", negotiationPercentStep);
+  console.log("maxNegotiations:", maxNegotiations);
+  console.log("maxNegotiationPercent:", maxNegotiationPercent);
+  console.log("failureBonusRate:", failureBonusRate);
+  console.log("firstTimeBonusRate:", firstTimeBonusRate);
 
   // シミュレーションパラメータを設定
   const params = {
@@ -469,10 +487,22 @@ function runMarkUpSimulation() {
   const initialFatigue = parseFloat(m.initialFatigue) || 0;
   const fatigueIncrement = parseFloat(m.fatigueIncrement) || 10;
   const negotiationPercentStep = parseFloat(m.negotiationIncrement) || 10;
-  const maxNegotiations = parseInt(m.maxNegotiations) || 5;
+  const maxNegotiations = parseInt(m.maxNegotiations) || 5; // ここを確認
   const maxNegotiationPercent = parseFloat(m.negotiationRateLimit) || 20;
   const failureBonusRate = parseFloat(m.failBonusSuccess) || 5;
   const firstTimeBonusRate = parseFloat(m.firstTimeBonusSuccess) || 10;
+
+  // デバッグ用ログ
+  console.log("=== MarkUp Simulation Settings ===");
+  console.log("initialNegotiationPercent:", initialNegotiationPercent);
+  console.log("initialSuccessRate:", initialSuccessRate);
+  console.log("initialFatigue:", initialFatigue);
+  console.log("fatigueIncrement:", fatigueIncrement);
+  console.log("negotiationPercentStep:", negotiationPercentStep);
+  console.log("maxNegotiations:", maxNegotiations);
+  console.log("maxNegotiationPercent:", maxNegotiationPercent);
+  console.log("failureBonusRate:", failureBonusRate);
+  console.log("firstTimeBonusRate:", firstTimeBonusRate);
 
   // シミュレーションパラメータを設定
   const params = {
@@ -917,7 +947,10 @@ async function loadConsumptionFatigue() {
       processCityBuySellList();
 
       // (F) 追加処理: 都市売買リストの利益計算と最適化
-      calculateProfits(); // 新しく追加した関数
+      calculateProfits(); // 既存の利益計算関数
+
+      // (G) 往復利益期待値の計算
+      calculateRoundTripProfits(); // 新しく追加した関数
     })
     .catch((error) => {
       console.error("データを読み込めませんでした:", error);
@@ -944,8 +977,11 @@ function calculateProfits() {
   globalCityBuySellList.forEach((pair) => {
     const { cityA, cityB, 疲労値, items } = pair;
 
-    // 定義されている最大交渉回数
-    const maxNegotiations = discountExpectFatigue.length; // 例: 5
+    // negotiation.discount と negotiation.markUp の最大交渉回数を取得
+    const maxNegotiationsDiscount =
+      parseInt(settingsData.negotiation?.discount?.maxNegotiations) || 5;
+    const maxNegotiationsMarkUp =
+      parseInt(settingsData.negotiation?.markUp?.maxNegotiations) || 5;
 
     // 最大疲労値毎利益とその組み合わせを初期化
     let maxFatiguePerProfit = -Infinity;
@@ -957,9 +993,9 @@ function calculateProfits() {
     let optimalNReceipt = 0;
     let optimalMReceipt = 0;
 
-    // 全てのn,mの組み合わせを試す
-    for (let n = 0; n <= maxNegotiations; n++) {
-      for (let m = 0; m <= maxNegotiations; m++) {
+    // 全てのn,mの組み合わせを試す（値引きと値上げのmaxNegotiationsを個別に使用）
+    for (let n = 0; n <= maxNegotiationsDiscount; n++) {
+      for (let m = 0; m <= maxNegotiationsMarkUp; m++) {
         // discountFatigue と markUpFatigue の設定
         let discountFatigue = n > 0 ? discountExpectFatigue[n - 1] : 0;
         let markUpFatigue = m > 0 ? markUpExpectFatigue[m - 1] : 0;
@@ -972,7 +1008,7 @@ function calculateProfits() {
           continue;
         }
 
-        // ① 各 `(n, m)` 組み合わせごとに商品を並び替え
+        // 各 `(n, m)` 組み合わせごとに商品を並び替え
         const sortedItems = [...items].sort((a, b) => {
           // 商品Aの `(n, m)` の最終利益
           const profitA =
@@ -991,7 +1027,7 @@ function calculateProfits() {
         let loadCountReceipt = 0;
         let loadProfitReceipt = 0;
 
-        // ② 並び替えた順にmaxLoadを使って積載利益を計算
+        // 並び替えた順にmaxLoadを使って積載利益を計算
         sortedItems.forEach((item) => {
           // 各商品の `(n, m)` の最終利益を取得
           const profitCalc = item.利益計算リスト.find(
@@ -1062,11 +1098,11 @@ function calculateProfits() {
           continue;
         }
 
-        // ⑤ loadProfit / totalFatigue と loadProfitReceipt / totalFatigue を計算
+        // loadProfit / totalFatigue と loadProfitReceipt / totalFatigue を計算
         const fatiguePerProfit = loadProfit / totalFatigue;
         const purchaseFatiguePerProfit = loadProfitReceipt / totalFatigue;
 
-        // ⑥ 最大の疲労値毎利益を更新
+        // 最大の疲労値毎利益を更新
         if (fatiguePerProfit > maxFatiguePerProfit) {
           maxFatiguePerProfit = fatiguePerProfit;
           optimalN = n;
@@ -1090,7 +1126,7 @@ function calculateProfits() {
       }
     }
 
-    // ⑥ 最大の疲労値毎利益と最大仕入れ書疲労値毎利益をペアに設定
+    // 最大の疲労値毎利益と最大仕入れ書疲労値毎利益をペアに設定
     pair.最大疲労値毎利益 = maxFatiguePerProfit;
     pair.値引き回数 = optimalN;
     pair.値上げ回数 = optimalM;
@@ -1118,3 +1154,211 @@ function calculateProfits() {
   // ここではコンソールに結果を表示していますが、必要に応じてHTMLに表示することもできます。
   console.log("=== 都市売買リストの最適化結果 ===", globalCityBuySellList);
 }
+
+/**
+ * 都市間の往復利益期待値を計算し、新しいリストを作成する関数
+ */
+function calculateRoundTripProfits() {
+  const roundTripProfitsList = [];
+  const processedPairs = new Set(); // 処理済みの都市ペアを記録するセット
+
+  globalCityBuySellList.forEach((pair) => {
+    const { cityA, cityB, 最大疲労値毎利益 } = pair;
+
+    // 順方向のペアキーを作成
+    const forwardKey = `${cityA}->${cityB}`;
+    // 逆方向のペアキーを作成
+    const reverseKey = `${cityB}->${cityA}`;
+
+    // 既に処理済みの場合はスキップ
+    if (processedPairs.has(forwardKey) || processedPairs.has(reverseKey)) {
+      return;
+    }
+
+    // 順方向のペアを探す
+    const forwardPair = globalCityBuySellList.find(
+      (p) => p.cityA === cityA && p.cityB === cityB
+    );
+    // 逆方向のペアを探す
+    const reversePair = globalCityBuySellList.find(
+      (p) => p.cityA === cityB && p.cityB === cityA
+    );
+
+    // 最大疲労値毎利益を取得
+    const forwardProfit = forwardPair ? forwardPair.最大疲労値毎利益 : null;
+    const reverseProfit = reversePair ? reversePair.最大疲労値毎利益 : null;
+
+    // 両方のペアが存在する場合のみ計算
+    if (forwardProfit !== null && reverseProfit !== null) {
+      const averageRoundTripProfit = (forwardProfit + reverseProfit) / 2;
+      roundTripProfitsList.push({
+        cityA: cityA,
+        cityB: cityB,
+        roundTripProfitExpectedValue: averageRoundTripProfit,
+      });
+
+      // 処理済みとしてマーク
+      processedPairs.add(forwardKey);
+      processedPairs.add(reverseKey);
+
+      // コンソールに往復利益を表示
+      console.log(
+        `【往復利益】都市A: ${cityA}, 都市B: ${cityB}, 往復利益期待値: ${averageRoundTripProfit.toFixed(
+          2
+        )}`
+      );
+    }
+  });
+
+  // 新しいリストをグローバル変数に保存（必要に応じて）
+  globalRoundTripProfitsList = roundTripProfitsList;
+
+  // 結果をHTMLテーブルに表示
+  displayRoundTripProfits(roundTripProfitsList);
+}
+
+/**
+ * 往復利益期待値をHTMLテーブルに表示する関数
+ * @param {Array} roundTripProfitsList - 往復利益期待値リスト
+ */
+function displayRoundTripProfits(roundTripProfitsList) {
+  const resultsTableBody = document.querySelector(
+    "#roundTripResultsTable tbody"
+  );
+
+  // 既存のテーブル内容をクリア
+  resultsTableBody.innerHTML = "";
+
+  roundTripProfitsList.forEach((entry) => {
+    const row = document.createElement("tr");
+
+    const cityACell = document.createElement("td");
+    cityACell.textContent = entry.cityA;
+    row.appendChild(cityACell);
+
+    const cityBCell = document.createElement("td");
+    cityBCell.textContent = entry.cityB;
+    row.appendChild(cityBCell);
+
+    const roundTripProfitCell = document.createElement("td");
+    roundTripProfitCell.textContent =
+      entry.roundTripProfitExpectedValue.toFixed(2);
+    row.appendChild(roundTripProfitCell);
+
+    resultsTableBody.appendChild(row);
+  });
+
+  console.log("=== 往復利益期待値リスト ===", roundTripProfitsList);
+}
+
+// -------------------------------------------
+// ④ 追加機能はここまで
+// -------------------------------------------
+
+/**
+ * MessagePackを使用して市場データをデコードし、各種計算を行う関数
+ */
+async function fetchMarketData() {
+  try {
+    // MessagePackの市場データを読み込む
+    const response = await fetch("./価格/market_data.msgpack");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    const data = decode(uint8Array);
+
+    console.log("市場データのデコード結果:", data);
+
+    // 各種計算を実行
+    const totalSales = calculateTotalSales(data);
+    const averagePrice = calculateAveragePrice(data);
+    const sellBuyCounts = countSellBuy(data);
+
+    console.log("総売上額:", totalSales);
+    console.log("平均値段:", averagePrice.toFixed(2));
+    console.log("売りの数:", sellBuyCounts.sell);
+    console.log("買いの数:", sellBuyCounts.buy);
+
+    // 都市リストの取得
+    const uniqueCityList = getUniqueCityList(data);
+    console.log("ユニークな都市リスト:", uniqueCityList);
+    globalCityList = uniqueCityList;
+
+    // 都市別にデータを整形
+    const cityDataMap = restructureDataByCity(data);
+    console.log("都市別データ:", cityDataMap);
+    globalCityDataMap = cityDataMap;
+
+    // 各都市の最新更新時間を取得
+    const latestTimeMap = getLatestUpdateTimePerCity(cityDataMap);
+    console.log("各都市の最新更新時間:", latestTimeMap);
+    globalLatestTimeMap = latestTimeMap;
+
+    // HTMLに都市名リストと都市データを表示
+    displayCityList(uniqueCityList);
+    displayCityData(latestTimeMap, cityDataMap, uniqueCityList, new Date());
+
+    // 値引きと値上げのシミュレーションを実行
+    runDiscountSimulation();
+    runMarkUpSimulation();
+
+    // 都市ごとにデータを処理
+    globalCityList.forEach((city) => {
+      const allCityData = cityDataMap.get(city);
+      if (!allCityData) return;
+
+      const cityTime = latestTimeMap.get(city);
+      if (!cityTime || cityTime.getTime() === new Date(0).getTime()) {
+        console.log(`都市「${city}」はデータが無いか最新時間がありません。`);
+        return;
+      }
+
+      // 最新時間と同じ更新時間のデータに絞る
+      const filteredCityData = allCityData.filter((item) => {
+        const d = new Date(item.更新時間.replace(" ", "T"));
+        return d.getTime() === cityTime.getTime();
+      });
+
+      // (1) 買いデータ
+      const cityBuyData = filteredCityData.filter(
+        (it) => it["売りor買い"] === "買い"
+      );
+      // 販売個数倍率を計算
+      processBuyDataRates(cityBuyData, city);
+      // 値引き買い値段リストを計算( discountExpectPct[n] を用いる )
+      fillDiscountBuyPriceLists(cityBuyData, city);
+
+      // (2) 売りデータ
+      const citySellData = filteredCityData.filter(
+        (it) => it["売りor買い"] === "売り"
+      );
+      // 値上げ売り値段リストを計算( markUpExpectPct[m] を用いる )
+      fillMarkUpSellPriceLists(citySellData);
+
+      // mathGlobalCityDataMap に登録
+      mathGlobalCityDataMap.set(city, {
+        buyData: cityBuyData,
+        sellData: citySellData,
+      });
+    });
+
+    // 都市売買リストを作り、(売り - 買い) で最終利益を計算
+    processCityBuySellList();
+
+    // 都市売買リストの利益計算と最適化
+    calculateProfits();
+
+    // 往復利益期待値の計算
+    calculateRoundTripProfits();
+  } catch (error) {
+    console.error("市場データの取得・処理中にエラーが発生しました:", error);
+  }
+}
+
+// 市場データの取得と処理を実行
+fetchMarketData();
+
+// スクリプト終了の合図
+console.log("スクリプト終了！(ESM版)");
