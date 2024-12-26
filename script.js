@@ -1057,15 +1057,15 @@ function calculateProfits() {
           }
 
           if (loadedUnits > 0) {
-            // console.log(
-            //   `【積載】商品: ${
-            //     item.商品名
-            //   }, 数量: ${loadedUnits}, 利益単価: ${profit}, 合計利益: ${
-            //     loadedUnits * profit
-            //   }`,
-            //   cityA,
-            //   cityB
-            // );
+            console.log(
+              `【積載】商品: ${
+                item.商品名
+              }, 数量: ${loadedUnits}, 利益単価: ${profit}, 合計利益: ${
+                loadedUnits * profit
+              }`,
+              cityA,
+              cityB
+            );
           }
 
           // 仕入れ書販売個数を使用して積載
