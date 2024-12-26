@@ -75,3 +75,17 @@ input[type="number"] {
 .close:focus {
     color: red;
 }
+
+  /* ヘッダーをクリック可能に見せる */
+  #roundTripResultsTable th {
+    cursor: pointer;
+  }
+
+  /* ソート方向を示す矢印（オプション） */
+  #roundTripResultsTable th.sorted-desc::after {
+    content: " ▼";
+  }
+
+  #roundTripResultsTable th.sorted-asc::after {
+    content: " ▲";
+  }

@@ -1062,7 +1062,9 @@ function calculateProfits() {
                 item.商品名
               }, 数量: ${loadedUnits}, 利益単価: ${profit}, 合計利益: ${
                 loadedUnits * profit
-              }`
+              }`,
+              cityA,
+              cityB
             );
           }
 
@@ -1163,7 +1165,7 @@ function calculateRoundTripProfits() {
   const processedPairs = new Set(); // 処理済みの都市ペアを記録するセット
 
   globalCityBuySellList.forEach((pair) => {
-    const { cityA, cityB, 最大疲労値毎利益 } = pair;
+    const { cityA, cityB, 最大仕入れ書疲労値毎利益 } = pair;
 
     // 順方向のペアキーを作成
     const forwardKey = `${cityA}->${cityB}`;
@@ -1184,30 +1186,72 @@ function calculateRoundTripProfits() {
       (p) => p.cityA === cityB && p.cityB === cityA
     );
 
-    // 最大疲労値毎利益を取得
-    const forwardProfit = forwardPair ? forwardPair.最大疲労値毎利益 : null;
-    const reverseProfit = reversePair ? reversePair.最大疲労値毎利益 : null;
-
-    // 両方のペアが存在する場合のみ計算
-    if (forwardProfit !== null && reverseProfit !== null) {
-      const averageRoundTripProfit = (forwardProfit + reverseProfit) / 2;
-      roundTripProfitsList.push({
-        cityA: cityA,
-        cityB: cityB,
-        roundTripProfitExpectedValue: averageRoundTripProfit,
-      });
-
-      // 処理済みとしてマーク
-      processedPairs.add(forwardKey);
-      processedPairs.add(reverseKey);
-
-      // コンソールに往復利益を表示
-      console.log(
-        `【往復利益】都市A: ${cityA}, 都市B: ${cityB}, 往復利益期待値: ${averageRoundTripProfit.toFixed(
-          2
-        )}`
-      );
+    // ペアが存在しない場合はスキップ
+    if (!forwardPair || !reversePair) {
+      return;
     }
+
+    // 往路（A->B）の交渉回数
+    const outboundDiscountCount = forwardPair.値引き回数;
+    const outboundMarkUpCount = forwardPair.値上げ回数;
+
+    // 復路（B->A）の交渉回数
+    const returnDiscountCount = reversePair.値引き回数;
+    const returnMarkUpCount = reversePair.値上げ回数;
+
+    // 仕入れ書往復利益期待値: ペアの最大仕入れ書疲労値毎利益の平均
+    const purchaseRoundTripExpectedProfit =
+      (forwardPair.最大仕入れ書疲労値毎利益 +
+        reversePair.最大仕入れ書疲労値毎利益) /
+      2;
+
+    // 仕入れ書獲得利益: 仕入れ書往復利益期待値 - 往復利益期待値
+    const purchaseProfit =
+      purchaseRoundTripExpectedProfit -
+      (forwardPair.最大疲労値毎利益 + reversePair.最大疲労値毎利益) / 2;
+
+    // 仕入れ書往路値引き回数
+    const purchaseOutboundDiscountCount = forwardPair.仕入れ書値引き回数;
+    // 仕入れ書往路値上げ回数
+    const purchaseOutboundMarkUpCount = forwardPair.仕入れ書値上げ回数;
+    // 仕入れ書復路値引き回数
+    const purchaseReturnDiscountCount = reversePair.仕入れ書値引き回数;
+    // 仕入れ書復路値上げ回数
+    const purchaseReturnMarkUpCount = reversePair.仕入れ書値上げ回数;
+
+    // 往復利益期待値: ペアの最大疲労値毎利益の平均
+    const roundTripExpectedProfit =
+      (forwardPair.最大疲労値毎利益 + reversePair.最大疲労値毎利益) / 2;
+
+    // 往復利益期待値リストに追加
+    roundTripProfitsList.push({
+      cityA: cityA,
+      cityB: cityB,
+      roundTripProfitExpectedValue: roundTripExpectedProfit,
+      purchaseRoundTripExpectedProfit: purchaseRoundTripExpectedProfit,
+      purchaseProfit: purchaseProfit,
+      outboundDiscountCount: outboundDiscountCount,
+      outboundMarkUpCount: outboundMarkUpCount,
+      returnDiscountCount: returnDiscountCount,
+      returnMarkUpCount: returnMarkUpCount,
+      purchaseOutboundDiscountCount: purchaseOutboundDiscountCount,
+      purchaseOutboundMarkUpCount: purchaseOutboundMarkUpCount,
+      purchaseReturnDiscountCount: purchaseReturnDiscountCount,
+      purchaseReturnMarkUpCount: purchaseReturnMarkUpCount,
+    });
+
+    // 処理済みとしてマーク
+    processedPairs.add(forwardKey);
+    processedPairs.add(reverseKey);
+
+    // コンソールに往復利益を表示
+    console.log(
+      `【往復利益】都市A: ${cityA}, 都市B: ${cityB}, 往復利益期待値: ${roundTripExpectedProfit.toFixed(
+        2
+      )}, 仕入れ書往復利益期待値: ${purchaseRoundTripExpectedProfit.toFixed(
+        2
+      )}, 仕入れ書獲得利益: ${purchaseProfit.toFixed(2)}`
+    );
   });
 
   // 新しいリストをグローバル変数に保存（必要に応じて）
@@ -1232,18 +1276,73 @@ function displayRoundTripProfits(roundTripProfitsList) {
   roundTripProfitsList.forEach((entry) => {
     const row = document.createElement("tr");
 
+    // 都市A
     const cityACell = document.createElement("td");
     cityACell.textContent = entry.cityA;
     row.appendChild(cityACell);
 
+    // 都市B
     const cityBCell = document.createElement("td");
     cityBCell.textContent = entry.cityB;
     row.appendChild(cityBCell);
 
+    // 往路値引き回数
+    const outboundDiscountCell = document.createElement("td");
+    outboundDiscountCell.textContent = entry.outboundDiscountCount;
+    row.appendChild(outboundDiscountCell);
+
+    // 往路値上げ回数
+    const outboundMarkUpCell = document.createElement("td");
+    outboundMarkUpCell.textContent = entry.outboundMarkUpCount;
+    row.appendChild(outboundMarkUpCell);
+
+    // 復路値引き回数
+    const returnDiscountCell = document.createElement("td");
+    returnDiscountCell.textContent = entry.returnDiscountCount;
+    row.appendChild(returnDiscountCell);
+
+    // 復路値上げ回数
+    const returnMarkUpCell = document.createElement("td");
+    returnMarkUpCell.textContent = entry.returnMarkUpCount;
+    row.appendChild(returnMarkUpCell);
+
+    // 往復利益期待値
     const roundTripProfitCell = document.createElement("td");
     roundTripProfitCell.textContent =
       entry.roundTripProfitExpectedValue.toFixed(2);
     row.appendChild(roundTripProfitCell);
+
+    // 仕入れ書往復利益期待値
+    const purchaseRoundTripProfitCell = document.createElement("td");
+    purchaseRoundTripProfitCell.textContent =
+      entry.purchaseRoundTripExpectedProfit.toFixed(2);
+    row.appendChild(purchaseRoundTripProfitCell);
+
+    // 仕入れ書獲得利益
+    const purchaseProfitCell = document.createElement("td");
+    purchaseProfitCell.textContent = entry.purchaseProfit.toFixed(2);
+    row.appendChild(purchaseProfitCell);
+
+    // 仕入れ書往路値引き回数
+    const purchaseOutboundDiscountCell = document.createElement("td");
+    purchaseOutboundDiscountCell.textContent =
+      entry.purchaseOutboundDiscountCount;
+    row.appendChild(purchaseOutboundDiscountCell);
+
+    // 仕入れ書往路値上げ回数
+    const purchaseOutboundMarkUpCell = document.createElement("td");
+    purchaseOutboundMarkUpCell.textContent = entry.purchaseOutboundMarkUpCount;
+    row.appendChild(purchaseOutboundMarkUpCell);
+
+    // 仕入れ書復路値引き回数
+    const purchaseReturnDiscountCell = document.createElement("td");
+    purchaseReturnDiscountCell.textContent = entry.purchaseReturnDiscountCount;
+    row.appendChild(purchaseReturnDiscountCell);
+
+    // 仕入れ書復路値上げ回数
+    const purchaseReturnMarkUpCell = document.createElement("td");
+    purchaseReturnMarkUpCell.textContent = entry.purchaseReturnMarkUpCount;
+    row.appendChild(purchaseReturnMarkUpCell);
 
     resultsTableBody.appendChild(row);
   });

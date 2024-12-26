@@ -457,3 +457,76 @@ async function initializePage() {
 window.addEventListener("DOMContentLoaded", () => {
   initializePage();
 });
+
+// DOMが完全に読み込まれた後に実行
+document.addEventListener("DOMContentLoaded", function () {
+  const table = document.getElementById("roundTripResultsTable");
+  if (!table) return; // テーブルが存在しない場合は終了
+
+  const headers = table.querySelectorAll("thead th");
+
+  headers.forEach((header, index) => {
+    header.style.cursor = "pointer"; // カーソルをポインターに変更（CSSでも可能）
+
+    // クリックイベントを追加
+    header.addEventListener("click", () => {
+      // 現在のソート状態を取得
+      const currentSort = header.getAttribute("data-sort");
+
+      // ソート順を決定（既に降順なら昇順に、そうでなければ降順に切り替え）
+      let newSortOrder = "desc";
+      if (currentSort === "desc") {
+        newSortOrder = "asc";
+      }
+
+      // 全てのヘッダーのソートクラスをリセット
+      headers.forEach((h) => {
+        h.classList.remove("sorted-desc", "sorted-asc");
+        h.removeAttribute("data-sort");
+      });
+
+      // クリックされたヘッダーにソートクラスとソート順を設定
+      header.classList.add(
+        newSortOrder === "desc" ? "sorted-desc" : "sorted-asc"
+      );
+      header.setAttribute("data-sort", newSortOrder);
+
+      // テーブルをソート
+      sortTableByColumn(table, index, newSortOrder === "asc");
+    });
+  });
+});
+
+/**
+ * 指定した列でテーブルをソートする関数
+ * @param {HTMLTableElement} table - ソート対象のテーブル要素
+ * @param {number} column - ソート対象の列インデックス
+ * @param {boolean} ascending - 昇順にソートするか
+ */
+function sortTableByColumn(table, column, ascending = true) {
+  const tbody = table.tBodies[0];
+  const rowsArray = Array.from(tbody.querySelectorAll("tr"));
+
+  rowsArray.sort((a, b) => {
+    const aText = a.children[column].textContent.trim();
+    const bText = b.children[column].textContent.trim();
+
+    // 数値として比較
+    const aNum = parseFloat(aText);
+    const bNum = parseFloat(bText);
+
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      return ascending ? aNum - bNum : bNum - aNum;
+    } else {
+      // 数値でない場合は文字列として比較
+      return ascending
+        ? aText.localeCompare(bText)
+        : bText.localeCompare(aText);
+    }
+  });
+
+  // ソートされた行をtbodyに再追加
+  rowsArray.forEach((row) => {
+    tbody.appendChild(row);
+  });
+}
