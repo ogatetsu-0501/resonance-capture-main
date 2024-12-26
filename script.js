@@ -657,8 +657,8 @@ function fillMarkUpSellPriceLists(citySellData) {
  */
 function processCityBuySellList() {
   // ローカルストレージから設定を取得
-  const savedDataString = localStorage.getItem("mySettings") || "{}";
-  const settingsData = JSON.parse(savedDataString);
+  const mySettings = localStorage.getItem("mySettings") || "{}";
+  const settingsData = JSON.parse(mySettings);
 
   // 全ての都市のペア (順列) を作成
   const pairs = [];
@@ -765,6 +765,14 @@ function processCityBuySellList() {
 
         // 利益計算結果
         利益計算リスト: resultRows,
+
+        // 積載個数を格納するためのフィールド
+        loadedUnits: 0, // 後で計算
+        loadedUnitsReceipt: 0, // 後で計算
+
+        // 最適な積載個数を格納するフィールド
+        optimalLoadedUnits: 0, // 最適な n,m のときの積載個数
+        optimalLoadedUnitsReceipt: 0, // 最適な n,m のときの仕入れ書積載個数
       });
     });
 
@@ -993,6 +1001,10 @@ function calculateProfits() {
     let optimalNReceipt = 0;
     let optimalMReceipt = 0;
 
+    // 各都市ペアの各商品の積載個数を一時的に保存するための配列
+    let tempOptimalLoadedUnits = [];
+    let tempOptimalLoadedUnitsReceipt = [];
+
     // 全てのn,mの組み合わせを試す（値引きと値上げのmaxNegotiationsを個別に使用）
     for (let n = 0; n <= maxNegotiationsDiscount; n++) {
       for (let m = 0; m <= maxNegotiationsMarkUp; m++) {
@@ -1026,6 +1038,12 @@ function calculateProfits() {
         let loadProfit = 0;
         let loadCountReceipt = 0;
         let loadProfitReceipt = 0;
+
+        // 各商品の loadedUnits と loadedUnitsReceipt をリセット
+        sortedItems.forEach((item) => {
+          item.loadedUnits = 0;
+          item.loadedUnitsReceipt = 0;
+        });
 
         // 並び替えた順にmaxLoadを使って積載利益を計算
         sortedItems.forEach((item) => {
@@ -1068,6 +1086,8 @@ function calculateProfits() {
               n,
               m
             );
+            // loadedUnits を保存
+            item.loadedUnits += loadedUnits;
           }
 
           // 仕入れ書販売個数を使用して積載
@@ -1087,13 +1107,19 @@ function calculateProfits() {
           }
 
           if (loadedUnitsReceipt > 0) {
-            // console.log(
-            //   `【仕入れ書積載】商品: ${
-            //     item.商品名
-            //   }, 数量: ${loadedUnitsReceipt}, 利益単価: ${profit}, 合計利益: ${
-            //     loadedUnitsReceipt * profit
-            //   }`
-            // );
+            console.log(
+              `【仕入れ書積載】商品: ${
+                item.商品名
+              }, 数量: ${loadedUnitsReceipt}, 利益単価: ${profit}, 合計利益: ${
+                loadedUnitsReceipt * profit
+              }`,
+              cityA,
+              cityB,
+              n,
+              m
+            );
+            // loadedUnitsReceipt を保存
+            item.loadedUnitsReceipt += loadedUnitsReceipt;
           }
         });
 
@@ -1111,6 +1137,12 @@ function calculateProfits() {
           maxFatiguePerProfit = fatiguePerProfit;
           optimalN = n;
           optimalM = m;
+
+          // 各商品の loadedUnits と loadedUnitsReceipt を保存
+          tempOptimalLoadedUnits = items.map((item) => item.loadedUnits);
+          tempOptimalLoadedUnitsReceipt = items.map(
+            (item) => item.loadedUnitsReceipt
+          );
         }
 
         // 最大の仕入れ書疲労値毎利益を更新
@@ -1118,15 +1150,13 @@ function calculateProfits() {
           maxPurchaseFatiguePerProfit = purchaseFatiguePerProfit;
           optimalNReceipt = n;
           optimalMReceipt = m;
-        }
 
-        // コンソールに各組み合わせの結果を表示
-        // console.log(`=== 組み合わせ n=${n}, m=${m} ===`);
-        // console.log(`総疲労値: ${totalFatigue}`);
-        // console.log(`積載利益: ${loadProfit}`);
-        // console.log(`積載利益 / 総疲労値: ${fatiguePerProfit}`);
-        // console.log(`仕入れ書積載利益: ${loadProfitReceipt}`);
-        // console.log(`仕入れ書積載利益 / 総疲労値: ${purchaseFatiguePerProfit}`);
+          // 各商品の loadedUnits と loadedUnitsReceipt を保存
+          tempOptimalLoadedUnits = items.map((item) => item.loadedUnits);
+          tempOptimalLoadedUnitsReceipt = items.map(
+            (item) => item.loadedUnitsReceipt
+          );
+        }
       }
     }
 
@@ -1138,6 +1168,13 @@ function calculateProfits() {
     pair.最大仕入れ書疲労値毎利益 = maxPurchaseFatiguePerProfit;
     pair.仕入れ書値引き回数 = optimalNReceipt;
     pair.仕入れ書値上げ回数 = optimalMReceipt;
+
+    // 最適な loadedUnits と loadedUnitsReceipt を保存
+    pair.items.forEach((item, index) => {
+      item.optimalLoadedUnits = tempOptimalLoadedUnits[index] || 0;
+      item.optimalLoadedUnitsReceipt =
+        tempOptimalLoadedUnitsReceipt[index] || 0;
+    });
 
     // コンソールにペアの最終結果を表示
     // console.log(`=== 都市ペア ${cityA} -> ${cityB} の計算結果 ===`);
@@ -1163,7 +1200,7 @@ function calculateProfits() {
 // ⑦ 詳細表示用モーダルの設定
 // -----------------------------
 
-// モーダルの要素を取得
+// 詳細モーダルの要素を取得
 const detailsModal = document.getElementById("details-modal");
 const closeDetailsBtn = document.getElementById("close-details-btn");
 
@@ -1193,7 +1230,9 @@ detailsModal.addEventListener("click", (event) => {
   }
 });
 
-// テーブルの行をクリックしたときのイベントリスナーを追加する関数
+/**
+ * テーブルの行をクリックしたときのイベントリスナーを追加する関数
+ */
 function addRowClickListeners() {
   const table = document.getElementById("roundTripResultsTable");
   const tbody = table.querySelector("tbody");
@@ -1221,69 +1260,105 @@ function addRowClickListeners() {
         )}`;
 
         // 往路のルート情報を設定
+        const outboundRouteSpan = document.getElementById("outboundRoute");
+        outboundRouteSpan.textContent = `${cityA} -> ${cityB}`;
+
+        // 復路のルート情報を設定
+        const returnRouteSpan = document.getElementById("returnRoute");
+        returnRouteSpan.textContent = `${cityB} -> ${cityA}`;
+
+        // 往路の商品リストを表示
         outboundDetailsTableBody.innerHTML = ""; // 既存の内容をクリア
-        const outboundHeaderRow = document.createElement("tr");
-        const outboundHeaderCell = document.createElement("th");
-        outboundHeaderCell.colSpan = 2;
-        outboundHeaderCell.textContent = `往路: ${cityA} -> ${cityB}`;
-        outboundHeaderRow.appendChild(outboundHeaderCell);
-        outboundDetailsTableBody.appendChild(outboundHeaderRow);
 
         if (
           matchingEntry.outboundItems &&
           matchingEntry.outboundItems.length > 0
         ) {
+          // ヘッダー行を追加
+          const outboundHeaderRow = document.createElement("tr");
+          const outboundHeaderCell1 = document.createElement("th");
+          outboundHeaderCell1.textContent = "商品名";
+          const outboundHeaderCell2 = document.createElement("th");
+          outboundHeaderCell2.textContent = "積載個数";
+          const outboundHeaderCell3 = document.createElement("th");
+          outboundHeaderCell3.textContent = "仕入れ書積載個数";
+          outboundHeaderRow.appendChild(outboundHeaderCell1);
+          outboundHeaderRow.appendChild(outboundHeaderCell2);
+          outboundHeaderRow.appendChild(outboundHeaderCell3);
+          outboundDetailsTableBody.appendChild(outboundHeaderRow);
+
           matchingEntry.outboundItems.forEach((item) => {
             const tr = document.createElement("tr");
 
+            // 商品名
             const tdProductName = document.createElement("td");
             tdProductName.textContent = item.商品名;
             tr.appendChild(tdProductName);
 
-            const tdLoadedCount = document.createElement("td");
-            // 仕入れ書積載個数を表示
-            tdLoadedCount.textContent = item.仕入れ書販売個数 || 0;
-            tr.appendChild(tdLoadedCount);
+            // 積載個数 (optimalLoadedUnits)
+            const tdLoadedUnits = document.createElement("td");
+            tdLoadedUnits.textContent = item.optimalLoadedUnits || 0;
+            tr.appendChild(tdLoadedUnits);
+
+            // 仕入れ書積載個数 (optimalLoadedUnitsReceipt)
+            const tdLoadedUnitsReceipt = document.createElement("td");
+            tdLoadedUnitsReceipt.textContent =
+              item.optimalLoadedUnitsReceipt || 0;
+            tr.appendChild(tdLoadedUnitsReceipt);
 
             outboundDetailsTableBody.appendChild(tr);
           });
         } else {
           const tr = document.createElement("tr");
           const td = document.createElement("td");
-          td.colSpan = 2;
+          td.colSpan = 3; // カラム数に合わせて調整
           td.textContent = "積載商品なし";
           tr.appendChild(td);
           outboundDetailsTableBody.appendChild(tr);
         }
 
-        // 復路のルート情報を設定
+        // 復路の商品リストを表示
         returnDetailsTableBody.innerHTML = ""; // 既存の内容をクリア
-        const returnHeaderRow = document.createElement("tr");
-        const returnHeaderCell = document.createElement("th");
-        returnHeaderCell.colSpan = 2;
-        returnHeaderCell.textContent = `復路: ${cityB} -> ${cityA}`;
-        returnHeaderRow.appendChild(returnHeaderCell);
-        returnDetailsTableBody.appendChild(returnHeaderRow);
 
         if (matchingEntry.returnItems && matchingEntry.returnItems.length > 0) {
+          // ヘッダー行を追加
+          const returnHeaderRow = document.createElement("tr");
+          const returnHeaderCell1 = document.createElement("th");
+          returnHeaderCell1.textContent = "商品名";
+          const returnHeaderCell2 = document.createElement("th");
+          returnHeaderCell2.textContent = "積載個数";
+          const returnHeaderCell3 = document.createElement("th");
+          returnHeaderCell3.textContent = "仕入れ書積載個数";
+          returnHeaderRow.appendChild(returnHeaderCell1);
+          returnHeaderRow.appendChild(returnHeaderCell2);
+          returnHeaderRow.appendChild(returnHeaderCell3);
+          returnDetailsTableBody.appendChild(returnHeaderRow);
+
           matchingEntry.returnItems.forEach((item) => {
             const tr = document.createElement("tr");
 
+            // 商品名
             const tdProductName = document.createElement("td");
             tdProductName.textContent = item.商品名;
             tr.appendChild(tdProductName);
 
-            const tdLoadedCount = document.createElement("td");
-            // 仕入れ書積載個数を表示
-            tdLoadedCount.textContent = item.仕入れ書販売個数 || 0;
-            tr.appendChild(tdLoadedCount);
+            // 積載個数 (optimalLoadedUnits)
+            const tdLoadedUnits = document.createElement("td");
+            tdLoadedUnits.textContent = item.optimalLoadedUnits || 0;
+            tr.appendChild(tdLoadedUnits);
+
+            // 仕入れ書積載個数 (optimalLoadedUnitsReceipt)
+            const tdLoadedUnitsReceipt = document.createElement("td");
+            tdLoadedUnitsReceipt.textContent =
+              item.optimalLoadedUnitsReceipt || 0;
+            tr.appendChild(tdLoadedUnitsReceipt);
 
             returnDetailsTableBody.appendChild(tr);
           });
         } else {
           const tr = document.createElement("tr");
           const td = document.createElement("td");
-          td.colSpan = 2;
+          td.colSpan = 3; // カラム数に合わせて調整
           td.textContent = "積載商品なし";
           tr.appendChild(td);
           returnDetailsTableBody.appendChild(tr);
@@ -1396,7 +1471,10 @@ function calculateRoundTripProfits() {
   displayRoundTripProfits(roundTripProfitsList);
 }
 
-// displayRoundTripProfits 関数内でテーブルが更新された後に呼び出す
+/**
+ * 都市間の往復利益期待値を表示する関数
+ * @param {Array} roundTripProfitsList - 往復利益期待値リスト
+ */
 function displayRoundTripProfits(roundTripProfitsList) {
   const resultsTableBody = document.querySelector(
     "#roundTripResultsTable tbody"
