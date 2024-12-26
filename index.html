@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- Chart.jsを読み込むために以下を<head>内に追加 -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <!-- ページの文字コードをUTF-8に設定 -->
     <meta charset="UTF-8" />
     <!-- ページのタイトルを設定 -->
-    <title>市場データ解析と設定</title>
+    <title>@msgpack/msgpack 3.x (ESM) を読み込む例 + モーダル設定</title>
 
-    <!-- モーダル用の簡易CSS -->
+    <!-- モーダル用の簡易CSSをここに追加 -->
     <style>
-      /* モーダルの背景を少し半透明にするための設定 */
+      /* 既存のモーダル用CSS */
       .modal-overlay {
         position: fixed; /* 画面全体を覆う */
         top: 0;
@@ -63,14 +60,9 @@
         text-align: center;
       }
 
-      /* グラフセクションのスタイル */
-      #profitChart {
-        max-width: 100%;
-        height: auto;
-      }
-
-      /* ヘッダーをクリック可能に見せる */
-      #roundTripResultsTable th {
+      /* 行にホバー効果を追加 */
+      #roundTripResultsTable tbody tr:hover {
+        background-color: #f1f1f1;
         cursor: pointer;
       }
 
@@ -82,73 +74,7 @@
       #roundTripResultsTable th.sorted-asc::after {
         content: " ▲";
       }
-
-      /* 一般的なページスタイル */
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-
-      h1 {
-        text-align: center;
-      }
-
-      .pair-card {
-        border: 1px solid #000;
-        padding: 10px;
-        margin: 10px 0;
-      }
-
-      .overall-settings {
-        margin-bottom: 20px;
-      }
-
-      label {
-        margin-right: 10px;
-      }
-
-      input[type="number"] {
-        width: 100px;
-        padding: 5px;
-        box-sizing: border-box;
-      }
-
-      /* モーダル */
-      .modal {
-        display: none; 
-        position: fixed;
-        z-index: 1000;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4);
-      }
-
-      .modal-content {
-        background-color: #fff;
-        margin: 5% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 90%; 
-        max-width: 800px;
-        box-sizing: border-box;
-      }
-
-      .close {
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-
-      .close:hover,
-      .close:focus {
-        color: red;
-      }
     </style>
-
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <!-- -------------------------------
@@ -160,12 +86,12 @@
 
       <!-- 指定時間を入力するフォーム -->
       <div id="time-input">
-        <!-- <label for="specified-time">指定時間:</label>
+        <label for="specified-time">指定時間:</label>
         <input
           type="datetime-local"
           id="specified-time"
           name="specified-time"
-        /> -->
+        />
         <button id="update-time">更新</button>
       </div>
 
@@ -173,8 +99,8 @@
       <ul id="city-list">
         計算中...
       </ul>
-      <!-- <h3>各都市のデータ</h3>
-      <div id="city-data">計算中...</div> -->
+      <h3>各都市のデータ</h3>
+      <div id="city-data">計算中...</div>
 
       <!-- -------------------------------
          ここから往復利益期待値表示セクションを追加
@@ -205,7 +131,7 @@
     </div>
 
     <!-- -------------------------------
-       ここからモーダル (設定画面)
+       ここから設定用モーダル
        ------------------------------- -->
 
     <!-- 「設定を開く」ボタンを作っておく -->
@@ -326,6 +252,37 @@
         <div class="modal-actions">
           <button id="save-settings-btn">保存</button>
           <button id="close-settings-btn">閉じる</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- -------------------------------
+       ここから詳細表示用モーダル
+       ------------------------------- -->
+
+    <!-- モーダルのオーバーレイ -->
+    <div class="modal-overlay" id="details-modal">
+      <!-- モーダルの本体部分 -->
+      <div class="modal-content">
+        <h2>詳細情報</h2>
+        <!-- 商品リストを表示するテーブル -->
+        <table id="detailsTable">
+          <thead>
+            <tr>
+              <th>商品名</th>
+              <th>積載個数</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JavaScriptで動的に行を追加 -->
+          </tbody>
+        </table>
+        <!-- 往復利益期待値の表示 -->
+        <p id="roundTripProfit">往復利益期待値:</p>
+        <p id="purchaseRoundTripProfit">仕入れ書往復利益期待値:</p>
+        <!-- モーダルの閉じるボタン -->
+        <div class="modal-actions">
+          <button id="close-details-btn">閉じる</button>
         </div>
       </div>
     </div>

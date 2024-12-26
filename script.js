@@ -1159,6 +1159,112 @@ function calculateProfits() {
   console.log("=== 都市売買リストの最適化結果 ===", globalCityBuySellList);
 }
 
+// -----------------------------
+// ⑦ 詳細表示用モーダルの設定
+// -----------------------------
+
+// 詳細モーダルの要素を取得
+const detailsModal = document.getElementById("details-modal");
+const closeDetailsBtn = document.getElementById("close-details-btn");
+const detailsTableBody = document
+  .getElementById("detailsTable")
+  .querySelector("tbody");
+const roundTripProfitPara = document.getElementById("roundTripProfit");
+const purchaseRoundTripProfitPara = document.getElementById(
+  "purchaseRoundTripProfit"
+);
+
+// 「閉じる」ボタンが押されたらモーダルを閉じる
+closeDetailsBtn.addEventListener("click", () => {
+  detailsModal.style.display = "none";
+});
+
+// モーダルのオーバーレイ部分をクリックしたらモーダルを閉じる
+detailsModal.addEventListener("click", (event) => {
+  if (event.target === detailsModal) {
+    detailsModal.style.display = "none";
+  }
+});
+
+// テーブルの行をクリックしたときのイベントリスナーを追加する関数
+function addRowClickListeners() {
+  const table = document.getElementById("roundTripResultsTable");
+  const tbody = table.querySelector("tbody");
+  const rows = tbody.querySelectorAll("tr");
+
+  rows.forEach((row) => {
+    row.addEventListener("click", () => {
+      // 各セルから都市Aと都市Bの名前を取得
+      const cells = row.querySelectorAll("td");
+      const cityA = cells[0].textContent.trim();
+      const cityB = cells[1].textContent.trim();
+
+      // 対応するデータをglobalRoundTripProfitsListから検索
+      const matchingEntry = globalRoundTripProfitsList.find(
+        (entry) => entry.cityA === cityA && entry.cityB === cityB
+      );
+
+      if (matchingEntry) {
+        // モーダルに表示するデータを設定
+        roundTripProfitPara.textContent = `往復利益期待値: ${matchingEntry.roundTripProfitExpectedValue.toFixed(
+          2
+        )}`;
+        purchaseRoundTripProfitPara.textContent = `仕入れ書往復利益期待値: ${matchingEntry.purchaseRoundTripExpectedProfit.toFixed(
+          2
+        )}`;
+
+        // 商品ごとの積載個数を表示
+        detailsTableBody.innerHTML = ""; // 既存の内容をクリア
+
+        // globalCityBuySellList から cityA->cityB と cityB->cityA のペアを検索
+        const forwardPair = globalCityBuySellList.find(
+          (p) => p.cityA === cityA && p.cityB === cityB
+        );
+        const reversePair = globalCityBuySellList.find(
+          (p) => p.cityA === cityB && p.cityB === cityA
+        );
+
+        let allItems = [];
+        if (forwardPair && forwardPair.items) {
+          allItems = allItems.concat(forwardPair.items);
+        }
+        if (reversePair && reversePair.items) {
+          allItems = allItems.concat(reversePair.items);
+        }
+
+        if (allItems.length > 0) {
+          allItems.forEach((item) => {
+            const tr = document.createElement("tr");
+
+            const tdProductName = document.createElement("td");
+            tdProductName.textContent = item.商品名;
+            tr.appendChild(tdProductName);
+
+            const tdLoadedCount = document.createElement("td");
+            tdLoadedCount.textContent = item.仕入れ書販売個数 || 0;
+            tr.appendChild(tdLoadedCount);
+
+            detailsTableBody.appendChild(tr);
+          });
+        } else {
+          // 該当する商品のデータがない場合
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          td.setAttribute("colspan", "2");
+          td.textContent = "積載商品データがありません。";
+          tr.appendChild(td);
+          detailsTableBody.appendChild(tr);
+        }
+
+        // モーダルを表示
+        detailsModal.style.display = "flex";
+      } else {
+        console.error(`データが見つかりません: ${cityA} -> ${cityB}`);
+      }
+    });
+  });
+}
+
 /**
  * 都市間の往復利益期待値を計算し、新しいリストを作成する関数
  */
@@ -1263,10 +1369,7 @@ function calculateRoundTripProfits() {
   displayRoundTripProfits(roundTripProfitsList);
 }
 
-/**
- * 往復利益期待値をHTMLテーブルに表示する関数
- * @param {Array} roundTripProfitsList - 往復利益期待値リスト
- */
+// displayRoundTripProfits 関数内でテーブルが更新された後に呼び出す
 function displayRoundTripProfits(roundTripProfitsList) {
   const resultsTableBody = document.querySelector(
     "#roundTripResultsTable tbody"
@@ -1348,6 +1451,9 @@ function displayRoundTripProfits(roundTripProfitsList) {
 
     resultsTableBody.appendChild(row);
   });
+
+  // クリックイベントリスナーを追加
+  addRowClickListeners();
 
   console.log("=== 往復利益期待値リスト ===", roundTripProfitsList);
 }
