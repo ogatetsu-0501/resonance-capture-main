@@ -4,12 +4,12 @@
   "total_r_num": 431
  }, 
  "bdhu": "", 
- "server_now": 1735305052, 
+ "server_now": 1735305954, 
  "resources_version": 143, 
  "stations": {
   "83000017": {
    "is_first": 0, 
-   "r_num": 0, 
+   "rc_num": 0, 
    "b_num": 0, 
    "drive_num": 0, 
    "construction": [
@@ -22,7 +22,7 @@
      "proportion": 0
     }
    ], 
-   "rc_num": 0, 
+   "r_num": 0, 
    "leaflet_location": [
     "80302550"
    ], 
@@ -139,7 +139,7 @@
   }, 
   "mail_status": 0, 
   "friend_cnt": 1, 
-  "move_energy_time": 1735305052, 
+  "move_energy_time": 1735305954, 
   "CNY": 8100.0, 
   "role_name": "reyfine", 
   "give_like_list": [], 
@@ -157,7 +157,7 @@
   "newbie_step": 353, 
   "gender": 0, 
   "subarea": "1", 
-  "energy_upd_time": 1735305052, 
+  "energy_upd_time": 1735305954, 
   "exp": 374, 
   "friend_ss": 0, 
   "space_info": {
@@ -207,93 +207,93 @@
  "goods_price": {
   "sell_price": {
    "84702533": {
-    "not_num": 3, 
+    "not_num": 4, 
     "trend": -1, 
     "price": 559, 
-    "ti": 1735302601, 
-    "quota": 0.93, 
-    "trade_num": 4290, 
     "is_rise": 0, 
+    "quota": 0.93, 
+    "trade_num": 6582, 
+    "ti": 1735302601, 
     "stock": 1440
    }, 
    "84702532": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": 1, 
     "price": 701, 
-    "is_rise": 0, 
-    "quota": 1.0, 
-    "trade_num": 6517, 
     "ti": 1735302001, 
+    "quota": 1.0, 
+    "trade_num": 7889, 
+    "is_rise": 0, 
     "stock": 1280
    }, 
    "84702537": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": 1, 
     "price": 201, 
-    "is_rise": 0, 
-    "quota": 1.0, 
-    "trade_num": 3359, 
     "ti": 1735302001, 
+    "quota": 1.0, 
+    "trade_num": 4104, 
+    "is_rise": 0, 
     "stock": 1760
    }, 
    "84702536": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": -1, 
     "price": 321, 
-    "is_rise": 0, 
-    "quota": 1.08, 
-    "trade_num": 3408, 
     "ti": 1735302001, 
+    "quota": 1.08, 
+    "trade_num": 4591, 
+    "is_rise": 0, 
     "stock": 1600
    }, 
    "84702535": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": 1, 
     "price": 316, 
-    "is_rise": 0, 
-    "quota": 1.05, 
-    "trade_num": 3513, 
     "ti": 1735302001, 
+    "quota": 1.05, 
+    "trade_num": 4610, 
+    "is_rise": 0, 
     "stock": 1600
    }, 
    "84702534": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": -1, 
     "price": 361, 
-    "is_rise": 0, 
-    "quota": 0.9, 
-    "trade_num": 6825, 
     "ti": 1735302001, 
+    "quota": 0.9, 
+    "trade_num": 9071, 
+    "is_rise": 0, 
     "stock": 1600
    }, 
    "84702539": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": 1, 
     "price": 107, 
-    "is_rise": 0, 
-    "quota": 1.08, 
-    "trade_num": 3014, 
     "ti": 1735302001, 
+    "quota": 1.08, 
+    "trade_num": 3861, 
+    "is_rise": 0, 
     "stock": 1800
    }, 
    "84702538": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": 1, 
     "price": 1020, 
-    "is_rise": 0, 
-    "quota": 1.2, 
-    "trade_num": 2997, 
     "ti": 1735302001, 
+    "quota": 1.2, 
+    "trade_num": 4248, 
+    "is_rise": 0, 
     "stock": 1120
    }, 
    "84702540": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": 1, 
     "price": 71, 
-    "is_rise": 0, 
-    "quota": 1.14, 
-    "trade_num": 1299, 
     "ti": 1735302001, 
+    "quota": 1.14, 
+    "trade_num": 1619, 
+    "is_rise": 0, 
     "stock": 2240
    }
   }, 
@@ -307,517 +307,1977 @@
    "11700027", 
    "11700186"
   ], 
-  "dev_degree": 666101.9943999994, 
+  "dev_degree": 666137.1763999994, 
   "buy_price": {
    "84702443": {
-    "not_num": 4, 
+    "not_num": 5, 
     "trend": -1, 
     "price": 2511, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 80, 
+    "is_rise": 0
+   }, 
+   "84702442": {
+    "not_num": 0, 
+    "trend": 1, 
+    "price": 3786, 
+    "ti": 1735305601, 
+    "quota": 1.15, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702441": {
+    "not_num": 2, 
+    "trend": 1, 
+    "price": 2409, 
+    "ti": 1735303802, 
+    "quota": 1.1, 
+    "is_rare": 0, 
+    "trade_num": 69, 
+    "is_rise": 0
+   }, 
+   "84702440": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 68, 
+    "ti": 1735302001, 
+    "quota": 0.93, 
+    "is_rare": 0, 
+    "trade_num": 950, 
+    "is_rise": 0
+   }, 
+   "84702447": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 600, 
+    "ti": 1735302001, 
+    "quota": 0.86, 
+    "is_rare": 0, 
+    "trade_num": 1096, 
+    "is_rise": 0
+   }, 
+   "84702446": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 916, 
+    "ti": 1735302001, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 262, 
+    "is_rise": 0
+   }, 
+   "84702445": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1243, 
+    "ti": 1735302001, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 532, 
+    "is_rise": 0
+   }, 
+   "84702444": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2034, 
+    "ti": 1735302001, 
+    "quota": 1.11, 
+    "is_rare": 0, 
+    "trade_num": 2358, 
+    "is_rise": 0
+   }, 
+   "84702449": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 71, 
+    "ti": 1735302001, 
+    "quota": 1.07, 
+    "is_rare": 0, 
+    "trade_num": 2987, 
+    "is_rise": 0
+   }, 
+   "84702448": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 420, 
+    "ti": 1735302001, 
+    "quota": 1.06, 
+    "is_rare": 0, 
+    "trade_num": 1185, 
+    "is_rise": 0
+   }, 
+   "84702569": {
+    "not_num": 2, 
+    "trend": 1, 
+    "price": 1746, 
+    "ti": 1735303802, 
+    "quota": 1.07, 
+    "is_rare": 0, 
+    "trade_num": 1383, 
+    "is_rise": 0
+   }, 
+   "84702523": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 7064, 
+    "ti": 1735302001, 
+    "quota": 0.87, 
+    "is_rare": 0, 
+    "trade_num": 9, 
+    "is_rise": 0
+   }, 
+   "84705559": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1034, 
     "is_rise": 0, 
     "quota": 1.01, 
     "is_rare": 0, 
-    "trade_num": 60, 
-    "ti": 1735302001
+    "trade_num": 0, 
+    "ti": 1735302601
    }, 
-   "84702442": {
+   "84702506": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 130, 
+    "ti": 1735302001, 
+    "quota": 0.8, 
+    "is_rare": 0, 
+    "trade_num": 102, 
+    "is_rise": 0
+   }, 
+   "84702519": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1923, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 1101, 
+    "is_rise": 0
+   }, 
+   "84702518": {
     "not_num": 5, 
     "trend": 1, 
-    "price": 3654, 
-    "is_rise": 0, 
-    "quota": 1.11, 
+    "price": 2252, 
+    "ti": 1735302001, 
+    "quota": 1.03, 
     "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735301402
+    "trade_num": 708, 
+    "is_rise": 0
    }, 
-   "84702441": {
-    "not_num": 1, 
-    "trend": 1, 
-    "price": 2409, 
-    "is_rise": 0, 
-    "quota": 1.1, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735303802
-   }, 
-   "84702440": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 68, 
-    "is_rise": 0, 
-    "quota": 0.93, 
-    "is_rare": 0, 
-    "trade_num": 618, 
-    "ti": 1735302001
-   }, 
-   "84702447": {
+   "84704533": {
     "not_num": 4, 
     "trend": -1, 
-    "price": 600, 
+    "price": 1, 
     "is_rise": 0, 
-    "quota": 0.86, 
+    "quota": 0.99, 
     "is_rare": 0, 
-    "trade_num": 820, 
-    "ti": 1735302001
+    "trade_num": 0, 
+    "ti": 1735302601
    }, 
-   "84702446": {
-    "not_num": 4, 
+   "84702511": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1056, 
+    "ti": 1735302001, 
+    "quota": 1.15, 
+    "is_rare": 0, 
+    "trade_num": 113, 
+    "is_rise": 0
+   }, 
+   "84702510": {
+    "not_num": 5, 
     "trend": -1, 
-    "price": 916, 
-    "is_rise": 0, 
+    "price": 1382, 
+    "ti": 1735302001, 
+    "quota": 0.87, 
+    "is_rare": 0, 
+    "trade_num": 211, 
+    "is_rise": 0
+   }, 
+   "84702513": {
+    "not_num": 3, 
+    "trend": 1, 
+    "price": 868, 
+    "ti": 1735303202, 
+    "quota": 1.36, 
+    "is_rare": 0, 
+    "trade_num": 40, 
+    "is_rise": 0
+   }, 
+   "84702512": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 819, 
+    "ti": 1735302001, 
     "quota": 1.08, 
     "is_rare": 0, 
-    "trade_num": 105, 
-    "ti": 1735302001
+    "trade_num": 255, 
+    "is_rise": 0
    }, 
-   "84702445": {
+   "84702515": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 9382, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 198, 
+    "is_rise": 0
+   }, 
+   "84702514": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 174, 
+    "ti": 1735302001, 
+    "quota": 0.87, 
+    "is_rare": 0, 
+    "trade_num": 74, 
+    "is_rise": 0
+   }, 
+   "84702517": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 4133, 
+    "ti": 1735302001, 
+    "quota": 0.87, 
+    "is_rare": 0, 
+    "trade_num": 572, 
+    "is_rise": 0
+   }, 
+   "84704542": {
     "not_num": 4, 
     "trend": -1, 
-    "price": 1243, 
+    "price": 1, 
     "is_rise": 0, 
     "quota": 0.97, 
     "is_rare": 0, 
-    "trade_num": 339, 
-    "ti": 1735302001
+    "trade_num": 0, 
+    "ti": 1735302601
    }, 
-   "84702444": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2034, 
-    "is_rise": 0, 
-    "quota": 1.11, 
+   "84702476": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 376, 
+    "ti": 1735302001, 
+    "quota": 1.05, 
     "is_rare": 0, 
-    "trade_num": 1526, 
-    "ti": 1735302001
+    "trade_num": 99, 
+    "is_rise": 0
    }, 
-   "84702449": {
-    "not_num": 4, 
+   "84702477": {
+    "not_num": 5, 
     "trend": 1, 
-    "price": 71, 
-    "is_rise": 0, 
-    "quota": 1.07, 
+    "price": 193, 
+    "ti": 1735302001, 
+    "quota": 0.96, 
     "is_rare": 0, 
-    "trade_num": 2151, 
-    "ti": 1735302001
+    "trade_num": 57, 
+    "is_rise": 0
    }, 
-   "84702448": {
-    "not_num": 4, 
+   "84702474": {
+    "not_num": 5, 
     "trend": 1, 
-    "price": 420, 
-    "is_rise": 0, 
+    "price": 1034, 
+    "ti": 1735302001, 
     "quota": 1.06, 
     "is_rare": 0, 
-    "trade_num": 797, 
-    "ti": 1735302001
+    "trade_num": 85, 
+    "is_rise": 0
    }, 
-   "84702569": {
-    "not_num": 1, 
+   "84702475": {
+    "not_num": 5, 
     "trend": 1, 
-    "price": 1746, 
-    "is_rise": 0, 
-    "quota": 1.07, 
+    "price": 858, 
+    "ti": 1735302001, 
+    "quota": 1.05, 
     "is_rare": 0, 
-    "trade_num": 560, 
-    "ti": 1735303802
+    "trade_num": 90, 
+    "is_rise": 0
    }, 
-   "84705045": {
+   "84702472": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1589, 
+    "ti": 1735302001, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 46, 
+    "is_rise": 0
+   }, 
+   "84702473": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 865, 
+    "ti": 1735302001, 
+    "quota": 0.94, 
+    "is_rare": 0, 
+    "trade_num": 50, 
+    "is_rise": 0
+   }, 
+   "84702470": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2330, 
+    "ti": 1735302001, 
+    "quota": 0.95, 
+    "is_rare": 0, 
+    "trade_num": 36, 
+    "is_rise": 0
+   }, 
+   "84702471": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2004, 
+    "ti": 1735302001, 
+    "quota": 1.16, 
+    "is_rare": 0, 
+    "trade_num": 122, 
+    "is_rise": 0
+   }, 
+   "84702436": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1055, 
+    "ti": 1735302001, 
+    "quota": 1.18, 
+    "is_rare": 0, 
+    "trade_num": 6481, 
+    "is_rise": 0
+   }, 
+   "84702478": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 8488, 
+    "ti": 1735302001, 
+    "quota": 1.04, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702479": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 5962, 
+    "ti": 1735302001, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 36, 
+    "is_rise": 0
+   }, 
+   "84704539": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702568": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 434, 
+    "ti": 1735302001, 
+    "quota": 0.85, 
+    "is_rare": 0, 
+    "trade_num": 1071, 
+    "is_rise": 0
+   }, 
+   "84705555": {
     "not_num": 4, 
     "trend": -1, 
+    "price": 2336, 
+    "is_rise": 0, 
+    "quota": 0.8, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705556": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1762, 
+    "is_rise": 0, 
+    "quota": 0.9, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705557": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1545, 
+    "is_rise": 0, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702564": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 3028, 
+    "ti": 1735302001, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84704530": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702566": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 2374, 
+    "ti": 1735302001, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84704532": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704535": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704534": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704537": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702563": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 3571, 
+    "ti": 1735302001, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702450": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 3600, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 39, 
+    "is_rise": 0
+   }, 
+   "84702565": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 2753, 
+    "ti": 1735302001, 
+    "quota": 1.0, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702452": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1110, 
+    "ti": 1735302001, 
+    "quota": 0.91, 
+    "is_rare": 0, 
+    "trade_num": 538, 
+    "is_rise": 0
+   }, 
+   "84702453": {
+    "not_num": 3, 
+    "trend": 1, 
+    "price": 1142, 
+    "ti": 1735303202, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 325, 
+    "is_rise": 0
+   }, 
+   "84705814": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 675, 
+    "is_rise": 0, 
+    "quota": 1.05, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702455": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 634, 
+    "ti": 1735302001, 
+    "quota": 1.04, 
+    "is_rare": 0, 
+    "trade_num": 410, 
+    "is_rise": 0
+   }, 
+   "84702456": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 475, 
+    "ti": 1735302001, 
+    "quota": 0.95, 
+    "is_rare": 0, 
+    "trade_num": 152, 
+    "is_rise": 0
+   }, 
+   "84702457": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 341, 
+    "ti": 1735302001, 
+    "quota": 0.92, 
+    "is_rare": 0, 
+    "trade_num": 1312, 
+    "is_rise": 0
+   }, 
+   "84704540": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704541": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702571": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 3002, 
+    "ti": 1735302001, 
+    "quota": 0.92, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702570": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 477, 
+    "ti": 1735302001, 
+    "quota": 0.93, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84705070": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 2455, 
+    "is_rise": 0, 
+    "quota": 0.88, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702494": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2271, 
+    "ti": 1735302001, 
+    "quota": 0.9, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702495": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1912, 
+    "ti": 1735302001, 
+    "quota": 0.93, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702496": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1541, 
+    "ti": 1735302001, 
+    "quota": 1.05, 
+    "is_rare": 0, 
+    "trade_num": 55, 
+    "is_rise": 0
+   }, 
+   "84702497": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1517, 
+    "ti": 1735302001, 
+    "quota": 1.2, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702490": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 8929, 
+    "ti": 1735302001, 
+    "quota": 1.13, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702491": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 4262, 
+    "ti": 1735302001, 
+    "quota": 0.8, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702492": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 5843, 
+    "ti": 1735302001, 
+    "quota": 1.04, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702493": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 4502, 
+    "ti": 1735302001, 
+    "quota": 0.93, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702498": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 905, 
+    "ti": 1735302001, 
+    "quota": 0.88, 
+    "is_rare": 0, 
+    "trade_num": 278, 
+    "is_rise": 0
+   }, 
+   "84702499": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 460, 
+    "ti": 1735302001, 
+    "quota": 0.94, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702567": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 208, 
+    "ti": 1735302001, 
+    "quota": 1.02, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702560": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 3008, 
+    "ti": 1735302001, 
+    "quota": 1.18, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702561": {
+    "not_num": 3, 
+    "trend": 1, 
+    "price": 1049, 
+    "ti": 1735303202, 
+    "quota": 1.13, 
+    "is_rare": 0, 
+    "trade_num": 736, 
+    "is_rise": 0
+   }, 
+   "84702469": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 4361, 
+    "ti": 1735302001, 
+    "quota": 1.19, 
+    "is_rare": 0, 
+    "trade_num": 59, 
+    "is_rise": 0
+   }, 
+   "84702543": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 918, 
+    "ti": 1735302001, 
+    "quota": 1.02, 
+    "is_rare": 0, 
+    "trade_num": 408, 
+    "is_rise": 0
+   }, 
+   "84702540": {
+    "not_num": 0, 
+    "trend": 1, 
+    "price": 36, 
+    "ti": 1735302001, 
+    "quota": 0.57, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702541": {
+    "not_num": 3, 
+    "trend": -1, 
+    "price": 644, 
+    "ti": 1735303202, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 742, 
+    "is_rise": 0
+   }, 
+   "84702546": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2767, 
+    "ti": 1735302001, 
+    "quota": 1.18, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84705573": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 0.89, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705570": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702545": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2356, 
+    "ti": 1735302001, 
+    "quota": 0.85, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702461": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2470, 
+    "ti": 1735302001, 
+    "quota": 1.09, 
+    "is_rare": 0, 
+    "trade_num": 1347, 
+    "is_rise": 0
+   }, 
+   "84702460": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2691, 
+    "ti": 1735302001, 
+    "quota": 0.89, 
+    "is_rare": 0, 
+    "trade_num": 948, 
+    "is_rise": 0
+   }, 
+   "84702463": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 609, 
+    "ti": 1735302001, 
+    "quota": 0.93, 
+    "is_rare": 0, 
+    "trade_num": 1212, 
+    "is_rise": 0
+   }, 
+   "84704536": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702465": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 307, 
+    "ti": 1735302001, 
+    "quota": 1.09, 
+    "is_rare": 0, 
+    "trade_num": 876, 
+    "is_rise": 0
+   }, 
+   "84702464": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 579, 
+    "ti": 1735302001, 
+    "quota": 1.06, 
+    "is_rare": 0, 
+    "trade_num": 1208, 
+    "is_rise": 0
+   }, 
+   "84702467": {
+    "not_num": 1, 
+    "trend": 1, 
+    "price": 4495, 
+    "ti": 1735305001, 
+    "quota": 1.13, 
+    "is_rare": 0, 
+    "trade_num": 757, 
+    "is_rise": 0
+   }, 
+   "84702466": {
+    "not_num": 3, 
+    "trend": -1, 
+    "price": 6471, 
+    "is_rise": 0, 
+    "quota": 0.82, 
+    "is_rare": 0, 
+    "trade_num": 239, 
+    "ti": 1735303202
+   }, 
+   "84702520": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 882, 
+    "ti": 1735302001, 
+    "quota": 0.82, 
+    "is_rare": 0, 
+    "trade_num": 1356, 
+    "is_rise": 0
+   }, 
+   "84702521": {
+    "not_num": 3, 
+    "trend": 1, 
+    "price": 1003, 
+    "ti": 1735303202, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 1187, 
+    "is_rise": 0
+   }, 
+   "84702522": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 845, 
+    "ti": 1735302001, 
+    "quota": 1.15, 
+    "is_rare": 0, 
+    "trade_num": 3319, 
+    "is_rise": 0
+   }, 
+   "84705045": {
+    "not_num": 5, 
+    "trend": -1, 
     "price": 4309, 
+    "is_rise": 0, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302001
+   }, 
+   "84702524": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 4141, 
+    "ti": 1735302001, 
+    "quota": 0.85, 
+    "is_rare": 0, 
+    "trade_num": 23, 
+    "is_rise": 0
+   }, 
+   "84702525": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 4543, 
+    "ti": 1735302001, 
+    "quota": 1.1, 
+    "is_rare": 0, 
+    "trade_num": 311, 
+    "is_rise": 0
+   }, 
+   "84702526": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 3792, 
+    "ti": 1735302001, 
+    "quota": 1.11, 
+    "is_rare": 0, 
+    "trade_num": 261, 
+    "is_rise": 0
+   }, 
+   "84702527": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 2521, 
+    "ti": 1735302001, 
+    "quota": 0.82, 
+    "is_rare": 0, 
+    "trade_num": 174, 
+    "is_rise": 0
+   }, 
+   "84702528": {
+    "not_num": 3, 
+    "trend": -1, 
+    "price": 2085, 
+    "ti": 1735303202, 
+    "quota": 1.22, 
+    "is_rare": 0, 
+    "trade_num": 96, 
+    "is_rise": 0
+   }, 
+   "84702529": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1399, 
+    "ti": 1735302001, 
+    "quota": 1.11, 
+    "is_rare": 0, 
+    "trade_num": 67, 
+    "is_rise": 0
+   }, 
+   "84702487": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 347, 
+    "ti": 1735302001, 
+    "quota": 1.02, 
+    "is_rare": 0, 
+    "trade_num": 133, 
+    "is_rise": 0
+   }, 
+   "84702486": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 492, 
+    "ti": 1735302001, 
+    "quota": 1.12, 
+    "is_rare": 0, 
+    "trade_num": 119, 
+    "is_rise": 0
+   }, 
+   "84702485": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 466, 
+    "ti": 1735302001, 
+    "quota": 0.98, 
+    "is_rare": 0, 
+    "trade_num": 41, 
+    "is_rise": 0
+   }, 
+   "84702484": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 615, 
+    "ti": 1735302001, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 67, 
+    "is_rise": 0
+   }, 
+   "84702483": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1333, 
+    "ti": 1735302001, 
+    "quota": 1.1, 
+    "is_rare": 0, 
+    "trade_num": 106, 
+    "is_rise": 0
+   }, 
+   "84702482": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1649, 
+    "ti": 1735302001, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 62, 
+    "is_rise": 0
+   }, 
+   "84702481": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2415, 
+    "ti": 1735302001, 
+    "quota": 0.98, 
+    "is_rare": 0, 
+    "trade_num": 36, 
+    "is_rise": 0
+   }, 
+   "84702480": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 3619, 
     "ti": 1735302001, 
     "quota": 1.08, 
     "is_rare": 0, 
     "trade_num": 0, 
     "is_rise": 0
    }, 
-   "84705559": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1034, 
-    "ti": 1735302601, 
-    "quota": 1.01, 
+   "84702502": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1929, 
+    "ti": 1735302001, 
+    "quota": 1.0, 
     "is_rare": 0, 
-    "trade_num": 0, 
+    "trade_num": 33, 
     "is_rise": 0
    }, 
-   "84702519": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1923, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 831, 
-    "ti": 1735302001
-   }, 
-   "84702518": {
-    "not_num": 4, 
+   "84702562": {
+    "not_num": 5, 
     "trend": 1, 
-    "price": 2252, 
-    "is_rise": 0, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 508, 
-    "ti": 1735302001
-   }, 
-   "84702431": {
-    "not_num": 2, 
-    "trend": -1, 
-    "price": 4289, 
-    "is_rise": 0, 
-    "quota": 1.17, 
-    "is_rare": 0, 
-    "trade_num": 27, 
-    "ti": 1735303202
-   }, 
-   "84704533": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702511": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1056, 
-    "is_rise": 0, 
-    "quota": 1.15, 
-    "is_rare": 0, 
-    "trade_num": 95, 
-    "ti": 1735302001
-   }, 
-   "84702510": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1382, 
-    "is_rise": 0, 
-    "quota": 0.87, 
-    "is_rare": 0, 
-    "trade_num": 28, 
-    "ti": 1735302001
-   }, 
-   "84702513": {
-    "not_num": 2, 
-    "trend": 1, 
-    "price": 868, 
-    "is_rise": 0, 
-    "quota": 1.36, 
-    "is_rare": 0, 
-    "trade_num": 28, 
-    "ti": 1735303202
-   }, 
-   "84702512": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 819, 
-    "is_rise": 0, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 235, 
-    "ti": 1735302001
-   }, 
-   "84702515": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 9382, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 162, 
-    "ti": 1735302001
-   }, 
-   "84702514": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 174, 
-    "is_rise": 0, 
-    "quota": 0.87, 
-    "is_rare": 0, 
-    "trade_num": 59, 
-    "ti": 1735302001
-   }, 
-   "84702517": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 4133, 
-    "is_rise": 0, 
-    "quota": 0.87, 
-    "is_rare": 0, 
-    "trade_num": 349, 
-    "ti": 1735302001
-   }, 
-   "84704542": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702476": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 376, 
-    "is_rise": 0, 
-    "quota": 1.05, 
-    "is_rare": 0, 
-    "trade_num": 82, 
-    "ti": 1735302001
-   }, 
-   "84702477": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 193, 
-    "is_rise": 0, 
-    "quota": 0.96, 
-    "is_rare": 0, 
-    "trade_num": 47, 
-    "ti": 1735302001
-   }, 
-   "84702474": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1034, 
-    "is_rise": 0, 
-    "quota": 1.06, 
-    "is_rare": 0, 
-    "trade_num": 68, 
-    "ti": 1735302001
-   }, 
-   "84702475": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 858, 
-    "is_rise": 0, 
-    "quota": 1.05, 
-    "is_rare": 0, 
-    "trade_num": 76, 
-    "ti": 1735302001
-   }, 
-   "84702472": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1589, 
-    "is_rise": 0, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 42, 
-    "ti": 1735302001
-   }, 
-   "84702473": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 865, 
-    "is_rise": 0, 
-    "quota": 0.94, 
-    "is_rare": 0, 
-    "trade_num": 42, 
-    "ti": 1735302001
-   }, 
-   "84702470": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2330, 
-    "is_rise": 0, 
-    "quota": 0.95, 
-    "is_rare": 0, 
-    "trade_num": 28, 
-    "ti": 1735302001
-   }, 
-   "84702471": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2004, 
-    "is_rise": 0, 
-    "quota": 1.16, 
-    "is_rare": 0, 
-    "trade_num": 107, 
-    "ti": 1735302001
-   }, 
-   "84702478": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 8488, 
-    "is_rise": 0, 
-    "quota": 1.04, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702479": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 5962, 
-    "is_rise": 0, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 30, 
-    "ti": 1735302001
-   }, 
-   "84704539": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704527": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 3536, 
-    "ti": 1735302601, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702568": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 434, 
-    "is_rise": 0, 
+    "price": 3034, 
+    "ti": 1735302001, 
     "quota": 0.85, 
     "is_rare": 0, 
-    "trade_num": 663, 
-    "ti": 1735302001
-   }, 
-   "84705555": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 2336, 
-    "ti": 1735302601, 
-    "quota": 0.8, 
-    "is_rare": 0, 
     "trade_num": 0, 
     "is_rise": 0
    }, 
-   "84705556": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1762, 
-    "ti": 1735302601, 
+   "84702489": {
+    "not_num": 2, 
+    "trend": 1, 
+    "price": 2234, 
+    "ti": 1735303802, 
     "quota": 0.9, 
     "is_rare": 0, 
     "trade_num": 0, 
     "is_rise": 0
    }, 
-   "84705557": {
-    "not_num": 3, 
+   "84702488": {
+    "not_num": 5, 
     "trend": 1, 
-    "price": 1545, 
-    "ti": 1735302601, 
+    "price": 145, 
+    "ti": 1735302001, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 327, 
+    "is_rise": 0
+   }, 
+   "84705569": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705568": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 0, 
+    "is_rise": 0, 
     "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702500": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1252, 
+    "ti": 1735302001, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 962, 
+    "is_rise": 0
+   }, 
+   "84705561": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 467, 
+    "is_rise": 0, 
+    "quota": 0.98, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705560": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 867, 
+    "is_rise": 0, 
+    "quota": 0.95, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705563": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1934, 
+    "is_rise": 0, 
+    "quota": 1.16, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705562": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 75, 
+    "is_rise": 0, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705565": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 677, 
+    "is_rise": 0, 
+    "quota": 0.83, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705564": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1248, 
+    "is_rise": 0, 
+    "quota": 1.02, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84705566": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1056, 
+    "is_rise": 0, 
+    "quota": 1.15, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702555": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 4997, 
+    "ti": 1735302001, 
+    "quota": 0.98, 
     "is_rare": 0, 
     "trade_num": 0, 
     "is_rise": 0
    }, 
-   "84702564": {
+   "84702554": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 3671, 
+    "ti": 1735302001, 
+    "quota": 0.9, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702557": {
     "not_num": 4, 
     "trend": -1, 
-    "price": 3028, 
+    "price": 1192, 
+    "is_rise": 0, 
+    "quota": 0.86, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702556": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1604, 
+    "ti": 1735302001, 
+    "quota": 0.9, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702551": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 76, 
+    "ti": 1735302001, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702550": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 191, 
+    "ti": 1735302001, 
+    "quota": 0.98, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702553": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 3194, 
+    "ti": 1735302001, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702552": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1631, 
+    "ti": 1735302001, 
+    "quota": 0.8, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702414": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1986, 
+    "ti": 1735302001, 
+    "quota": 0.93, 
+    "is_rare": 0, 
+    "trade_num": 409, 
+    "is_rise": 0
+   }, 
+   "84702418": {
+    "not_num": 3, 
+    "trend": 1, 
+    "price": 472, 
+    "ti": 1735303202, 
+    "quota": 1.29, 
+    "is_rare": 0, 
+    "trade_num": 365, 
+    "is_rise": 0
+   }, 
+   "84702416": {
+    "not_num": 3, 
+    "trend": 1, 
+    "price": 946, 
+    "ti": 1735303202, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 366, 
+    "is_rise": 0
+   }, 
+   "84702417": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 683, 
+    "ti": 1735302001, 
+    "quota": 1.05, 
+    "is_rare": 0, 
+    "trade_num": 1741, 
+    "is_rise": 0
+   }, 
+   "84702410": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 153, 
+    "ti": 1735302001, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 757, 
+    "is_rise": 0
+   }, 
+   "84702411": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 106, 
+    "ti": 1735302001, 
+    "quota": 0.93, 
+    "is_rare": 0, 
+    "trade_num": 510, 
+    "is_rise": 0
+   }, 
+   "84702412": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 8866, 
+    "ti": 1735302001, 
+    "quota": 1.06, 
+    "is_rare": 0, 
+    "trade_num": 24, 
+    "is_rise": 0
+   }, 
+   "84702413": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 4619, 
+    "ti": 1735302001, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 18, 
+    "is_rise": 0
+   }, 
+   "84702533": {
+    "not_num": 0, 
+    "trend": -1, 
+    "price": 280, 
+    "is_rise": 0, 
+    "quota": 0.47, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702532": {
+    "not_num": 0, 
+    "trend": 1, 
+    "price": 351, 
+    "ti": 1735302001, 
+    "quota": 0.5, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702531": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 899, 
+    "ti": 1735302001, 
+    "quota": 1.07, 
+    "is_rare": 0, 
+    "trade_num": 109, 
+    "is_rise": 0
+   }, 
+   "84702530": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1099, 
+    "ti": 1735302001, 
+    "quota": 1.09, 
+    "is_rare": 0, 
+    "trade_num": 111, 
+    "is_rise": 0
+   }, 
+   "84702537": {
+    "not_num": 0, 
+    "trend": 1, 
+    "price": 101, 
+    "ti": 1735302001, 
+    "quota": 0.5, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702419": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 3840, 
+    "ti": 1735302001, 
+    "quota": 0.96, 
+    "is_rare": 0, 
+    "trade_num": 110, 
+    "is_rise": 0
+   }, 
+   "84702535": {
+    "not_num": 0, 
+    "trend": 1, 
+    "price": 158, 
+    "ti": 1735302001, 
+    "quota": 0.53, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702534": {
+    "not_num": 0, 
+    "trend": -1, 
+    "price": 181, 
+    "ti": 1735302001, 
+    "quota": 0.45, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702539": {
+    "not_num": 0, 
+    "trend": 1, 
+    "price": 54, 
+    "ti": 1735302001, 
+    "quota": 0.54, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702538": {
+    "not_num": 0, 
+    "trend": 1, 
+    "price": 510, 
+    "ti": 1735302001, 
+    "quota": 0.6, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702507": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 52, 
+    "ti": 1735302001, 
+    "quota": 0.95, 
+    "is_rare": 0, 
+    "trade_num": 230, 
+    "is_rise": 0
+   }, 
+   "84702544": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1801, 
+    "ti": 1735302001, 
+    "quota": 1.07, 
+    "is_rare": 0, 
+    "trade_num": 7, 
+    "is_rise": 0
+   }, 
+   "84702415": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1739, 
+    "ti": 1735302001, 
+    "quota": 1.11, 
+    "is_rare": 0, 
+    "trade_num": 648, 
+    "is_rise": 0
+   }, 
+   "84702451": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1898, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 61, 
+    "is_rise": 0
+   }, 
+   "84702559": {
+    "not_num": 2, 
+    "trend": 1, 
+    "price": 2227, 
+    "ti": 1735303802, 
+    "quota": 1.04, 
+    "is_rare": 0, 
+    "trade_num": 85, 
+    "is_rise": 0
+   }, 
+   "84702558": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1467, 
+    "ti": 1735302001, 
+    "quota": 1.14, 
+    "is_rare": 0, 
+    "trade_num": 444, 
+    "is_rise": 0
+   }, 
+   "84702409": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 242, 
+    "ti": 1735302001, 
+    "quota": 0.92, 
+    "is_rare": 0, 
+    "trade_num": 517, 
+    "is_rise": 0
+   }, 
+   "84702408": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 666, 
+    "ti": 1735302001, 
+    "quota": 1.16, 
+    "is_rare": 0, 
+    "trade_num": 1530, 
+    "is_rise": 0
+   }, 
+   "84702407": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1075, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 606, 
+    "is_rise": 0
+   }, 
+   "84702406": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 829, 
+    "ti": 1735302001, 
+    "quota": 0.89, 
+    "is_rare": 0, 
+    "trade_num": 436, 
+    "is_rise": 0
+   }, 
+   "84702405": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1247, 
+    "ti": 1735302001, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 496, 
+    "is_rise": 0
+   }, 
+   "84702404": {
+    "not_num": 2, 
+    "trend": 1, 
+    "price": 2094, 
+    "ti": 1735303802, 
+    "quota": 0.91, 
+    "is_rare": 0, 
+    "trade_num": 58, 
+    "is_rise": 0
+   }, 
+   "84702403": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2613, 
+    "ti": 1735302001, 
+    "quota": 0.9, 
+    "is_rare": 0, 
+    "trade_num": 337, 
+    "is_rise": 0
+   }, 
+   "84702402": {
+    "not_num": 2, 
+    "trend": 1, 
+    "price": 5676, 
+    "ti": 1735303802, 
+    "quota": 0.98, 
+    "is_rare": 0, 
+    "trade_num": 57, 
+    "is_rise": 0
+   }, 
+   "84704513": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 4048, 
+    "is_rise": 0, 
+    "quota": 0.92, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704512": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 8667, 
+    "is_rise": 0, 
+    "quota": 0.85, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702504": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 634, 
+    "ti": 1735302001, 
+    "quota": 0.84, 
+    "is_rare": 0, 
+    "trade_num": 48, 
+    "is_rise": 0
+   }, 
+   "84702505": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 546, 
+    "ti": 1735302001, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 53, 
+    "is_rise": 0
+   }, 
+   "84704517": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1292, 
     "is_rise": 0, 
     "quota": 0.99, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
+    "ti": 1735302601
    }, 
-   "84704530": {
-    "not_num": 3, 
+   "84704516": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 3201, 
+    "is_rise": 0, 
+    "quota": 1.06, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704515": {
+    "not_num": 4, 
     "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.97, 
+    "price": 4614, 
+    "is_rise": 0, 
+    "quota": 1.14, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702501": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 2667, 
+    "ti": 1735302001, 
+    "quota": 1.11, 
+    "is_rare": 0, 
+    "trade_num": 55, 
+    "is_rise": 0
+   }, 
+   "84704519": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 1447, 
+    "is_rise": 0, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704518": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 2369, 
+    "is_rise": 0, 
+    "quota": 1.04, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702508": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 3278, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 46, 
+    "is_rise": 0
+   }, 
+   "84702509": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 2202, 
+    "ti": 1735302001, 
+    "quota": 1.15, 
+    "is_rare": 0, 
+    "trade_num": 70, 
+    "is_rise": 0
+   }, 
+   "84704514": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1272, 
+    "is_rise": 0, 
+    "quota": 0.8, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702536": {
+    "not_num": 0, 
+    "trend": -1, 
+    "price": 161, 
+    "ti": 1735302001, 
+    "quota": 0.54, 
     "is_rare": 0, 
     "trade_num": 0, 
     "is_rise": 0
    }, 
-   "84702566": {
+   "84702542": {
     "not_num": 4, 
     "trend": -1, 
-    "price": 2374, 
+    "price": 851, 
+    "ti": 1735302601, 
+    "quota": 0.86, 
+    "is_rare": 0, 
+    "trade_num": 350, 
+    "is_rise": 0
+   }, 
+   "84702468": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 4226, 
+    "ti": 1735302001, 
+    "quota": 0.87, 
+    "is_rare": 0, 
+    "trade_num": 29, 
+    "is_rise": 0
+   }, 
+   "84702516": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 6861, 
+    "ti": 1735302001, 
+    "quota": 1.05, 
+    "is_rare": 0, 
+    "trade_num": 37, 
+    "is_rise": 0
+   }, 
+   "84705574": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 0.82, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702432": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 2277, 
+    "ti": 1735302001, 
+    "quota": 0.93, 
+    "is_rare": 0, 
+    "trade_num": 819, 
+    "is_rise": 0
+   }, 
+   "84702433": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1139, 
+    "ti": 1735302001, 
+    "quota": 0.96, 
+    "is_rare": 0, 
+    "trade_num": 730, 
+    "is_rise": 0
+   }, 
+   "84702430": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1957, 
+    "ti": 1735302001, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 84, 
+    "is_rise": 0
+   }, 
+   "84702431": {
+    "not_num": 3, 
+    "trend": -1, 
+    "price": 4289, 
+    "ti": 1735303202, 
+    "quota": 1.17, 
+    "is_rare": 0, 
+    "trade_num": 30, 
+    "is_rise": 0
+   }, 
+   "84705575": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702437": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 353, 
+    "ti": 1735302001, 
+    "quota": 0.89, 
+    "is_rare": 0, 
+    "trade_num": 1015, 
+    "is_rise": 0
+   }, 
+   "84702434": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1007, 
+    "ti": 1735302001, 
+    "quota": 1.12, 
+    "is_rare": 0, 
+    "trade_num": 520, 
+    "is_rise": 0
+   }, 
+   "84702435": {
+    "not_num": 3, 
+    "trend": 1, 
+    "price": 800, 
+    "ti": 1735303202, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 1481, 
+    "is_rise": 0
+   }, 
+   "84705572": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
     "is_rise": 0, 
     "quota": 0.97, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
+    "ti": 1735302601
    }, 
-   "84702567": {
-    "not_num": 4, 
+   "84702438": {
+    "not_num": 5, 
     "trend": -1, 
-    "price": 208, 
-    "is_rise": 0, 
-    "quota": 1.02, 
+    "price": 456, 
+    "ti": 1735302001, 
+    "quota": 0.98, 
     "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702560": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 3008, 
-    "is_rise": 0, 
-    "quota": 1.18, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702561": {
-    "not_num": 2, 
-    "trend": 1, 
-    "price": 1049, 
-    "is_rise": 0, 
-    "quota": 1.13, 
-    "is_rare": 0, 
-    "trade_num": 624, 
-    "ti": 1735303202
-   }, 
-   "84704537": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 0, 
+    "trade_num": 1229, 
     "is_rise": 0
    }, 
-   "84702563": {
+   "84702439": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 125, 
+    "ti": 1735302001, 
+    "quota": 1.05, 
+    "is_rare": 0, 
+    "trade_num": 1651, 
+    "is_rise": 0
+   }, 
+   "84702454": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 664, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 1172, 
+    "is_rise": 0
+   }, 
+   "84704531": {
     "not_num": 4, 
     "trend": 1, 
-    "price": 3571, 
+    "price": 1, 
     "is_rise": 0, 
     "quota": 1.03, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
+    "ti": 1735302601
+   }, 
+   "84702547": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1510, 
+    "ti": 1735302001, 
+    "quota": 0.85, 
+    "is_rare": 0, 
+    "trade_num": 33, 
+    "is_rise": 0
    }, 
    "84704526": {
-    "not_num": 3, 
+    "not_num": 4, 
     "trend": -1, 
     "price": 5720, 
-    "ti": 1735302601, 
+    "is_rise": 0, 
     "quota": 1.02, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "is_rise": 0
+    "ti": 1735302601
    }, 
-   "84702565": {
+   "84704527": {
     "not_num": 4, 
-    "trend": -1, 
-    "price": 2753, 
+    "trend": 1, 
+    "price": 3536, 
     "is_rise": 0, 
-    "quota": 1.0, 
+    "quota": 1.03, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
+    "ti": 1735302601
    }, 
    "84704524": {
     "not_num": 0, 
@@ -829,1714 +2289,254 @@
     "is_rise": 0
    }, 
    "84704525": {
-    "not_num": 3, 
+    "not_num": 4, 
     "trend": 1, 
     "price": 5507, 
-    "ti": 1735302601, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705814": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 675, 
-    "ti": 1735302601, 
-    "quota": 1.05, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704523": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 285, 
-    "ti": 1735302601, 
-    "quota": 1.06, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704520": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 454, 
-    "ti": 1735302601, 
-    "quota": 1.0, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704521": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 231, 
-    "ti": 1735302601, 
-    "quota": 1.05, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704540": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704541": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702571": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 3002, 
-    "is_rise": 0, 
-    "quota": 0.92, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702570": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 477, 
-    "is_rise": 0, 
-    "quota": 0.93, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84704513": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 4048, 
-    "ti": 1735302601, 
-    "quota": 0.92, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705070": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 2455, 
-    "ti": 1735302601, 
-    "quota": 0.88, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704522": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 437, 
-    "ti": 1735302601, 
-    "quota": 0.9, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702494": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2271, 
-    "is_rise": 0, 
-    "quota": 0.9, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702495": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1912, 
-    "is_rise": 0, 
-    "quota": 0.93, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702496": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1541, 
-    "is_rise": 0, 
-    "quota": 1.05, 
-    "is_rare": 0, 
-    "trade_num": 11, 
-    "ti": 1735302001
-   }, 
-   "84702497": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1517, 
-    "is_rise": 0, 
-    "quota": 1.2, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702490": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 8929, 
-    "is_rise": 0, 
-    "quota": 1.13, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702491": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 4262, 
-    "is_rise": 0, 
-    "quota": 0.8, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702492": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 5843, 
-    "is_rise": 0, 
-    "quota": 1.04, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702493": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 4502, 
-    "is_rise": 0, 
-    "quota": 0.93, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702498": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 905, 
-    "is_rise": 0, 
-    "quota": 0.88, 
-    "is_rare": 0, 
-    "trade_num": 278, 
-    "ti": 1735302001
-   }, 
-   "84702499": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 460, 
-    "is_rise": 0, 
-    "quota": 0.94, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84704512": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 8667, 
-    "ti": 1735302601, 
-    "quota": 0.85, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704532": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704535": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704534": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702469": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 4361, 
-    "is_rise": 0, 
-    "quota": 1.19, 
-    "is_rare": 0, 
-    "trade_num": 48, 
-    "ti": 1735302001
-   }, 
-   "84702543": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 918, 
-    "is_rise": 0, 
-    "quota": 1.02, 
-    "is_rare": 0, 
-    "trade_num": 408, 
-    "ti": 1735302001
-   }, 
-   "84702540": {
-    "not_num": 0, 
-    "trend": 1, 
-    "price": 36, 
-    "is_rise": 0, 
-    "quota": 0.57, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702541": {
-    "not_num": 2, 
-    "trend": -1, 
-    "price": 644, 
-    "is_rise": 0, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 446, 
-    "ti": 1735303202
-   }, 
-   "84702546": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2767, 
-    "is_rise": 0, 
-    "quota": 1.18, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84705573": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.89, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705570": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702545": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2356, 
-    "is_rise": 0, 
-    "quota": 0.85, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702461": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2470, 
-    "is_rise": 0, 
-    "quota": 1.09, 
-    "is_rare": 0, 
-    "trade_num": 673, 
-    "ti": 1735302001
-   }, 
-   "84702460": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2691, 
-    "is_rise": 0, 
-    "quota": 0.89, 
-    "is_rare": 0, 
-    "trade_num": 731, 
-    "ti": 1735302001
-   }, 
-   "84702463": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 609, 
-    "is_rise": 0, 
-    "quota": 0.93, 
-    "is_rare": 0, 
-    "trade_num": 1202, 
-    "ti": 1735302001
-   }, 
-   "84704536": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702465": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 307, 
-    "is_rise": 0, 
-    "quota": 1.09, 
-    "is_rare": 0, 
-    "trade_num": 664, 
-    "ti": 1735302001
-   }, 
-   "84702464": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 579, 
-    "is_rise": 0, 
-    "quota": 1.06, 
-    "is_rare": 0, 
-    "trade_num": 1081, 
-    "ti": 1735302001
-   }, 
-   "84702467": {
-    "not_num": 0, 
-    "trend": 1, 
-    "price": 4495, 
-    "is_rise": 0, 
-    "quota": 1.13, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735305001
-   }, 
-   "84702466": {
-    "not_num": 2, 
-    "trend": -1, 
-    "price": 6471, 
-    "ti": 1735303202, 
-    "quota": 0.82, 
-    "is_rare": 0, 
-    "trade_num": 200, 
-    "is_rise": 0
-   }, 
-   "84702520": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 882, 
-    "is_rise": 0, 
-    "quota": 0.82, 
-    "is_rare": 0, 
-    "trade_num": 913, 
-    "ti": 1735302001
-   }, 
-   "84702521": {
-    "not_num": 2, 
-    "trend": 1, 
-    "price": 1003, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 379, 
-    "ti": 1735303202
-   }, 
-   "84702522": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 845, 
-    "is_rise": 0, 
-    "quota": 1.15, 
-    "is_rare": 0, 
-    "trade_num": 2114, 
-    "ti": 1735302001
-   }, 
-   "84702523": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 7064, 
-    "is_rise": 0, 
-    "quota": 0.87, 
-    "is_rare": 0, 
-    "trade_num": 7, 
-    "ti": 1735302001
-   }, 
-   "84702524": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 4141, 
-    "is_rise": 0, 
-    "quota": 0.85, 
-    "is_rare": 0, 
-    "trade_num": 15, 
-    "ti": 1735302001
-   }, 
-   "84702525": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 4543, 
-    "is_rise": 0, 
-    "quota": 1.1, 
-    "is_rare": 0, 
-    "trade_num": 224, 
-    "ti": 1735302001
-   }, 
-   "84702526": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 3792, 
-    "is_rise": 0, 
-    "quota": 1.11, 
-    "is_rare": 0, 
-    "trade_num": 249, 
-    "ti": 1735302001
-   }, 
-   "84702527": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 2521, 
-    "is_rise": 0, 
-    "quota": 0.82, 
-    "is_rare": 0, 
-    "trade_num": 168, 
-    "ti": 1735302001
-   }, 
-   "84702528": {
-    "not_num": 2, 
-    "trend": -1, 
-    "price": 2085, 
-    "is_rise": 0, 
-    "quota": 1.22, 
-    "is_rare": 0, 
-    "trade_num": 86, 
-    "ti": 1735303202
-   }, 
-   "84702529": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1399, 
-    "is_rise": 0, 
-    "quota": 1.11, 
-    "is_rare": 0, 
-    "trade_num": 50, 
-    "ti": 1735302001
-   }, 
-   "84702487": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 347, 
-    "is_rise": 0, 
-    "quota": 1.02, 
-    "is_rare": 0, 
-    "trade_num": 113, 
-    "ti": 1735302001
-   }, 
-   "84702486": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 492, 
-    "is_rise": 0, 
-    "quota": 1.12, 
-    "is_rare": 0, 
-    "trade_num": 91, 
-    "ti": 1735302001
-   }, 
-   "84702485": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 466, 
-    "is_rise": 0, 
-    "quota": 0.98, 
-    "is_rare": 0, 
-    "trade_num": 35, 
-    "ti": 1735302001
-   }, 
-   "84702484": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 615, 
-    "is_rise": 0, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 55, 
-    "ti": 1735302001
-   }, 
-   "84702483": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1333, 
-    "is_rise": 0, 
-    "quota": 1.1, 
-    "is_rare": 0, 
-    "trade_num": 86, 
-    "ti": 1735302001
-   }, 
-   "84702482": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1649, 
-    "is_rise": 0, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 48, 
-    "ti": 1735302001
-   }, 
-   "84702481": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2415, 
-    "is_rise": 0, 
-    "quota": 0.98, 
-    "is_rare": 0, 
-    "trade_num": 34, 
-    "ti": 1735302001
-   }, 
-   "84702480": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 3619, 
     "is_rise": 0, 
     "quota": 1.08, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84704517": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1292, 
-    "ti": 1735302601, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702562": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 3034, 
-    "is_rise": 0, 
-    "quota": 0.85, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702489": {
-    "not_num": 1, 
-    "trend": 1, 
-    "price": 2234, 
-    "is_rise": 0, 
-    "quota": 0.9, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735303802
-   }, 
-   "84702488": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 145, 
-    "is_rise": 0, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 246, 
-    "ti": 1735302001
-   }, 
-   "84705569": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705568": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 0, 
-    "ti": 1735302601, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704515": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 4614, 
-    "ti": 1735302601, 
-    "quota": 1.14, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705561": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 467, 
-    "ti": 1735302601, 
-    "quota": 0.98, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705560": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 867, 
-    "ti": 1735302601, 
-    "quota": 0.95, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705563": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1934, 
-    "ti": 1735302601, 
-    "quota": 1.16, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705562": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 75, 
-    "ti": 1735302601, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705565": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 677, 
-    "ti": 1735302601, 
-    "quota": 0.83, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705564": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1248, 
-    "ti": 1735302601, 
-    "quota": 1.02, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84705566": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1056, 
-    "ti": 1735302601, 
-    "quota": 1.15, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702555": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 4997, 
-    "is_rise": 0, 
-    "quota": 0.98, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702554": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 3671, 
-    "is_rise": 0, 
-    "quota": 0.9, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702557": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1192, 
-    "ti": 1735302601, 
-    "quota": 0.86, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702556": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1604, 
-    "is_rise": 0, 
-    "quota": 0.9, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702551": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 76, 
-    "is_rise": 0, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702550": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 191, 
-    "is_rise": 0, 
-    "quota": 0.98, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702553": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 3194, 
-    "is_rise": 0, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702552": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1631, 
-    "is_rise": 0, 
-    "quota": 0.8, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702414": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1986, 
-    "is_rise": 0, 
-    "quota": 0.93, 
-    "is_rare": 0, 
-    "trade_num": 307, 
-    "ti": 1735302001
-   }, 
-   "84702418": {
-    "not_num": 2, 
-    "trend": 1, 
-    "price": 472, 
-    "is_rise": 0, 
-    "quota": 1.29, 
-    "is_rare": 0, 
-    "trade_num": 330, 
-    "ti": 1735303202
-   }, 
-   "84702416": {
-    "not_num": 2, 
-    "trend": 1, 
-    "price": 946, 
-    "is_rise": 0, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 268, 
-    "ti": 1735303202
-   }, 
-   "84702417": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 683, 
-    "is_rise": 0, 
-    "quota": 1.05, 
-    "is_rare": 0, 
-    "trade_num": 1623, 
-    "ti": 1735302001
-   }, 
-   "84702410": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 153, 
-    "is_rise": 0, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 563, 
-    "ti": 1735302001
-   }, 
-   "84702411": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 106, 
-    "is_rise": 0, 
-    "quota": 0.93, 
-    "is_rare": 0, 
-    "trade_num": 287, 
-    "ti": 1735302001
-   }, 
-   "84702412": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 8866, 
-    "is_rise": 0, 
-    "quota": 1.06, 
-    "is_rare": 0, 
-    "trade_num": 19, 
-    "ti": 1735302001
-   }, 
-   "84702413": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 4619, 
-    "is_rise": 0, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 14, 
-    "ti": 1735302001
-   }, 
-   "84702533": {
-    "not_num": 0, 
-    "trend": -1, 
-    "price": 280, 
-    "ti": 1735302601, 
-    "quota": 0.47, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702532": {
-    "not_num": 0, 
-    "trend": 1, 
-    "price": 351, 
-    "is_rise": 0, 
-    "quota": 0.5, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702531": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 899, 
-    "is_rise": 0, 
-    "quota": 1.07, 
-    "is_rare": 0, 
-    "trade_num": 101, 
-    "ti": 1735302001
-   }, 
-   "84702530": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1099, 
-    "is_rise": 0, 
-    "quota": 1.09, 
-    "is_rare": 0, 
-    "trade_num": 103, 
-    "ti": 1735302001
-   }, 
-   "84702537": {
-    "not_num": 0, 
-    "trend": 1, 
-    "price": 101, 
-    "is_rise": 0, 
-    "quota": 0.5, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702419": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 3840, 
-    "is_rise": 0, 
-    "quota": 0.96, 
-    "is_rare": 0, 
-    "trade_num": 105, 
-    "ti": 1735302001
-   }, 
-   "84702535": {
-    "not_num": 0, 
-    "trend": 1, 
-    "price": 158, 
-    "is_rise": 0, 
-    "quota": 0.53, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702534": {
-    "not_num": 0, 
-    "trend": -1, 
-    "price": 181, 
-    "is_rise": 0, 
-    "quota": 0.45, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702539": {
-    "not_num": 0, 
-    "trend": 1, 
-    "price": 54, 
-    "is_rise": 0, 
-    "quota": 0.54, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702538": {
-    "not_num": 0, 
-    "trend": 1, 
-    "price": 510, 
-    "is_rise": 0, 
-    "quota": 0.6, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84705558": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1413, 
-    "ti": 1735302601, 
-    "quota": 0.95, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702544": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1801, 
-    "is_rise": 0, 
-    "quota": 1.07, 
-    "is_rare": 0, 
-    "trade_num": 7, 
-    "ti": 1735302001
-   }, 
-   "84702415": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1739, 
-    "is_rise": 0, 
-    "quota": 1.11, 
-    "is_rare": 0, 
-    "trade_num": 503, 
-    "ti": 1735302001
-   }, 
-   "84702559": {
-    "not_num": 1, 
-    "trend": 1, 
-    "price": 2227, 
-    "is_rise": 0, 
-    "quota": 1.04, 
-    "is_rare": 0, 
-    "trade_num": 25, 
-    "ti": 1735303802
-   }, 
-   "84702558": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1467, 
-    "is_rise": 0, 
-    "quota": 1.14, 
-    "is_rare": 0, 
-    "trade_num": 444, 
-    "ti": 1735302001
-   }, 
-   "84702409": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 242, 
-    "is_rise": 0, 
-    "quota": 0.92, 
-    "is_rare": 0, 
-    "trade_num": 381, 
-    "ti": 1735302001
-   }, 
-   "84702408": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 666, 
-    "is_rise": 0, 
-    "quota": 1.16, 
-    "is_rare": 0, 
-    "trade_num": 884, 
-    "ti": 1735302001
-   }, 
-   "84702407": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1075, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 477, 
-    "ti": 1735302001
-   }, 
-   "84702406": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 829, 
-    "is_rise": 0, 
-    "quota": 0.89, 
-    "is_rare": 0, 
-    "trade_num": 340, 
-    "ti": 1735302001
-   }, 
-   "84702405": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1247, 
-    "is_rise": 0, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 429, 
-    "ti": 1735302001
-   }, 
-   "84702404": {
-    "not_num": 1, 
-    "trend": 1, 
-    "price": 2094, 
-    "is_rise": 0, 
-    "quota": 0.91, 
-    "is_rare": 0, 
-    "trade_num": 7, 
-    "ti": 1735303802
-   }, 
-   "84702403": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2613, 
-    "is_rise": 0, 
-    "quota": 0.9, 
-    "is_rare": 0, 
-    "trade_num": 334, 
-    "ti": 1735302001
-   }, 
-   "84702402": {
-    "not_num": 1, 
-    "trend": 1, 
-    "price": 5676, 
-    "is_rise": 0, 
-    "quota": 0.98, 
-    "is_rare": 0, 
-    "trade_num": 30, 
-    "ti": 1735303802
-   }, 
-   "84702506": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 130, 
-    "is_rise": 0, 
-    "quota": 0.8, 
-    "is_rare": 0, 
-    "trade_num": 73, 
-    "ti": 1735302001
-   }, 
-   "84702507": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 52, 
-    "is_rise": 0, 
-    "quota": 0.95, 
-    "is_rare": 0, 
-    "trade_num": 187, 
-    "ti": 1735302001
-   }, 
-   "84702504": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 634, 
-    "is_rise": 0, 
-    "quota": 0.84, 
-    "is_rare": 0, 
-    "trade_num": 41, 
-    "ti": 1735302001
-   }, 
-   "84702505": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 546, 
-    "is_rise": 0, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 44, 
-    "ti": 1735302001
-   }, 
-   "84702502": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1929, 
-    "is_rise": 0, 
-    "quota": 1.0, 
-    "is_rare": 0, 
-    "trade_num": 25, 
-    "ti": 1735302001
-   }, 
-   "84704516": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 3201, 
-    "ti": 1735302601, 
-    "quota": 1.06, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702500": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1252, 
-    "is_rise": 0, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 818, 
-    "ti": 1735302001
-   }, 
-   "84702501": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 2667, 
-    "is_rise": 0, 
-    "quota": 1.11, 
-    "is_rare": 0, 
-    "trade_num": 49, 
-    "ti": 1735302001
-   }, 
-   "84704519": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1447, 
-    "ti": 1735302601, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704518": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 2369, 
-    "ti": 1735302601, 
-    "quota": 1.04, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702508": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 3278, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 39, 
-    "ti": 1735302001
-   }, 
-   "84702509": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 2202, 
-    "is_rise": 0, 
-    "quota": 1.15, 
-    "is_rare": 0, 
-    "trade_num": 57, 
-    "ti": 1735302001
-   }, 
-   "84704514": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1272, 
-    "ti": 1735302601, 
-    "quota": 0.8, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702536": {
-    "not_num": 0, 
-    "trend": -1, 
-    "price": 161, 
-    "is_rise": 0, 
-    "quota": 0.54, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702542": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 851, 
-    "is_rise": 0, 
-    "quota": 0.86, 
-    "is_rare": 0, 
-    "trade_num": 344, 
     "ti": 1735302601
    }, 
-   "84702468": {
+   "84704522": {
     "not_num": 4, 
     "trend": -1, 
-    "price": 4226, 
-    "is_rise": 0, 
-    "quota": 0.87, 
-    "is_rare": 0, 
-    "trade_num": 24, 
-    "ti": 1735302001
-   }, 
-   "84702516": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 6861, 
-    "is_rise": 0, 
-    "quota": 1.05, 
-    "is_rare": 0, 
-    "trade_num": 26, 
-    "ti": 1735302001
-   }, 
-   "84705574": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.82, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702432": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 2277, 
-    "is_rise": 0, 
-    "quota": 0.93, 
-    "is_rare": 0, 
-    "trade_num": 650, 
-    "ti": 1735302001
-   }, 
-   "84702433": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1139, 
-    "is_rise": 0, 
-    "quota": 0.96, 
-    "is_rare": 0, 
-    "trade_num": 530, 
-    "ti": 1735302001
-   }, 
-   "84702430": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1957, 
-    "is_rise": 0, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 84, 
-    "ti": 1735302001
-   }, 
-   "84705575": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702436": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1055, 
-    "is_rise": 0, 
-    "quota": 1.18, 
-    "is_rare": 0, 
-    "trade_num": 3792, 
-    "ti": 1735302001
-   }, 
-   "84702437": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 353, 
-    "is_rise": 0, 
-    "quota": 0.89, 
-    "is_rare": 0, 
-    "trade_num": 783, 
-    "ti": 1735302001
-   }, 
-   "84702434": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1007, 
-    "is_rise": 0, 
-    "quota": 1.12, 
-    "is_rare": 0, 
-    "trade_num": 340, 
-    "ti": 1735302001
-   }, 
-   "84702435": {
-    "not_num": 2, 
-    "trend": 1, 
-    "price": 800, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 918, 
-    "ti": 1735303202
-   }, 
-   "84705572": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702438": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 456, 
-    "is_rise": 0, 
-    "quota": 0.98, 
-    "is_rare": 0, 
-    "trade_num": 1098, 
-    "ti": 1735302001
-   }, 
-   "84702439": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 125, 
-    "is_rise": 0, 
-    "quota": 1.05, 
-    "is_rare": 0, 
-    "trade_num": 1329, 
-    "ti": 1735302001
-   }, 
-   "84702547": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1510, 
-    "is_rise": 0, 
-    "quota": 0.85, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "ti": 1735302001
-   }, 
-   "84702450": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 3600, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 37, 
-    "ti": 1735302001
-   }, 
-   "84702451": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1898, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 50, 
-    "ti": 1735302001
-   }, 
-   "84702452": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 1110, 
-    "is_rise": 0, 
-    "quota": 0.91, 
-    "is_rare": 0, 
-    "trade_num": 244, 
-    "ti": 1735302001
-   }, 
-   "84702453": {
-    "not_num": 2, 
-    "trend": 1, 
-    "price": 1142, 
-    "is_rise": 0, 
-    "quota": 1.03, 
-    "is_rare": 0, 
-    "trade_num": 317, 
-    "ti": 1735303202
-   }, 
-   "84702454": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 664, 
-    "is_rise": 0, 
-    "quota": 1.01, 
-    "is_rare": 0, 
-    "trade_num": 798, 
-    "ti": 1735302001
-   }, 
-   "84702455": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 634, 
-    "is_rise": 0, 
-    "quota": 1.04, 
-    "is_rare": 0, 
-    "trade_num": 399, 
-    "ti": 1735302001
-   }, 
-   "84702456": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 475, 
-    "is_rise": 0, 
-    "quota": 0.95, 
-    "is_rare": 0, 
-    "trade_num": 144, 
-    "ti": 1735302001
-   }, 
-   "84702457": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 341, 
-    "is_rise": 0, 
-    "quota": 0.92, 
-    "is_rare": 0, 
-    "trade_num": 1203, 
-    "ti": 1735302001
-   }, 
-   "84702458": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 199, 
-    "is_rise": 0, 
-    "quota": 0.98, 
-    "is_rare": 0, 
-    "trade_num": 209, 
-    "ti": 1735302001
-   }, 
-   "84702459": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 29, 
-    "is_rise": 0, 
-    "quota": 0.89, 
-    "is_rare": 0, 
-    "trade_num": 246, 
-    "ti": 1735302001
-   }, 
-   "84705571": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 1.08, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704528": {
-    "not_num": 3, 
-    "trend": 1, 
-    "price": 4583, 
-    "ti": 1735302601, 
-    "quota": 1.07, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84704529": {
-    "not_num": 3, 
-    "trend": -1, 
-    "price": 1, 
-    "ti": 1735302601, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 0, 
-    "is_rise": 0
-   }, 
-   "84702503": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1475, 
-    "is_rise": 0, 
-    "quota": 1.2, 
-    "is_rare": 0, 
-    "trade_num": 50, 
-    "ti": 1735302001
-   }, 
-   "84702548": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 619, 
+    "price": 437, 
     "is_rise": 0, 
     "quota": 0.9, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
+    "ti": 1735302601
    }, 
-   "84702462": {
+   "84704523": {
     "not_num": 4, 
-    "trend": -1, 
-    "price": 1978, 
+    "trend": 1, 
+    "price": 285, 
     "is_rise": 0, 
-    "quota": 0.97, 
-    "is_rare": 0, 
-    "trade_num": 417, 
-    "ti": 1735302001
-   }, 
-   "84702549": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 258, 
-    "is_rise": 0, 
-    "quota": 1.03, 
+    "quota": 1.06, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
+    "ti": 1735302601
    }, 
-   "84702425": {
+   "84704520": {
     "not_num": 4, 
     "trend": -1, 
-    "price": 519, 
+    "price": 454, 
     "is_rise": 0, 
-    "quota": 1.04, 
+    "quota": 1.0, 
     "is_rare": 0, 
-    "trade_num": 239, 
-    "ti": 1735302001
+    "trade_num": 0, 
+    "ti": 1735302601
    }, 
-   "84702424": {
+   "84704521": {
     "not_num": 4, 
     "trend": -1, 
-    "price": 476, 
-    "is_rise": 0, 
-    "quota": 0.83, 
-    "is_rare": 0, 
-    "trade_num": 153, 
-    "ti": 1735302001
-   }, 
-   "84702427": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 284, 
-    "is_rise": 0, 
-    "quota": 0.99, 
-    "is_rare": 0, 
-    "trade_num": 120, 
-    "ti": 1735302001
-   }, 
-   "84702426": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 403, 
+    "price": 231, 
     "is_rise": 0, 
     "quota": 1.05, 
     "is_rare": 0, 
-    "trade_num": 380, 
-    "ti": 1735302001
-   }, 
-   "84702421": {
-    "not_num": 4, 
-    "trend": -1, 
-    "price": 2364, 
-    "is_rise": 0, 
-    "quota": 1.03, 
-    "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
+    "ti": 1735302601
    }, 
-   "84702420": {
-    "not_num": 4, 
+   "84702458": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 199, 
+    "ti": 1735302001, 
+    "quota": 0.98, 
+    "is_rare": 0, 
+    "trade_num": 223, 
+    "is_rise": 0
+   }, 
+   "84702459": {
+    "not_num": 5, 
     "trend": -1, 
-    "price": 2980, 
-    "is_rise": 0, 
-    "quota": 1.01, 
+    "price": 29, 
+    "ti": 1735302001, 
+    "quota": 0.89, 
     "is_rare": 0, 
-    "trade_num": 159, 
-    "ti": 1735302001
+    "trade_num": 306, 
+    "is_rise": 0
    }, 
-   "84702423": {
+   "84705571": {
     "not_num": 4, 
-    "trend": 1, 
-    "price": 1111, 
-    "is_rise": 0, 
-    "quota": 1.15, 
-    "is_rare": 0, 
-    "trade_num": 209, 
-    "ti": 1735302001
-   }, 
-   "84702422": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 1087, 
-    "is_rise": 0, 
-    "quota": 0.92, 
-    "is_rare": 0, 
-    "trade_num": 157, 
-    "ti": 1735302001
-   }, 
-   "84704531": {
-    "not_num": 3, 
     "trend": 1, 
     "price": 1, 
-    "ti": 1735302601, 
+    "is_rise": 0, 
+    "quota": 1.08, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704528": {
+    "not_num": 4, 
+    "trend": 1, 
+    "price": 4583, 
+    "is_rise": 0, 
+    "quota": 1.07, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84704529": {
+    "not_num": 4, 
+    "trend": -1, 
+    "price": 1, 
+    "is_rise": 0, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702503": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1475, 
+    "ti": 1735302001, 
+    "quota": 1.2, 
+    "is_rare": 0, 
+    "trade_num": 58, 
+    "is_rise": 0
+   }, 
+   "84702548": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 619, 
+    "ti": 1735302001, 
+    "quota": 0.9, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702462": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 1978, 
+    "ti": 1735302001, 
+    "quota": 0.97, 
+    "is_rare": 0, 
+    "trade_num": 427, 
+    "is_rise": 0
+   }, 
+   "84702549": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 258, 
+    "ti": 1735302001, 
     "quota": 1.03, 
     "is_rare": 0, 
     "trade_num": 0, 
     "is_rise": 0
    }, 
-   "84702429": {
-    "not_num": 4, 
-    "trend": 1, 
-    "price": 4740, 
-    "is_rise": 0, 
+   "84702425": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 519, 
+    "ti": 1735302001, 
+    "quota": 1.04, 
+    "is_rare": 0, 
+    "trade_num": 262, 
+    "is_rise": 0
+   }, 
+   "84702424": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 476, 
+    "ti": 1735302001, 
+    "quota": 0.83, 
+    "is_rare": 0, 
+    "trade_num": 164, 
+    "is_rise": 0
+   }, 
+   "84702427": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 284, 
+    "ti": 1735302001, 
+    "quota": 0.99, 
+    "is_rare": 0, 
+    "trade_num": 133, 
+    "is_rise": 0
+   }, 
+   "84702426": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 403, 
+    "ti": 1735302001, 
+    "quota": 1.05, 
+    "is_rare": 0, 
+    "trade_num": 410, 
+    "is_rise": 0
+   }, 
+   "84702421": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 2364, 
+    "ti": 1735302001, 
     "quota": 1.03, 
     "is_rare": 0, 
     "trade_num": 0, 
-    "ti": 1735302001
+    "is_rise": 0
    }, 
-   "84702428": {
+   "84702420": {
+    "not_num": 5, 
+    "trend": -1, 
+    "price": 2980, 
+    "ti": 1735302001, 
+    "quota": 1.01, 
+    "is_rare": 0, 
+    "trade_num": 165, 
+    "is_rise": 0
+   }, 
+   "84702423": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1111, 
+    "ti": 1735302001, 
+    "quota": 1.15, 
+    "is_rare": 0, 
+    "trade_num": 226, 
+    "is_rise": 0
+   }, 
+   "84702422": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 1087, 
+    "ti": 1735302001, 
+    "quota": 0.92, 
+    "is_rare": 0, 
+    "trade_num": 162, 
+    "is_rise": 0
+   }, 
+   "84705558": {
     "not_num": 4, 
     "trend": 1, 
-    "price": 10670, 
+    "price": 1413, 
     "is_rise": 0, 
-    "quota": 1.2, 
+    "quota": 0.95, 
     "is_rare": 0, 
-    "trade_num": 767, 
-    "ti": 1735302001
+    "trade_num": 0, 
+    "ti": 1735302601
+   }, 
+   "84702429": {
+    "not_num": 5, 
+    "trend": 1, 
+    "price": 4740, 
+    "ti": 1735302001, 
+    "quota": 1.03, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
+   }, 
+   "84702428": {
+    "not_num": 0, 
+    "trend": -1, 
+    "price": 10226, 
+    "ti": 1735305601, 
+    "quota": 1.15, 
+    "is_rare": 0, 
+    "trade_num": 0, 
+    "is_rise": 0
    }
   }
  }
